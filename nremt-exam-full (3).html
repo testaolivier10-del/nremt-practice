@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NREMT-EMT Practice Exam — 100 Questions, Timed</title>
+<meta name="description" content="Free 100-question NREMT-EMT practice exam with a 2-hour timer, pace tracker, and a missed-question review queue.">
+<style>
+  :root{
+    --navy:#122033;
+    --navy2:#1C3350;
+    --paper:#F4F5F3;
+    --white:#FFFFFF;
+    --accent:#C1502E;
+    --line:#DCE0DE;
+    --ink:#1A1F1D;
+    --muted:#5C645F;
+    --good:#2F7A4F;
+    --bad:#B0402A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Charter','Georgia',serif;
+    line-height:1.55;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
+  .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .top .tag{font-family:'SFMono-Regular','Menlo',monospace;font-size:12px;letter-spacing:0.03em;color:var(--accent);}
+  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+  .lede{color:var(--muted);font-size:15.5px;max-width:52ch;margin:0 0 24px;}
+  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
+  .site-nav a{color:var(--accent);text-decoration:none;}
+  .site-nav a:hover{text-decoration:underline;}
+  .backlink{font-size:13px;color:var(--muted);margin-bottom:18px;display:inline-block;}
+  .backlink a{color:var(--muted);}
+
+  .domain-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
+  .domain-list span{font-size:12px;padding:5px 10px;background:var(--white);border:1px solid var(--line);border-radius:20px;color:var(--muted);}
+
+  .exam-facts{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:18px 20px;
+    margin-bottom:28px;
+    font-size:14px;
+    color:var(--muted);
+  }
+  .exam-facts .row{display:flex;justify-content:space-between;padding:6px 0;}
+  .exam-facts .row span:last-child{font-family:'SFMono-Regular',monospace;color:var(--ink);}
+
+  .start-btn{width:100%;padding:15px;background:var(--navy);color:var(--white);border:none;border-radius:4px;font-family:inherit;font-size:16px;cursor:pointer;}
+  .difficulty-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .difficulty-row label{font-size:13px;color:var(--muted);flex-shrink:0;}
+  .difficulty-row select{
+    flex:1;padding:10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:13.5px;
+    background:var(--white);color:var(--ink);
+  }
+  .start-btn:hover{background:var(--navy2);}
+  .review-btn{
+    width:100%;padding:15px;background:var(--white);color:var(--navy);
+    border:1px solid var(--navy);border-radius:4px;font-family:inherit;font-size:16px;
+    cursor:pointer;margin-top:12px;
+    display:flex;justify-content:center;align-items:center;gap:8px;
+  }
+  .review-btn:hover{background:#EEF1F6;}
+  .review-btn:disabled{opacity:0.4;cursor:not-allowed;background:var(--white);color:var(--muted);border-color:var(--line);}
+  .review-btn .count{
+    background:var(--accent);color:var(--white);font-size:12px;font-family:'SFMono-Regular',monospace;
+    padding:2px 8px;border-radius:10px;
+  }
+  .best-score{margin-top:14px;font-size:13px;color:var(--muted);text-align:center;}
+  .domain-quiz-box{
+    margin-top:28px;padding:18px 20px;background:var(--white);border:1px solid var(--line);border-radius:6px;
+  }
+  .domain-quiz-title{font-size:13px;color:var(--muted);margin-bottom:12px;}
+  .domain-quiz-row{display:flex;gap:8px;margin-bottom:12px;}
+  .domain-quiz-row select{
+    flex:1;padding:10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:13.5px;
+    background:var(--paper);color:var(--ink);
+  }
+  .domain-btn{
+    width:100%;padding:12px;background:var(--paper);color:var(--ink);border:1px solid var(--navy);
+    border-radius:4px;font-family:inherit;font-size:14.5px;cursor:pointer;
+  }
+  .domain-btn:hover{background:#EEF1F6;}
+  .progress-toggle{
+    display:block;margin:14px auto 0;background:none;border:none;
+    font-family:'SFMono-Regular',monospace;font-size:12.5px;color:var(--muted);
+    cursor:pointer;text-decoration:underline;
+  }
+  .progress-panel{
+    margin-top:20px;padding:20px;background:var(--white);border:1px solid var(--line);border-radius:6px;
+  }
+  .progress-stats{
+    display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:14px;
+  }
+  .progress-stats b{color:var(--ink);font-family:'SFMono-Regular',monospace;}
+  .progress-chart{width:100%;height:auto;display:block;margin-bottom:14px;}
+  .progress-list{font-size:12.5px;color:var(--muted);}
+  .progress-list .p-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);}
+
+  #timerBar{
+    position:sticky;top:0;background:var(--paper);padding:14px 0 12px;margin:-40px -22px 20px;
+    padding-left:22px;padding-right:22px;border-bottom:1px solid var(--line);display:none;z-index:10;
+  }
+  .timer-row{display:flex;justify-content:space-between;align-items:center;font-family:'SFMono-Regular',monospace;font-size:13px;}
+  .timer-row .time-remaining{font-size:18px;font-weight:600;color:var(--navy);}
+  .timer-row .time-remaining.warn{color:var(--bad);}
+  .pace-line{font-size:11.5px;color:var(--muted);margin-top:4px;}
+  .pace-line.ahead{color:var(--good);}
+  .pace-line.behind{color:var(--bad);}
+  .practice-banner{
+    position:sticky;top:0;background:var(--paper);padding:14px 0 12px;margin:-40px -22px 20px;
+    padding-left:22px;padding-right:22px;border-bottom:1px solid var(--line);display:none;z-index:10;
+    font-size:13px;color:var(--accent);font-family:'SFMono-Regular',monospace;
+  }
+
+  #quizScreen{display:none;}
+  .exit-row{margin:4px 0 18px;}
+  .exit-link{
+    background:none;border:none;padding:0;cursor:pointer;
+    font-family:'SFMono-Regular','Menlo',monospace;font-size:12.5px;
+    color:var(--muted);
+  }
+  .exit-link:hover{color:var(--bad);}
+  .progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:12.5px;color:var(--muted);font-family:'SFMono-Regular',monospace;}
+  .progress-track{height:4px;background:var(--line);border-radius:2px;margin-bottom:28px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--accent);transition:width 0.2s;}
+  .q-domain{font-size:11.5px;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin-bottom:10px;}
+  .diff-badge{
+    display:inline-block;font-family:'SFMono-Regular',monospace;font-size:10px;
+    padding:2px 7px;border-radius:10px;margin-left:8px;text-transform:none;letter-spacing:0;
+  }
+  .diff-badge.easy{background:#E4F3E9;color:var(--good);}
+  .diff-badge.medium{background:#FBF0E9;color:var(--accent);}
+  .diff-badge.hard{background:#F8E6E1;color:var(--bad);}
+  .q-prompt{font-size:19px;margin-bottom:24px;line-height:1.5;}
+  .options{display:grid;gap:10px;margin-bottom:28px;}
+  .option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--white);border:1px solid var(--line);border-radius:5px;cursor:pointer;font-size:15.5px;}
+  .option:hover{border-color:var(--navy);}
+  .option.selected{border-color:var(--navy);background:#EEF1F6;}
+  .option .letter{font-family:'SFMono-Regular',monospace;font-weight:600;color:var(--muted);flex-shrink:0;}
+  .option.selected .letter{color:var(--navy);}
+  .nav-row{display:flex;gap:10px;}
+  .nav-row button{flex:1;padding:13px;border-radius:4px;font-family:inherit;font-size:14.5px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--ink);}
+  .nav-row button.primary{background:var(--navy);color:var(--white);border:none;}
+  .nav-row button:disabled{opacity:0.4;cursor:not-allowed;}
+  .jump-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:20px;max-height:80px;overflow-y:auto;}
+  .jump-btn{
+    width:26px;height:26px;font-size:10px;font-family:'SFMono-Regular',monospace;
+    border:1px solid var(--line);background:var(--white);border-radius:3px;cursor:pointer;
+    color:var(--muted);display:flex;align-items:center;justify-content:center;
+  }
+  .jump-btn.current{border-color:var(--navy);color:var(--navy);font-weight:600;}
+  .jump-btn.answered{background:#EEF1F6;}
+
+  .fc-card{
+    background:var(--white);border:1px solid var(--line);border-radius:8px;
+    min-height:220px;padding:26px 24px;margin-bottom:24px;cursor:pointer;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .fc-front{font-size:18px;line-height:1.5;}
+  .fc-back .answer{
+    font-size:17px;font-weight:600;color:var(--good);margin-bottom:12px;
+  }
+  .fc-back .explain{font-size:14.5px;color:var(--muted);line-height:1.6;}
+  .fc-hint{
+    text-align:center;font-size:11.5px;color:var(--muted);margin-top:16px;
+    font-family:'SFMono-Regular',monospace;
+  }
+
+  #resultsScreen{display:none;}
+  .score-card{background:var(--navy);color:var(--white);border-radius:6px;padding:30px 26px;margin-bottom:32px;}
+  .score-card .big{font-size:44px;font-weight:600;font-family:'SFMono-Regular',monospace;}
+  .score-card .sub{color:#B7C2CE;font-size:14px;margin-top:4px;}
+  .domain-breakdown{display:grid;gap:8px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.15);}
+  .domain-breakdown .row{display:flex;justify-content:space-between;font-size:13.5px;color:#D7DEE4;}
+  .review-item{background:var(--white);border:1px solid var(--line);border-radius:5px;padding:18px 20px;margin-bottom:14px;}
+  .review-item .r-domain{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:8px;}
+  .review-item .r-q{font-size:16px;margin-bottom:12px;}
+  .review-item .r-answer{font-size:14px;padding:8px 10px;border-radius:4px;margin-bottom:6px;}
+  .r-answer.correct{background:#E4F3E9;color:var(--good);}
+  .r-answer.incorrect{background:#F8E6E1;color:var(--bad);}
+  .r-explain{font-size:14px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
+  .retry-btn{width:100%;padding:14px;background:var(--navy);color:var(--white);border:none;border-radius:4px;font-family:inherit;font-size:15px;cursor:pointer;margin-top:10px;}
+  .filter-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .filter-row button{padding:8px 14px;border:1px solid var(--line);background:var(--white);border-radius:20px;font-family:inherit;font-size:12.5px;cursor:pointer;color:var(--muted);}
+  .filter-row button.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
+  .cleared-note{
+    background:#E4F3E9;color:var(--good);padding:14px 16px;border-radius:5px;font-size:14px;margin-bottom:20px;
+  }
+
+  .ad-slot{margin-top:36px;padding:18px;border:1px dashed var(--line);border-radius:4px;text-align:center;font-size:12px;color:#9AA19C;}
+  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="introScreen">
+    <div class="top"><span class="tag">FULL PRACTICE EXAM</span></div>
+    <div class="site-nav"><a href="study-plan.html">Study Plan</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a></div>
+    <h1>NREMT-EMT Practice Exam — 100 Questions</h1>
+    <p class="lede">A full-length practice exam matching the scale of the real NREMT-EMT cognitive exam. Each attempt randomly draws 100 questions from a 200-question pool — in the same domain proportions every time — so retaking it isn't just re-memorizing the same set. Includes a live 2-hour timer, pace tracker, and a review queue for questions you've missed.</p>
+
+    <div class="domain-list">
+      <span>Assessment</span>
+      <span>Airway &amp; Respiratory</span>
+      <span>Cardiac &amp; Medical</span>
+      <span>Trauma</span>
+      <span>OB/Pediatrics &amp; Special Populations</span>
+      <span>EMS Operations</span>
+    </div>
+
+    <div class="exam-facts">
+      <div class="row"><span>Questions per attempt</span><span>100 (randomized)</span></div>
+      <div class="row"><span>Total question pool</span><span>200</span></div>
+      <div class="row"><span>Time limit</span><span>2:00:00</span></div>
+      <div class="row"><span>Target pace</span><span>~72 sec/question</span></div>
+    </div>
+
+    <div class="difficulty-row">
+      <label for="difficultySelect">Difficulty</label>
+      <select id="difficultySelect">
+        <option value="all">All levels</option>
+        <option value="easy">Easy only</option>
+        <option value="medium">Medium only</option>
+        <option value="hard">Hard only</option>
+      </select>
+    </div>
+
+    <button class="start-btn" id="startBtn">Start Timed Exam</button>
+    <button class="review-btn" id="reviewBtn">
+      <span>Review Missed Questions</span>
+      <span class="count" id="missedCount">0</span>
+    </button>
+
+    <div class="domain-quiz-box">
+      <div class="domain-quiz-title">Or drill one domain</div>
+      <div class="domain-quiz-row">
+        <select id="domainSelect">
+          <option value="all">All Domains</option>
+          <option value="Assessment">Assessment</option>
+          <option value="Airway & Respiratory">Airway & Respiratory</option>
+          <option value="Cardiac & Medical">Cardiac & Medical</option>
+          <option value="Trauma">Trauma</option>
+          <option value="OB/Peds & Special Populations">OB/Peds &amp; Special Populations</option>
+          <option value="EMS Operations">EMS Operations</option>
+        </select>
+        <select id="domainLength">
+          <option value="10">10 questions</option>
+          <option value="20" selected>20 questions</option>
+          <option value="30">30 questions</option>
+        </select>
+      </div>
+      <div class="domain-quiz-row">
+        <button class="domain-btn" id="domainStartBtn">Start Domain Quiz</button>
+        <button class="domain-btn" id="flashcardBtn">Flashcard Review</button>
+      </div>
+    </div>
+    <div class="best-score" id="bestScoreLine"></div>
+    <button class="progress-toggle" id="progressToggle" style="display:none;">View progress &darr;</button>
+    <div class="progress-panel" id="progressPanel" style="display:none;"></div>
+  </div>
+
+  <div id="quizScreen">
+    <div id="timerBar">
+      <div class="timer-row">
+        <span>Time remaining</span>
+        <span class="time-remaining" id="timeRemaining">2:00:00</span>
+      </div>
+      <div class="pace-line" id="paceLine">—</div>
+    </div>
+    <div id="practiceBanner" class="practice-banner"></div>
+    <div class="exit-row"><button id="exitBtn" class="exit-link">&larr; Exit exam</button></div>
+
+    <div class="progress-row">
+      <span id="progressText">Question 1 of 100</span>
+      <span id="answeredText">0 answered</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:1%"></div></div>
+
+    <div class="q-domain" id="qDomain"></div>
+    <div class="q-prompt" id="qPrompt"></div>
+    <div class="options" id="qOptions"></div>
+
+    <div class="nav-row" style="margin-bottom:20px;">
+      <button id="prevBtn">Previous</button>
+      <button class="primary" id="nextBtn">Next</button>
+    </div>
+    <div class="jump-row" id="jumpRow"></div>
+    <div class="nav-row">
+      <button class="primary" id="submitBtn" style="background:var(--accent);">Submit Now</button>
+    </div>
+  </div>
+
+  <div id="flashcardScreen" style="display:none;">
+    <div class="exit-row"><button id="flashcardExitBtn" class="exit-link">&larr; Exit flashcards</button></div>
+    <div class="progress-row">
+      <span id="fcProgressText">Card 1 of 20</span>
+      <span id="fcDomain"></span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="fcProgressFill" style="width:5%"></div></div>
+
+    <div class="fc-card" id="fcCard">
+      <div class="fc-face fc-front" id="fcFront"></div>
+      <div class="fc-face fc-back" id="fcBack" style="display:none;"></div>
+      <div class="fc-hint">Tap the card to flip</div>
+    </div>
+
+    <div class="nav-row">
+      <button id="fcPrevBtn">Previous</button>
+      <button class="primary" id="fcNextBtn">Next</button>
+    </div>
+  </div>
+
+  <div id="resultsScreen">
+    <div class="score-card">
+      <div class="big" id="scoreBig">0/100</div>
+      <div class="sub" id="scoreSub">0% correct — completed in 0:00:00</div>
+      <div class="domain-breakdown" id="domainBreakdown"></div>
+    </div>
+    <div id="clearedNote" class="cleared-note" style="display:none;"></div>
+    <div class="filter-row">
+      <button class="active" data-filter="all">All</button>
+      <button data-filter="incorrect">Incorrect only</button>
+      <button data-filter="unanswered">Unanswered only</button>
+    </div>
+    <div id="reviewList"></div>
+    <button class="retry-btn" id="retryBtn">Back to Start</button>
+  </div>
+
+  <div class="ad-slot">Ad space — 300×250 or responsive unit</div>
+
+  <footer>
+    <p>These are original practice questions written to reflect standard EMT-B knowledge and the NREMT cognitive exam's blueprint domains. This is unofficial, independently created study material — not affiliated with, endorsed by, or sourced verbatim from the National Registry of EMTs or any specific publisher. The real NREMT-EMT exam is computer-adaptive (70–120 questions, up to 2 hours); this fixed 100-question-per-attempt, randomly-drawn timed format is designed to build stamina and pacing with some variation between attempts, not to replicate the adaptive algorithm. This tool supplements, and does not replace, your official course materials and instructor guidance. Your score, timing, and missed-question history are stored only in your own browser and aren't sent anywhere.</p>
+  </footer>
+</div>
+
+<script>
+const QUESTIONS = [{domain:"Assessment", diff:"medium", q:"You arrive on scene, BSI precautions are taken, and the scene is confirmed safe. What is the correct next step in the primary assessment?",
+   options:["Auscultate lung sounds bilaterally","Form a general impression of the patient","Obtain a full set of vital signs","Ask about the patient's current medications"],
+   correct:1, explain:"After scene safety and BSI, the primary assessment begins with forming a general impression (age, sex, distress level, obvious life threats) before moving to AVPU/LOC and the ABCs. Vital signs, medications, and detailed auscultation come later, in the secondary assessment."},
+  {domain:"Assessment", diff:"medium", q:"According to the NREMT Patient Assessment skill sheet, when should systematic bilateral lung auscultation be performed?",
+   options:["During the primary assessment, immediately after opening the airway","During the secondary assessment","Only if the patient is unresponsive","During scene size-up, before patient contact"],
+   correct:1, explain:"The primary assessment's breathing check is limited to rate, rhythm, and quality (observed and felt, not through a stethoscope). Full systematic bilateral auscultation is a secondary assessment step, not a primary one."},
+  {domain:"Assessment", diff:"medium", q:"A patient doesn't respond to your voice, but withdraws his arm when you apply a painful stimulus to his nail bed. What is his AVPU status?",
+   options:["Alert","Verbal","Pain","Unresponsive"],
+   correct:2, explain:"AVPU = Alert, Verbal, Pain, Unresponsive. Since he didn't respond to voice but did respond purposefully to a painful stimulus, he's classified at the \"Pain\" level."},
+  {domain:"Assessment", diff:"easy", q:"In the SAMPLE history mnemonic, what does the \"M\" stand for?",
+   options:["Medical history","Medications","Mechanism of injury","Mental status"],
+   correct:1, explain:"SAMPLE = Signs/Symptoms, Allergies, Medications, Pertinent past medical history, Last oral intake, Events leading up to the incident."},
+  {domain:"Assessment", diff:"hard", q:"A patient has an isolated ankle injury with no other apparent trauma, a normal mental status, and no significant mechanism of injury. What secondary assessment approach is most appropriate?",
+   options:["Rapid full-body trauma assessment","Focused assessment of the injured area","No secondary assessment is needed","A detailed head-to-toe exam, but only if the patient becomes unconscious"],
+   correct:1, explain:"A stable patient with an isolated injury and no significant MOI gets a focused assessment of that specific area, rather than the rapid full-body exam reserved for patients with a significant mechanism of injury or altered mental status."},
+  {domain:"Assessment", diff:"easy", q:"Which of the following is NOT one of the components of scene size-up?",
+   options:["BSI/standard precautions","Scene safety","Obtaining a SAMPLE history","Determining mechanism of injury/nature of illness"],
+   correct:2, explain:"Scene size-up covers BSI, scene safety, MOI/NOI, and determining number of patients/need for additional resources. SAMPLE history is gathered later, as part of patient assessment."},
+  {domain:"Assessment", diff:"hard", q:"During scene size-up, why is determining the number of patients important before beginning patient care?",
+   options:["It determines transport destination","It helps decide if additional resources are needed early","It's only relevant for billing purposes","It has no impact on your response"],
+   correct:1, explain:"Identifying the number of patients early lets you request additional units, ALS support, or activate a mass-casualty response before you're already committed to single-patient care."},
+  {domain:"Assessment", diff:"medium", q:"A patient's \"general impression,\" formed at the start of the primary assessment, is based primarily on:",
+   options:["Vital sign values","Age, sex, level of distress, and any obvious life threats visible on approach","The patient's SAMPLE history","Laboratory findings"],
+   correct:1, explain:"The general impression is a quick visual/observational read on approach — before hands-on assessment or vital signs are taken."},
+  {domain:"Assessment", diff:"easy", q:"The \"chief complaint\" refers to:",
+   options:["The EMT's assessment of the most serious problem","The specific reason, in the patient's own words, that they called for help","The mechanism of injury","The vital signs at time of arrival"],
+   correct:1, explain:"Chief complaint is the patient's own description of why they need help — distinct from the EMT's clinical impression, which may differ."},
+  {domain:"Assessment", diff:"medium", q:"The OPQRST mnemonic is primarily used to:",
+   options:["Assess a patient's pain or chief complaint in detail","Determine scene safety","Calculate a Glasgow Coma Scale score","Guide airway management"],
+   correct:0, explain:"OPQRST (Onset, Provocation/Palliation, Quality, Radiation, Severity, Time) is a structured way to characterize a symptom like pain in detail."},
+  {domain:"Assessment", diff:"medium", q:"How often should reassessment generally be performed on an unstable patient during transport?",
+   options:["Every 15 minutes","Every 5 minutes","Only once, at the start of transport","Only if the patient requests it"],
+   correct:1, explain:"Standard teaching is roughly every 5 minutes for unstable patients and every 15 minutes for stable patients, adjusted for the specific situation."},
+  {domain:"Assessment", diff:"medium", q:"A detailed physical exam (a more thorough head-to-toe exam performed after the rapid trauma or focused assessment) is typically performed:",
+   options:["Before scene size-up","En route to the hospital, time and condition permitting","Instead of the primary assessment","Only on patients who refuse care"],
+   correct:1, explain:"The detailed exam is a lower-priority, more thorough exam done during transport when time and the patient's condition allow, after higher-priority assessments and interventions."},
+  {domain:"Assessment", diff:"medium", q:"Which finding would most likely make a trauma patient a \"load and go\" (immediate transport) priority?",
+   options:["An isolated, closed forearm fracture with a normal mental status","Altered mental status with signs of poor perfusion","A minor laceration with controlled bleeding","A patient requesting to walk to the ambulance"],
+   correct:1, explain:"Altered mental status combined with signs of poor perfusion suggests a serious underlying problem (e.g., shock, significant head injury) that warrants rapid transport rather than prolonged on-scene care."},
+  {domain:"Assessment", diff:"medium", q:"When assessing a patient who is deaf or hard of hearing, which approach is most appropriate?",
+   options:["Speak loudly and slowly regardless of the patient's preference","Face the patient, ask their preferred communication method, and use written notes or an interpreter if needed","Avoid direct communication and rely only on family members","Assume the patient cannot understand any spoken language"],
+   correct:1, explain:"Asking the patient directly about their preferred communication method respects their autonomy and improves the accuracy of the history you gather."},
+  {domain:"Assessment", diff:"medium", q:"Which scenario would most clearly call for eye protection in addition to gloves?",
+   options:["Taking a blood pressure on a calm, cooperative patient","A patient who is actively vomiting or has arterial bleeding with potential for splashing","Applying a bandage to a dry, closed wound","Interviewing a patient about their medical history"],
+   correct:1, explain:"Situations with a realistic risk of splash or spray to the face (vomiting, spurting arterial bleeding) call for eye protection beyond standard gloves."},
+
+  {domain:"Airway & Respiratory", diff:"medium", q:"A conscious patient is breathing adequately but has an SpO2 of 88% with no signs of inadequate ventilation. What's the appropriate oxygen delivery method?",
+   options:["Nasal cannula at 2 LPM","Non-rebreather mask at 15 LPM","Bag-valve mask at 10–12 breaths/min","No supplemental oxygen is needed"],
+   correct:1, explain:"A patient who is breathing adequately but hypoxic needs high-concentration passive oxygen — a non-rebreather mask at 15 LPM — not assisted ventilation, which is reserved for inadequate breathing."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"Which finding indicates a patient needs assisted ventilation with a BVM, rather than just supplemental oxygen?",
+   options:["Respiratory rate of 18 with good tidal volume","Respiratory rate of 6 with shallow, irregular breaths","Mild wheezing with a rate of 20","A productive cough with a normal respiratory rate"],
+   correct:1, explain:"A rate of 6 with shallow, irregular breathing indicates inadequate breathing, which requires assisted ventilation, not just passive oxygen."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"When ventilating an apneic adult patient with a BVM and no advanced airway in place, what is the correct ventilation rate?",
+   options:["1 breath every 3–5 seconds (12–20/min)","1 breath every 6 seconds (about 10/min)","1 breath every 10 seconds (about 6/min)","As fast as possible until color improves"],
+   correct:1, explain:"Current guidance for an apneic adult without an advanced airway is 1 breath every 6 seconds, roughly 10 breaths per minute."},
+  {domain:"Airway & Respiratory", diff:"hard", q:"Which finding in a patient with respiratory distress is the strongest indicator of impending respiratory failure?",
+   options:["Loud wheezing heard on auscultation","Diminished or absent breath sounds with visible fatigue","Mild nasal flaring","A respiratory rate of 22"],
+   correct:1, explain:"Diminished or absent breath sounds combined with fatigue suggest the patient is losing the ability to move air at all — more ominous than loud wheezing, which at least means air is moving."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"What's true about cherry-red skin as a sign of carbon monoxide poisoning?",
+   options:["It's present in the vast majority of cases and is diagnostic on its own","It's an unreliable, often late sign that shouldn't be relied on to rule CO poisoning in or out","It appears immediately upon exposure, before any other symptoms","It's more common in mild poisoning than in severe poisoning"],
+   correct:1, explain:"Cherry-red skin is classically taught but is actually unreliable and often a late finding — suspect CO poisoning from scene clues and symptoms, not skin color alone."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"For a conscious adult with a severe (complete) airway obstruction, the recommended intervention is:",
+   options:["Back blows only","Abdominal thrusts (or chest thrusts if pregnant/obese) until the obstruction clears or the patient becomes unresponsive","Immediate needle cricothyrotomy","Have the patient lie down and wait"],
+   correct:1, explain:"Standard management for a conscious adult with a complete obstruction is abdominal thrusts (chest thrusts for pregnant or very obese patients), continued until the obstruction clears or the patient becomes unresponsive."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"A patient who is coughing forcefully and can still speak has:",
+   options:["A complete airway obstruction requiring immediate abdominal thrusts","A partial airway obstruction with adequate air exchange; encourage continued coughing","No airway involvement at all","A condition that always requires a jaw-thrust maneuver"],
+   correct:1, explain:"Forceful coughing and the ability to speak indicate adequate air exchange despite a partial obstruction — encourage continued coughing rather than intervening with thrusts, which are reserved for complete obstruction or failing air exchange."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"An oropharyngeal airway (OPA) should generally NOT be used in which patient?",
+   options:["An unresponsive patient with no gag reflex","A patient who is unresponsive but still has an intact gag reflex","An apneic patient being ventilated with a BVM","A patient in cardiac arrest"],
+   correct:1, explain:"An OPA is contraindicated in a patient with an intact gag reflex, due to the risk of triggering vomiting and aspiration. A nasopharyngeal airway may be better tolerated in that case."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"Which of the following is a relative contraindication for inserting a nasopharyngeal airway (NPA)?",
+   options:["A patient with a gag reflex","Suspected severe facial or skull fracture","An unresponsive patient","A patient who is apneic"],
+   correct:1, explain:"Significant facial or skull trauma raises concern for inadvertent placement into the cranial cavity, so an NPA is generally avoided or used with extreme caution in that situation."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"When suctioning an adult patient's airway, how long should a single suction attempt generally be limited to?",
+   options:["No more than about 15 seconds","Up to 60 seconds continuously","There is no time limit","Suction should never be interrupted once started"],
+   correct:0, explain:"Adult suctioning passes are generally limited to about 15 seconds to avoid worsening hypoxia; the limit is shorter for children and infants."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"When ventilating a patient with a BVM, what is the best indicator that ventilations are effective?",
+   options:["Loud gurgling sounds during ventilation","Visible, adequate chest rise with each breath","The bag feels completely empty after every squeeze","The patient's color does not matter as long as the bag is being squeezed"],
+   correct:1, explain:"Visible, adequate chest rise is the primary indicator of an effective ventilation — gurgling suggests airway obstruction or secretions needing suction."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"A conscious patient in respiratory distress from a suspected asthma exacerbation will typically be most comfortable in which position?",
+   options:["Supine, flat on the back","Sitting upright or leaning forward (tripod position)","Trendelenburg (head down)","Left lateral recumbent"],
+   correct:1, explain:"Patients in respiratory distress typically self-select an upright or tripod position because it allows better use of accessory breathing muscles."},
+  {domain:"Airway & Respiratory", diff:"hard", q:"Which condition can cause a falsely normal or elevated pulse oximetry reading despite the patient actually being hypoxic?",
+   options:["Carbon monoxide poisoning","A simple nosebleed","A twisted ankle","Mild anxiety"],
+   correct:0, explain:"Carbon monoxide binds hemoglobin in a way that standard pulse oximeters often can't distinguish from oxygen, producing a falsely reassuring high reading despite significant hypoxia."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"A pediatric patient with suspected epiglottitis is found sitting upright, leaning forward, drooling, and refusing to lie down. What is the most appropriate EMT action regarding positioning?",
+   options:["Force the child to lie flat for a better exam","Allow the child to remain in the position of comfort and avoid agitating them","Immediately attempt to visualize the airway with a tongue depressor","Have the child lie on their back with legs elevated"],
+   correct:1, explain:"Forcing repositioning or attempting to visualize the airway can trigger complete airway obstruction in suspected epiglottitis — keep the child calm and in their position of comfort, and transport promptly."},
+  {domain:"Airway & Respiratory", diff:"hard", q:"Which finding is most concerning for a developing tension pneumothorax in a trauma patient?",
+   options:["Mild shortness of breath with equal breath sounds","Worsening respiratory distress, absent breath sounds on one side, and tracheal deviation","A small, superficial laceration to the chest wall","A respiratory rate of 16 with no distress"],
+   correct:1, explain:"Worsening distress with unilateral absent breath sounds and tracheal deviation are hallmark late signs of a tension pneumothorax, a life-threatening emergency."},
+
+  {domain:"Cardiac & Medical", diff:"hard", q:"Which presentation is most consistent with hypoglycemia in a known diabetic patient?",
+   options:["Slow onset, warm/dry skin, fruity breath odor","Rapid onset, cool/clammy skin, altered mental status, possible combativeness","Kussmaul respirations with severe dehydration","A slow heart rate with high blood pressure"],
+   correct:1, explain:"Hypoglycemia classically develops rapidly, with cool/clammy skin and altered mental status from a sympathetic response — contrasted with the slower-onset, warm/dry presentation more typical of severe hyperglycemia/DKA."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"What is the primary mechanism causing altered mental status in a patient with diabetic ketoacidosis (severe hyperglycemia)?",
+   options:["Brain cells are starved of glucose because insulin isn't available to let it in","Osmotic water shifts, dehydration, and acidosis disrupting brain function","Excess insulin causing brain cells to swell","Elevated potassium directly impairing neuron function"],
+   correct:1, explain:"Brain cells use insulin-independent glucose transporters, so they aren't 'starved' the way it's sometimes taught. The real mechanism is osmotic water shifting out of brain cells, worsening dehydration, and the acidosis that develops in DKA."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Before assisting a patient with their own prescribed nitroglycerin, which of the following must be checked?",
+   options:["The patient's blood glucose level","That the patient's systolic blood pressure meets the required minimum (commonly cited around 100 mmHg)","That the patient's respiratory rate is normal","That the patient hasn't eaten in the last hour"],
+   correct:1, explain:"Nitroglycerin is a vasodilator and can cause a significant blood pressure drop, so a minimum systolic blood pressure threshold must be confirmed before administration."},
+  {domain:"Cardiac & Medical", diff:"easy", q:"Which three findings make up the Cincinnati Prehospital Stroke Scale?",
+   options:["Facial droop, arm drift, speech abnormality","Headache, nausea, vomiting","Pupil response, grip strength, gait","Blood pressure, heart rate, respiratory rate"],
+   correct:0, explain:"The Cincinnati scale checks facial droop, arm drift, and abnormal speech — any one abnormal finding is a positive screen suggestive of stroke."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"Which presentation in a patient with a known allergic exposure most strongly indicates anaphylaxis requiring epinephrine?",
+   options:["Localized hives with no other symptoms","Mild itching at the exposure site only","Widespread hives with respiratory distress and/or hypotension","A single episode of sneezing"],
+   correct:2, explain:"Anaphylaxis is defined by systemic involvement — widespread symptoms plus respiratory or cardiovascular compromise — not just a localized skin reaction."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"For adult CPR, the current recommended chest compression rate and depth are:",
+   options:["60–80 per minute, at least 1 inch deep","100–120 per minute, at least 2 inches deep","140–160 per minute, at least 3 inches deep","Rate doesn't matter as long as depth is adequate"],
+   correct:1, explain:"Current adult CPR guidance is a rate of 100–120 compressions per minute at a depth of at least 2 inches, allowing full chest recoil between compressions."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"For a single rescuer performing adult CPR (no advanced airway in place), the compression-to-ventilation ratio is:",
+   options:["15:2","30:2","5:1","Continuous compressions with no ventilations ever"],
+   correct:1, explain:"The standard single-rescuer adult CPR ratio without an advanced airway is 30 compressions to 2 ventilations."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"When using an AED, what should all rescuers do immediately before the device analyzes the rhythm?",
+   options:["Continue chest compressions during analysis","Stop touching the patient (\"clear\" the patient)","Begin rescue breathing","Check a pulse manually before the AED does"],
+   correct:1, explain:"Everyone must stop touching the patient during rhythm analysis and shock delivery, since motion or contact can interfere with accurate rhythm reading."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Which feature would most suggest a patient's chest pain is a myocardial infarction rather than stable angina?",
+   options:["Pain that resolves completely with rest within a few minutes","Pain that persists despite rest and/or the patient's prescribed nitroglycerin","Pain that only occurs during physical exertion and never at rest","Pain that has occurred identically many times before with the same resolution"],
+   correct:1, explain:"Stable angina typically resolves with rest or nitroglycerin; pain that persists despite both raises concern for an evolving MI rather than stable angina."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"Why is establishing the patient's \"last known well\" time critical in a suspected stroke?",
+   options:["It has no real clinical significance","Certain time-sensitive treatments depend heavily on how long the stroke has been occurring","It's only used for paperwork","It determines which hospital has visiting hours"],
+   correct:1, explain:"Time-sensitive stroke treatments (like clot-dissolving medication) have narrow eligibility windows, so an accurate last-known-well time can directly affect the patient's treatment options."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"After a generalized seizure ends, a patient is found confused, drowsy, and slow to respond. This is best described as:",
+   options:["A sign the seizure is still ongoing and requires immediate intervention","The postictal state, a normal recovery period following a seizure","A stroke that occurred during the seizure","Definitive proof of a fever-related seizure"],
+   correct:1, explain:"Confusion and drowsiness after a seizure ends is the expected postictal state, not a sign the seizure is continuing or evidence of a separate event."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"The primary EMT priorities during an active generalized seizure are:",
+   options:["Restraining the patient's limbs to stop the movements","Protecting the patient from injury and protecting/maintaining the airway once the seizure stops","Inserting an oral airway during the active seizure","Giving the patient food or water immediately"],
+   correct:1, explain:"During an active seizure, the priority is protecting the patient from injury (clearing the area, not restraining) and managing the airway once the seizure activity stops — inserting anything into the mouth during active convulsions risks injury."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Activated charcoal is generally most effective when given:",
+   options:["Several hours after ingestion of most substances","Relatively soon after ingestion of certain oral poisons, and per medical direction/protocol","For all types of poisoning regardless of substance or timing","Only for inhaled toxins"],
+   correct:1, explain:"Activated charcoal's effectiveness depends heavily on timing and the substance involved, and its use is guided by protocol/medical direction — it's not a universal poisoning treatment."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Which combination of findings should raise the EMT's suspicion for sepsis in a patient with a known infection?",
+   options:["Normal vital signs and full alertness","Fever or hypothermia, altered mental status, and signs of poor perfusion","A single episode of sneezing","A well-healed surgical scar"],
+   correct:1, explain:"Sepsis involves a systemic response to infection — fever or hypothermia, altered mentation, and signs of poor perfusion together are red flags warranting prompt recognition and transport."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"What is the EMT's role regarding a patient's abdominal pain in the field?",
+   options:["Determine the exact diagnosis before transport","Recognize signs of a serious problem and transport promptly, without needing to name the specific diagnosis","Delay transport until a diagnosis is confirmed","Give the patient food to see if symptoms improve"],
+   correct:1, explain:"EMTs aren't expected to diagnose the specific cause of abdominal pain — the priority is recognizing signs of serious illness (shock, peritonitis) and transporting promptly."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"When approaching a patient experiencing a behavioral/psychiatric emergency who is agitated but not immediately violent, the EMT should generally:",
+   options:["Use a loud, commanding tone to assert control","Speak calmly, maintain a safe distance, and avoid sudden movements","Physically restrain the patient immediately as a precaution","Ignore the patient's concerns to save time"],
+   correct:1, explain:"A calm approach, safe positioning, and avoiding sudden movements helps de-escalate rather than provoke an agitated patient."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"An epinephrine auto-injector is typically administered:",
+   options:["Into the lateral thigh, mid-way between the hip and knee","Into the abdomen","Into the forearm","Under the tongue"],
+   correct:0, explain:"Epinephrine auto-injectors are designed for intramuscular injection into the lateral thigh."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"When assessing a dialysis patient, why is it important to avoid taking a blood pressure on the arm with the dialysis fistula/graft?",
+   options:["It has no real clinical importance","It can damage the fistula or occlude blood flow needed for dialysis","It always gives a falsely low reading","It's only a comfort preference, not a medical concern"],
+   correct:1, explain:"Compressing a dialysis fistula/graft with a blood pressure cuff can damage this surgically created access point, which the patient depends on for dialysis."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"A patient with known sickle cell disease presenting with severe pain, particularly in the joints/long bones, is most likely experiencing:",
+   options:["A vaso-occlusive (sickle cell) pain crisis","A simple muscle strain","A normal, expected daily symptom requiring no evaluation","An allergic reaction"],
+   correct:0, explain:"Severe pain, often in the joints or long bones, is a hallmark of a vaso-occlusive sickle cell crisis and should be taken seriously, not dismissed as routine."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"A young, anxious patient presents with rapid breathing, tingling in the fingers, and dizziness, with no other findings. What must the EMT do before assuming this is simple hyperventilation syndrome?",
+   options:["Immediately have the patient breathe into a paper bag with no further assessment","Rule out other serious causes of rapid breathing through thorough assessment first","Ignore the symptoms since anxiety isn't a real medical concern","Withhold oxygen regardless of findings"],
+   correct:1, explain:"Rapid breathing has many serious causes (DKA, pulmonary embolism, cardiac issues) that must be considered and reasonably ruled out before attributing symptoms to anxiety alone."},
+
+  {domain:"Trauma", diff:"medium", q:"What is the current recommended first-line approach for severe, life-threatening external hemorrhage from an extremity?",
+   options:["Elevation of the limb above the heart","Direct pressure, with early tourniquet application for severe bleeding","Pressure points only, avoiding direct contact with the wound","A loosely wrapped bandage to avoid restricting circulation"],
+   correct:1, explain:"Current guidance favors direct pressure combined with early tourniquet use for severe, life-threatening extremity hemorrhage."},
+  {domain:"Trauma", diff:"hard", q:"A patient fell from a height of 15 feet and has an altered mental status. What secondary assessment approach is indicated?",
+   options:["Focused assessment of only the obviously injured area","Rapid, full-body trauma assessment","No assessment needed until transport begins","A detailed exam limited to the head only"],
+   correct:1, explain:"A significant mechanism of injury combined with altered mental status calls for a rapid, full-body trauma assessment."},
+  {domain:"Trauma", diff:"medium", q:"For a trauma patient with a suspected spinal injury who is not breathing adequately, what airway maneuver should be used to open the airway?",
+   options:["Head-tilt, chin-lift","Jaw-thrust maneuver","Sellick's maneuver (cricoid pressure)","No airway maneuver should be attempted"],
+   correct:1, explain:"The jaw-thrust opens the airway without extending the cervical spine, making it appropriate when spinal injury is suspected."},
+  {domain:"Trauma", diff:"hard", q:"What is the hallmark sign of a flail chest?",
+   options:["Paradoxical movement of a segment of the chest wall during breathing","Absent breath sounds on one side only","Bruising isolated to the sternum","Crepitus felt in the neck"],
+   correct:0, explain:"A flail segment moves opposite to the rest of the chest wall during breathing — paradoxical movement — due to multiple rib fractures in two or more places."},
+  {domain:"Trauma", diff:"medium", q:"Which of the following is typically an EARLY sign of shock (compensated stage), rather than a late sign?",
+   options:["Hypotension","Tachycardia with a normal or only slightly low blood pressure","Absent radial pulses","Unresponsiveness"],
+   correct:1, explain:"Compensated shock maintains blood pressure via tachycardia and vasoconstriction; hypotension, absent pulses, and unresponsiveness are later, decompensated findings."},
+  {domain:"Trauma", diff:"medium", q:"How should a completely amputated body part generally be managed and transported?",
+   options:["Packed directly in ice with no protective wrapping","Wrapped in a sterile dressing, placed in a plastic bag, and kept cool (not frozen) on ice","Left at the scene since reattachment is rarely attempted","Submerged directly in saline without any wrapping"],
+   correct:1, explain:"An amputated part is wrapped in sterile dressing, bagged, and kept cool on ice — direct contact with ice risks tissue damage from freezing."},
+  {domain:"Trauma", diff:"medium", q:"The general EMT approach to an impaled object (e.g., a knife left in a wound) is to:",
+   options:["Remove it immediately to control bleeding","Stabilize it in place with bulky dressings and leave removal to the hospital, with limited exceptions","Push it further in to \"seal\" the wound","Twist it to test how deep it goes"],
+   correct:1, explain:"Impaled objects are generally stabilized in place, not removed, since the object may be tamponading (limiting) bleeding. Exceptions exist, such as objects through the cheek or interfering with CPR/airway management."},
+  {domain:"Trauma", diff:"medium", q:"The initial management of an open (sucking) chest wound involves:",
+   options:["Leaving the wound completely uncovered","Applying an occlusive or vented chest seal dressing","Packing the wound tightly with gauze and no dressing","Applying a tourniquet around the chest"],
+   correct:1, explain:"An occlusive or vented chest seal dressing is used to seal the open wound and reduce the risk of air entering the pleural space with each breath."},
+  {domain:"Trauma", diff:"medium", q:"For an abdominal evisceration (organs protruding through a wound), the EMT should:",
+   options:["Push the organs back into the abdominal cavity","Cover the exposed organs with a moist, sterile dressing and not attempt to replace them","Leave the wound completely uncovered to \"air out\"","Apply a tourniquet above the wound"],
+   correct:1, explain:"Exposed organs are covered with a moist, sterile dressing to prevent drying and further contamination — never pushed back in."},
+  {domain:"Trauma", diff:"medium", q:"Using the adult \"rule of nines,\" approximately what percentage of total body surface area does one entire arm represent?",
+   options:["4.5%","9%","18%","36%"],
+   correct:1, explain:"In the adult rule of nines, each entire arm represents approximately 9% of total body surface area."},
+  {domain:"Trauma", diff:"medium", q:"When providing initial care for a thermal burn, cooling the burn with water is appropriate primarily to:",
+   options:["Stop the burning process and relieve pain, while avoiding hypothermia from excessive or prolonged cooling","Fully submerge large burns in ice water for as long as possible","Only be done in a hospital setting, never in the field","Cause vasodilation to increase blood flow to the area"],
+   correct:0, explain:"Cooling stops the burning process and helps with pain, but excessive cooling — especially of large burns — risks hypothermia and must be balanced carefully."},
+  {domain:"Trauma", diff:"medium", q:"Rising blood pressure, decreasing heart rate, and irregular respirations in a head-injured patient (Cushing's triad) suggest:",
+   options:["The patient is stable and improving","Increasing intracranial pressure, a serious and worsening sign","A simple scalp laceration with no deeper injury","Normal compensatory shock response"],
+   correct:1, explain:"Cushing's triad is a late, ominous sign of rising intracranial pressure, not a sign of stability."},
+  {domain:"Trauma", diff:"medium", q:"Current EMS guidance on spinal motion restriction for trauma patients emphasizes:",
+   options:["Full spinal immobilization with a backboard for every trauma patient regardless of presentation","Selective spinal motion restriction based on assessment criteria, rather than backboarding every trauma patient","Never restricting spinal motion under any circumstances","Only restricting motion for patients who specifically request it"],
+   correct:1, explain:"Modern EMS protocols have shifted toward selective spinal motion restriction based on assessment findings, moving away from routine backboarding of every trauma patient."},
+  {domain:"Trauma", diff:"medium", q:"Applying a pelvic binder to a patient with a suspected unstable pelvic fracture is done primarily to:",
+   options:["Improve patient comfort only, with no effect on bleeding","Stabilize the pelvis and reduce internal hemorrhage by limiting further bone movement","Allow easier transport positioning","Replace the need for IV fluid resuscitation entirely"],
+   correct:1, explain:"A pelvic binder stabilizes an unstable pelvic fracture, helping reduce ongoing internal bleeding associated with pelvic bone movement."},
+  {domain:"Trauma", diff:"medium", q:"In a traumatic cardiac arrest, in addition to CPR, which intervention is a critical early priority if indicated?",
+   options:["Detailed head-to-toe exam before any other intervention","Controlling severe external hemorrhage and/or addressing a tension pneumothorax if suspected","Obtaining a full SAMPLE history from bystanders first","Delaying all interventions until arrival at the hospital"],
+   correct:1, explain:"Traumatic cardiac arrest often has a reversible cause — severe hemorrhage or tension pneumothorax — that must be addressed alongside CPR, since compressions alone won't fix the underlying problem."},
+  {domain:"Trauma", diff:"medium", q:"Which finding in a burn patient should raise the highest concern for airway involvement/inhalation injury?",
+   options:["A burn isolated to one hand","Singed nasal hair, soot around the mouth/nose, or a hoarse voice","A burn that occurred outdoors","A patient who is calm and asymptomatic"],
+   correct:1, explain:"Singed nasal/facial hair, soot around the airway, or voice changes are red flags for inhalation injury and potential airway swelling."},
+  {domain:"Trauma", diff:"medium", q:"Crush syndrome is a concern after prolonged entrapment/crush injury because:",
+   options:["It has no systemic effects beyond the injured limb","Toxins and potassium released from damaged muscle tissue can cause dangerous heart rhythm disturbances and kidney damage once the limb is freed","It only affects bone healing","It is purely a psychological condition"],
+   correct:1, explain:"When a crushed limb is released, toxins and potassium built up in the damaged tissue can enter circulation and cause life-threatening cardiac and renal complications."},
+  {domain:"Trauma", diff:"medium", q:"An avulsed (knocked-out) permanent tooth should ideally be:",
+   options:["Scrubbed clean with soap before storage","Handled by the crown (not the root) and placed in an appropriate storage medium such as milk or saline","Discarded, since reimplantation is never possible","Left dry and exposed to air for best preservation"],
+   correct:1, explain:"Handling by the crown protects the root structure, and storing in milk or saline (rather than letting it dry out) preserves the best chance of successful reimplantation."},
+  {domain:"Trauma", diff:"hard", q:"Why should EMTs generally avoid hyperventilating (over-ventilating) a patient with a traumatic brain injury?",
+   options:["It has no physiological effect","Excessive ventilation can lower CO2 levels and cause cerebral vasoconstriction, potentially worsening brain injury outcomes","It always improves oxygenation with no downside","It is required by all protocols regardless of injury type"],
+   correct:1, explain:"Over-ventilation lowers CO2, causing cerebral blood vessels to constrict — reducing blood flow to an already injured brain and potentially worsening outcomes."},
+  {domain:"Trauma", diff:"medium", q:"Which sign is considered an early, key warning sign of developing compartment syndrome in an injured limb?",
+   options:["Pain out of proportion to the apparent injury, especially with passive stretching","A normal, mild ache that resolves with rest","Warm, well-perfused skin with strong pulses and no complaints","Slight bruising with no pain"],
+   correct:0, explain:"Pain disproportionate to the visible injury, especially worsened by passive stretching of the affected muscles, is an early red flag for compartment syndrome."},
+
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"What is considered a normal heart rate for a healthy newborn immediately after birth?",
+   options:["40–60 bpm","Roughly 100–180 bpm (commonly cited around 120–160)","200–220 bpm","Less than 40 bpm"],
+   correct:1, explain:"A healthy newborn's normal heart rate is considerably faster than an adult's, generally in the range of about 100–180 bpm."},
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"The APGAR score evaluates a newborn's condition based on which five components?",
+   options:["Appearance, Pulse, Grimace, Activity, Respirations","Airway, Pulse, Glucose, Alertness, Reflexes","Appearance, Pain response, Gestational age, Activity, Respirations","Apnea, Pulse, Gag reflex, Alertness, Reflexes"],
+   correct:0, explain:"APGAR = Appearance (color), Pulse, Grimace (reflex irritability), Activity (muscle tone), and Respirations."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"For a newly born infant who is not breathing adequately, the first steps in resuscitation generally are:",
+   options:["Immediate chest compressions before anything else","Dry, warm, stimulate, and position/clear the airway, then reassess breathing","Immediate intubation","Skip assessment and start rescue breathing on all newborns automatically"],
+   correct:1, explain:"Initial newborn resuscitation starts with drying, warming, positioning/clearing the airway, and stimulating — then reassessing before escalating to ventilation or compressions."},
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"The Pediatric Assessment Triangle (PAT) evaluates which three components from across the room, before hands-on contact?",
+   options:["Appearance, work of breathing, circulation to skin","Blood pressure, pulse, respirations","SAMPLE history, OPQRST, vital signs","Weight, age, immunization status"],
+   correct:0, explain:"The PAT is a rapid, hands-off visual assessment of general appearance, work of breathing, and circulation (skin color/perfusion)."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Compared to adults, healthy children generally have:",
+   options:["Slower heart rates and slower respiratory rates","Faster heart rates and faster respiratory rates than adults","Identical vital sign ranges to adults at all ages","Lower blood pressure with a faster heart rate only after age 12"],
+   correct:1, explain:"Normal pediatric heart rates and respiratory rates run faster than adult norms, and these ranges shift with age."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Compared to adults, a child's airway is:",
+   options:["Proportionally larger and less prone to obstruction","Proportionally smaller, with a larger tongue relative to the mouth and a more anterior/higher larynx, making it more prone to obstruction","Structurally identical to an adult's in every way","Less flexible and more prone to fracture than an adult's"],
+   correct:1, explain:"Pediatric airway anatomy differs meaningfully from adult anatomy — a proportionally larger tongue and higher, more anterior larynx make children more prone to airway obstruction."},
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"A febrile seizure in a young child is generally defined as:",
+   options:["A seizure caused by a rapid rise in body temperature, most common in children roughly 6 months to 5 years old","A seizure that only occurs in adults with chronic fevers","A seizure unrelated to temperature in any way","A permanent neurological condition"],
+   correct:0, explain:"Febrile seizures are associated with rapid temperature rise and are most common in young children within a specific age range, generally around 6 months to 5 years."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Which finding in an infant should raise concern for possible abusive head trauma?",
+   options:["A clear, consistent history matching the type and severity of injury","A vague or inconsistent history that doesn't match the severity of the injury, or injuries inconsistent with the child's developmental stage","A minor bruise on the shin of a toddler who is learning to walk","Normal, age-appropriate behavior with no visible injury"],
+   correct:1, explain:"A mismatch between the reported history and the severity/pattern of injury, or an injury inconsistent with the child's developmental abilities, is a recognized red flag for abuse."},
+  {domain:"OB/Peds & Special Populations", diff:"hard", q:"Why should a pregnant patient in the third trimester generally avoid lying flat on her back for extended periods?",
+   options:["It has no physiological effect on a pregnant patient","The weight of the uterus can compress the inferior vena cava, reducing blood return to the heart and causing hypotension","It only affects fetal movement, not maternal circulation","It is purely a comfort preference with no medical basis"],
+   correct:1, explain:"Supine positioning late in pregnancy risks the uterus compressing the inferior vena cava, reducing venous return and causing maternal hypotension — this is why left-lateral positioning is often preferred."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"If the umbilical cord is visibly protruding from the vagina before delivery of the baby (prolapsed cord), the EMT should:",
+   options:["Attempt to push the cord back inside","Position the mother to relieve pressure on the cord, keep the cord moist, and transport immediately as a true emergency","Pull firmly on the cord to assist delivery","Ignore it and proceed with a normal delivery"],
+   correct:1, explain:"A prolapsed cord is a true obstetric emergency — position the mother to relieve pressure on the cord (such as knee-chest position), keep it moist, and transport immediately without attempting to reposition or pull the cord."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Elderly patients experiencing a myocardial infarction are more likely than younger patients to present with:",
+   options:["Classic, severe crushing chest pain in every case","Atypical symptoms such as shortness of breath, fatigue, or confusion, sometimes with little or no chest pain","No symptoms of any kind, ever","Symptoms that are always identical to younger patients"],
+   correct:1, explain:"Elderly patients more often present atypically — with vague symptoms like fatigue, confusion, or shortness of breath rather than classic chest pain — which can delay recognition."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Which finding should raise an EMT's suspicion for possible elder abuse or neglect?",
+   options:["A single, explained bruise consistent with a witnessed fall","Multiple injuries in various healing stages, poor hygiene, or a caregiver who won't allow the patient to speak privately","A clean, well-cared-for living environment","A patient who is fully alert and reports no concerns"],
+   correct:1, explain:"Multiple injuries at different healing stages, neglect indicators, or a caregiver preventing private conversation with the patient are recognized red flags for possible abuse or neglect."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"When caring for a patient with autism spectrum disorder, an EMT should generally:",
+   options:["Use a loud voice and rapid, complex sentences","Minimize sensory stimulation where possible, use clear/simple language, and allow extra time and patience","Assume the patient cannot understand anything being said","Physically restrain the patient immediately upon contact"],
+   correct:1, explain:"Reducing sensory overload, using clear and simple communication, and allowing extra time helps build trust and cooperation with an autistic patient."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"When planning to move and transport a bariatric (severely obese) patient, an important early EMT consideration is:",
+   options:["Assuming standard equipment and staffing will always be sufficient","Requesting additional resources/equipment (e.g., bariatric stretcher, extra personnel) proactively before attempting the move","Delaying any assessment until extra staff arrive, even if the patient is critical","It requires no different planning than any other patient"],
+   correct:1, explain:"Proactively requesting appropriate bariatric equipment and additional personnel reduces injury risk to both the patient and crew during movement and transport."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Which finding would be a concerning sign of significant dehydration in an infant?",
+   options:["A bulging fontanelle and excessive tearing","A sunken fontanelle, dry mucous membranes, and decreased urine output (fewer wet diapers)","Normal, moist mucous membranes","Frequent wet diapers with clear urine"],
+   correct:1, explain:"A sunken fontanelle, dry mucous membranes, and reduced wet diapers together are classic signs of significant dehydration in an infant."},
+
+  {domain:"EMS Operations", diff:"medium", q:"When positioning an ambulance at a motor vehicle collision on a roadway, a key safety principle is to:",
+   options:["Park as close to the wreckage as possible regardless of traffic flow","Position the ambulance to protect the scene from oncoming traffic when possible, and use appropriate warning devices","Never use hazard lights, as they distract other drivers","Block all lanes of traffic regardless of the situation"],
+   correct:1, explain:"Positioning the ambulance to help protect the scene and crew from oncoming traffic, along with proper warning devices, is a core scene-safety principle at roadway incidents."},
+  {domain:"EMS Operations", diff:"medium", q:"In a multiple-casualty incident, the first-arriving EMS unit's initial priority is generally to:",
+   options:["Begin immediate, detailed treatment of the first patient encountered","Perform a scene size-up, establish command, and request appropriate additional resources before becoming involved in single-patient care","Transport the most severely injured patient immediately, alone","Wait for all other units to arrive before doing anything"],
+   correct:1, explain:"The first unit's role in an MCI is typically to size up the scene, establish incident command, and call for adequate resources — getting tied up with one patient early can compromise the overall response."},
+  {domain:"EMS Operations", diff:"medium", q:"Basic START triage categorizes patients using which general framework?",
+   options:["Immediate, Delayed, Minor, Deceased/Expectant, based on ability to walk, breathing, perfusion, and mental status","Only two categories: alive or deceased","Based solely on the patient's age","Based solely on which patient asks for help first"],
+   correct:0, explain:"START triage rapidly sorts patients into Immediate, Delayed, Minor, or Deceased/Expectant categories using quick checks of mobility, breathing, perfusion, and mental status."},
+  {domain:"EMS Operations", diff:"medium", q:"During vehicle extrication, the EMT's general priority regarding patient care is to:",
+   options:["Wait until the patient is completely removed from the vehicle before any assessment or care begins","Gain access and begin necessary assessment/critical interventions as soon as safely possible, even before full extrication is complete","Never provide any care until the patient is on the stretcher","Always wait for the patient to self-extricate"],
+   correct:1, explain:"Once safe access is established, assessment and critical interventions should begin as early as possible rather than waiting for complete extrication."},
+  {domain:"EMS Operations", diff:"medium", q:"When arriving at a scene with a suspected hazardous materials release, the EMT's first priority is to:",
+   options:["Approach directly to assess for patients","Stage at a safe distance, avoid entering the hazard zone without proper training/equipment, and request appropriate specialized resources","Enter and begin patient care immediately regardless of the substance involved","Rely solely on smell to identify the hazard"],
+   correct:1, explain:"Without proper hazmat training and equipment, EMS should stage at a safe distance and request specialized resources rather than entering an unknown hazard zone."},
+  {domain:"EMS Operations", diff:"medium", q:"Which of the following is a recognized, normal acute stress reaction an EMT might experience after a difficult call?",
+   options:["Being completely unaffected is the only \"correct\" response","Symptoms such as difficulty sleeping, irritability, or intrusive thoughts, which may benefit from peer support or professional resources","These reactions mean the EMT is unfit for the job","These reactions should never be discussed with anyone"],
+   correct:1, explain:"Acute stress reactions like sleep disruption, irritability, or intrusive thoughts are recognized, normal responses to difficult calls, and seeking peer or professional support is appropriate."},
+  {domain:"EMS Operations", diff:"medium", q:"A primary purpose of the prehospital care report (PCR) is to:",
+   options:["Serve only as a formality with no real use","Provide an accurate legal and medical record of the call, supporting continuity of care and legal/QA review","Replace the need for verbal handoff at the hospital","Only be completed if the patient is transported"],
+   correct:1, explain:"The PCR is a legal medical document supporting patient care continuity, quality review, and legal accountability — it should be completed accurately regardless of whether transport occurs."},
+  {domain:"EMS Operations", diff:"medium", q:"For a competent adult patient to legally refuse care/transport, they generally must:",
+   options:["Simply say \"no\" with no further requirements","Be of legal age (or an emancipated minor), mentally competent, and be informed of the risks of refusing care","Have a family member sign on their behalf regardless of the patient's own wishes","Refusal is never legally valid under any circumstance"],
+   correct:1, explain:"Valid refusal generally requires legal capacity (age/emancipation), mental competence, and that the patient has been informed of the risks of refusing care."},
+  {domain:"EMS Operations", diff:"medium", q:"\"Implied consent\" in EMS generally applies to:",
+   options:["Every patient contact regardless of condition","An unresponsive or incapacitated patient who cannot give informed consent, assuming they would want life-saving treatment","Only pediatric patients","Only patients who have signed a written form in advance"],
+   correct:1, explain:"Implied consent assumes that a reasonable, incapacitated person would want emergency, life-saving treatment, allowing EMS to proceed without explicit consent in that situation."},
+  {domain:"EMS Operations", diff:"easy", q:"In EMS, \"abandonment\" refers to:",
+   options:["Terminating care of a patient without ensuring an equal or higher level of care continues, without the patient's consent","Any time a patient is transferred to a hospital","Refusing to accept a new call while already treating another patient","Following a valid refusal of care"],
+   correct:0, explain:"Abandonment specifically means stopping care without transferring to an equal or higher level of care and without the patient's consent — a properly handed-off patient or valid refusal isn't abandonment."},
+  {domain:"EMS Operations", diff:"medium", q:"For an EMT to be found legally negligent, which of the following must generally be demonstrated?",
+   options:["Duty to act, breach of that duty, damages, and causation connecting the breach to the damages","Only that the patient was unhappy with their care","Only that a mistake was made, regardless of harm","Negligence cannot apply to EMS providers under any circumstance"],
+   correct:0, explain:"Negligence generally requires showing all four elements: a duty existed, that duty was breached, actual damages occurred, and the breach caused those damages."},
+  {domain:"EMS Operations", diff:"hard", q:"Why is using clear, plain-language communication (rather than agency-specific codes) especially important during a multi-agency response?",
+   options:["It has no real benefit","It reduces confusion between different agencies/departments that may use different code systems","Codes are always faster and preferred in every situation","Plain language is never used in EMS operations"],
+   correct:1, explain:"Different agencies often use different code systems, so plain language reduces the risk of miscommunication during a coordinated multi-agency response."},
+  {domain:"EMS Operations", diff:"medium", q:"When establishing a landing zone for a medical helicopter, a key safety consideration is:",
+   options:["Any size, flat or not, is acceptable","Selecting an adequately sized, relatively flat, obstruction-free area, and keeping bystanders/loose objects clear during landing","Landing zones should always be located directly at the patient's exact location regardless of hazards","Helicopters can land anywhere without ground crew coordination"],
+   correct:1, explain:"A safe landing zone needs adequate size, a relatively flat and obstruction-free surface, and control of bystanders and loose objects during approach and landing."},
+  {domain:"EMS Operations", diff:"medium", q:"When responding to a call involving suspected domestic violence, an important EMT safety consideration is:",
+   options:["Assuming the scene is automatically safe once law enforcement clears it","Remaining alert to the possibility that the situation could become volatile again, and following scene safety protocols throughout patient contact","Interviewing the patient in front of the suspected abuser to save time","Never involving law enforcement under any circumstance"],
+   correct:1, explain:"Domestic violence scenes can remain unpredictable even after initial clearance, so ongoing situational awareness throughout patient contact is important."},
+  {domain:"EMS Operations", diff:"medium", q:"A patient's medical information gathered during an EMS call should generally be shared:",
+   options:["Freely with anyone who asks, including on social media","Only with those directly involved in the patient's care or as otherwise legally required/authorized","With family members regardless of the patient's wishes, in every case","Publicly, if the call was interesting"],
+   correct:1, explain:"Patient confidentiality principles limit sharing of medical information to those directly involved in care or as otherwise legally required, not to anyone who's curious."},
+
+  {domain:"Assessment", diff:"easy", q:"The Glasgow Coma Scale evaluates which three components?",
+   options:["Eye opening, verbal response, motor response","Pulse, respirations, blood pressure","Skin color, temperature, moisture","Pupil size, pupil reactivity, gaze"],
+   correct:0, explain:"GCS scores three components — eye opening, verbal response, and motor response — and sums them into a total score."},
+  {domain:"Assessment", diff:"medium", q:"A Glasgow Coma Scale score of 15 indicates:",
+   options:["The patient is unresponsive","The patient is fully alert and oriented, with no deficits in the components measured","The patient is in a deep coma","The score is invalid and must be re-checked"],
+   correct:1, explain:"15 is the maximum possible GCS score, reflecting full eye opening, oriented speech, and purposeful movement."},
+  {domain:"Assessment", diff:"medium", q:"Assessing distal pulses, motor function, and sensation (PMS) in an injured limb is done primarily to:",
+   options:["Determine the patient's pain tolerance","Evaluate for possible nerve or vascular compromise from the injury","Decide which hospital to transport to","Determine if a splint is needed at all"],
+   correct:1, explain:"PMS checks screen for circulation and nerve compromise distal to an injury, which affects urgency and management."},
+  {domain:"Assessment", diff:"medium", q:"Asking a patient their name, where they are, the approximate date, and what happened to them assesses:",
+   options:["Their level of orientation (person, place, time, event)","Their pain scale","Their respiratory effort","Their capillary refill time"],
+   correct:0, explain:"This four-part check — person, place, time, event — is the standard way to assess orientation."},
+  {domain:"Assessment", diff:"medium", q:"On approaching a motor vehicle collision with a downed power line across the vehicle, the EMT should:",
+   options:["Approach immediately to assess the patient","Stage at a safe distance and await confirmation the line is de-energized before approaching","Move the line out of the way with a wooden pole","Instruct the patient to exit the vehicle immediately"],
+   correct:1, explain:"Downed power lines are a serious, easily underestimated hazard — staging until the utility company or fire service confirms the line is safe is the correct approach, not attempting to move it yourself."},
+  {domain:"Assessment", diff:"hard", q:"Which of the following would generally be considered a significant mechanism of injury warranting a rapid trauma assessment?",
+   options:["A low-speed fender bender with no complaints","Ejection from a vehicle","A minor fall from standing height with no injury complaints","A stubbed toe"],
+   correct:1, explain:"Ejection from a vehicle is a classic example of a significant mechanism of injury that warrants a rapid, full-body trauma assessment regardless of how the patient initially appears."},
+  {domain:"Assessment", diff:"easy", q:"The concept sometimes called the \"golden period\" in trauma care refers to:",
+   options:["A fixed 60-minute window after which all patients will die","The general principle that minimizing time between injury and definitive care improves outcomes for seriously injured patients","The time it takes to complete paperwork","A specific billing time frame"],
+   correct:1, explain:"The golden period is a general principle about the value of minimizing time to definitive care, not a strict, literal deadline."},
+  {domain:"Assessment", diff:"medium", q:"A key EMT principle is to treat based on assessment findings rather than a specific diagnosis. This means:",
+   options:["EMTs should always attempt to name the specific disease process before treating","EMTs manage what they find (e.g., poor perfusion, inadequate breathing) even without knowing the underlying diagnosis","Diagnosis and treatment are the same thing in EMS","Findings should be ignored in favor of the patient's own opinion"],
+   correct:1, explain:"EMTs aren't expected to diagnose — they respond to what their assessment reveals (poor perfusion, inadequate breathing, etc.) regardless of the underlying cause."},
+  {domain:"Assessment", diff:"medium", q:"In a patient with chest pain, documenting that the patient denies shortness of breath, nausea, or radiation of pain is an example of:",
+   options:["An irrelevant detail that shouldn't be documented","A pertinent negative, which is a relevant part of the patient's history","A vital sign","A mechanism of injury"],
+   correct:1, explain:"A pertinent negative is a relevant symptom the patient does NOT have, and documenting it is just as clinically useful as documenting what they do have."},
+  {domain:"Assessment", diff:"hard", q:"Why is it important to trend vital signs (compare them over time) rather than relying on a single set?",
+   options:["A single set of vital signs always tells the complete story","A changing trend can reveal a deteriorating patient even if any one reading looks acceptable","Trending vital signs is only useful for healthy patients","Vital signs never change during a call"],
+   correct:1, explain:"A single reading is a snapshot; trends reveal direction — a rising heart rate or falling blood pressure over several readings can flag deterioration before any single number looks alarming."},
+  {domain:"Assessment", diff:"medium", q:"In a trauma patient where you cannot immediately get a blood pressure reading, the presence of a palpable radial pulse suggests:",
+   options:["The systolic blood pressure is critically low, below 60 mmHg","A rough estimate that systolic blood pressure is at least approximately 80-90 mmHg or higher","The patient has no perfusion at all","The heart rate must be below 60"],
+   correct:1, explain:"A palpable radial pulse is sometimes used as a rough field indicator that systolic pressure is at least in a certain range — it's an estimate, not a precise measurement, and shouldn't replace an actual blood pressure when time allows."},
+  {domain:"Assessment", diff:"medium", q:"When a patient's history is unreliable or unavailable (e.g., due to altered mental status with no bystanders), the EMT should:",
+   options:["Refuse to treat the patient until a history is obtained","Rely on physical exam findings, scene clues, and any available secondary sources to guide care","Assume the patient is faking their symptoms","Delay all treatment indefinitely"],
+   correct:1, explain:"When a reliable history isn't available, the EMT leans more heavily on physical findings, the scene itself, medical alert jewelry, medications found, and bystander information."},
+  {domain:"Assessment", diff:"medium", q:"For a responsive medical patient (as opposed to trauma), the assessment generally emphasizes:",
+   options:["A rapid full-body exam identical to trauma assessment for every patient","A history of the present illness and focused physical exam directed at the chief complaint","Skipping the history entirely and going straight to vital signs","Only assessing areas the patient points to"],
+   correct:1, explain:"Medical patient assessment generally centers on a detailed history and a focused exam guided by the chief complaint, rather than the full-body rapid trauma exam."},
+  {domain:"Assessment", diff:"medium", q:"For an unresponsive medical patient with an unknown cause, which assessment approach is generally indicated?",
+   options:["A focused exam of a single body system only","A rapid full-body physical exam, similar in scope to a trauma patient, since the cause is unknown","No physical exam is needed for medical patients","Only a discussion with family members"],
+   correct:1, explain:"When the cause of unresponsiveness is unknown, a broader rapid exam helps uncover clues (medical alert bracelets, injury signs, etc.) that a narrow focused exam might miss."},
+  {domain:"Assessment", diff:"medium", q:"Arriving at a residence following a report of a structural collapse, the EMT's first priority before entering is to:",
+   options:["Rush in to begin treating any visible patients","Ensure the structure has been assessed as safe to enter by appropriately trained personnel before entry","Wait indefinitely with no assessment at all","Enter only if patients are screaming for help"],
+   correct:1, explain:"Structural collapse scenes require specialized assessment before entry — becoming a second casualty helps no one."},
+
+  {domain:"Airway & Respiratory", diff:"medium", q:"Which of the following best describes adequate breathing in an adult?",
+   options:["A rate and depth sufficient to maintain normal oxygenation, with a regular rhythm and equal chest rise","Any respiratory rate above 40 per minute","Shallow breaths with visible retractions","Slow, gasping, irregular breaths"],
+   correct:0, explain:"Adequate breathing means the rate, depth, and rhythm together are actually accomplishing effective gas exchange — not just any movement of the chest."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"Visible retractions (skin pulling in around the ribs/neck with each breath) in a child are a sign of:",
+   options:["Normal breathing effort","Increased work of breathing/respiratory distress","A full stomach","Adequate oxygenation with no concern"],
+   correct:1, explain:"Retractions indicate the child is using significant accessory muscle effort to breathe — a sign of respiratory distress, not a normal finding."},
+  {domain:"Airway & Respiratory", diff:"hard", q:"A high-pitched sound heard during inspiration, known as stridor, is most concerning for:",
+   options:["Lower airway constriction, like asthma","Upper airway obstruction/narrowing","A completely normal breath sound","Fluid in the lower lungs only"],
+   correct:1, explain:"Stridor typically indicates narrowing somewhere in the upper airway and warrants close attention to airway status."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"Rales (crackles) heard on lung auscultation are often associated with:",
+   options:["Fluid in the alveoli, such as in pulmonary edema or pneumonia","A completely clear, healthy lung","Upper airway obstruction only","A pneumothorax exclusively"],
+   correct:0, explain:"Rales/crackles are classically associated with fluid-filled alveoli, as seen in pulmonary edema or pneumonia."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"Wheezing is most commonly associated with:",
+   options:["Narrowing of the lower airways, such as in asthma or COPD","A foreign body lodged in the upper airway only","A normal finding in all patients","Cardiac arrest"],
+   correct:0, explain:"Wheezing results from air moving through narrowed lower airways, classically seen in asthma and COPD exacerbations."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"A non-rebreather mask should generally be run at a flow rate of approximately:",
+   options:["1-2 LPM","6 LPM flat, never adjusted","At least 10-15 LPM, enough to keep the reservoir bag inflated","As low as possible to conserve oxygen"],
+   correct:2, explain:"A non-rebreather needs enough flow to keep the reservoir bag from collapsing during inhalation, generally around 10-15 LPM."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"A nasal cannula is generally used at flow rates of approximately:",
+   options:["1-6 LPM","15 LPM only","25 LPM","It is never used with supplemental oxygen"],
+   correct:0, explain:"Nasal cannulas are a low-flow device, typically run in the 1-6 LPM range."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"Continuous Positive Airway Pressure (CPAP) is most commonly used for patients with:",
+   options:["Cardiac arrest with no pulse","Moderate to severe respiratory distress with adequate mental status and effort, often from conditions like pulmonary edema or COPD","A completely normal, asymptomatic breathing pattern","Complete airway obstruction"],
+   correct:1, explain:"CPAP helps a conscious, breathing patient in significant respiratory distress — it isn't used for cardiac arrest or complete airway obstruction, where different interventions are needed."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"CPAP is generally contraindicated or used with caution in which situation?",
+   options:["A patient in respiratory distress who is alert and can protect their airway","A patient with a decreased level of consciousness who cannot protect their own airway, or who has a suspected pneumothorax","A patient with mild shortness of breath and a normal mental status","A patient who requests it"],
+   correct:1, explain:"CPAP requires the patient to protect their own airway and tolerate the mask/pressure — it's generally avoided with a significantly decreased level of consciousness or a suspected pneumothorax."},
+  {domain:"Airway & Respiratory", diff:"hard", q:"Why is two-rescuer BVM ventilation generally considered more effective than one-rescuer technique?",
+   options:["It allows one rescuer to focus entirely on maintaining a proper mask seal while the other squeezes the bag, typically improving tidal volume delivery","It uses less oxygen overall","It eliminates the need for airway positioning","It is required by law in every state for every ventilation"],
+   correct:0, explain:"Splitting the tasks — one person maintaining a tight seal and airway position, the other squeezing the bag — generally produces more effective, consistent ventilation than one person trying to do both."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"After beginning BVM ventilations, which finding would suggest the ventilations are NOT adequate?",
+   options:["Improving skin color and rising oxygen saturation","No visible chest rise and no improvement in oxygen saturation","Equal, visible chest rise with each squeeze","A steady, appropriate ventilation rate"],
+   correct:1, explain:"Lack of visible chest rise and no improvement in oxygenation both indicate the ventilations aren't effectively moving air — reassess the seal and airway positioning."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"Excessive ventilation volume or rate with a BVM can lead to:",
+   options:["Gastric distention, increasing the risk of vomiting and aspiration","Immediate cure of the underlying respiratory problem","A guaranteed improvement in oxygenation with no downsides","No physiological effect at all"],
+   correct:0, explain:"Over-aggressive bagging can force air into the stomach rather than the lungs, distending it and increasing aspiration risk."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"The recovery position (lateral recumbent) is used for a breathing, unresponsive patient primarily to:",
+   options:["Improve the effectiveness of chest compressions","Help protect the airway from aspiration if the patient vomits, while still allowing adequate breathing","Increase the patient's blood pressure","Prepare the patient for spinal immobilization"],
+   correct:1, explain:"The recovery position uses gravity to help keep the airway clear of vomit or secretions in a breathing but unresponsive patient with no suspected spinal injury."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"In a patient with severe COPD, oxygen administration should generally be:",
+   options:["Withheld completely regardless of the patient's condition","Titrated to relieve hypoxia while still being attentive to the patient's respiratory drive and response, per protocol","Always given at the maximum possible flow rate regardless of the patient's response","Only given if the patient specifically requests it"],
+   correct:1, explain:"Severe hypoxia should never be left untreated out of excessive caution, but oxygen in COPD patients is typically titrated thoughtfully rather than maximized reflexively, per protocol."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"For a conscious infant with a complete airway obstruction, the recommended technique is:",
+   options:["Abdominal thrusts, the same as an adult","A combination of back blows and chest thrusts","Sweeping the mouth blindly with a finger","No intervention until the infant becomes unresponsive"],
+   correct:1, explain:"Infants receive a combination of back blows and chest thrusts, not abdominal thrusts, due to the risk of organ injury from abdominal thrusts in infants."},
+
+  {domain:"Cardiac & Medical", diff:"medium", q:"The \"Chain of Survival\" for cardiac arrest generally includes which sequence of concepts?",
+   options:["Early recognition/activation of EMS, early CPR, early defibrillation, early advanced care, and post-arrest care","Only defibrillation, nothing else matters","Only performing CPR for exactly 2 minutes","Calling for help only after CPR is completed"],
+   correct:0, explain:"The Chain of Survival links several sequential steps, each of which matters — from early recognition through post-arrest care."},
+  {domain:"Cardiac & Medical", diff:"easy", q:"\"Return of spontaneous circulation\" (ROSC) refers to:",
+   options:["The patient regaining a palpable pulse and organized cardiac activity after cardiac arrest","The moment CPR begins","The moment the AED is applied","A permanently fixed neurological outcome"],
+   correct:0, explain:"ROSC specifically means the patient's heart resumes pumping on its own — it doesn't by itself predict the eventual neurological outcome."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Standard AED pad placement for an adult is generally:",
+   options:["One pad on the upper right chest, one pad on the lower left side/ribcage (or per pad diagram)","Both pads placed directly over the sternum","Both pads placed on the same side of the chest","Pad placement does not matter at all"],
+   correct:0, explain:"Standard placement puts the pads on opposite sides of the heart — upper right chest and lower left side — following the diagram printed on the pads."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Which of the following is a generally recognized reason to stop CPR in the field?",
+   options:["The rescuer feels tired for a few seconds","Return of spontaneous circulation, arrival of a higher level of care who assumes responsibility, valid orders to stop, or rescuer exhaustion/scene danger with no alternative","CPR should never be stopped once started, under any circumstance","After exactly 5 minutes regardless of the situation"],
+   correct:1, explain:"Recognized stopping points include ROSC, transfer to a higher level of care, valid orders, or situations where continuing simply isn't possible — not an arbitrary fixed time."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"Why is allowing full chest recoil between compressions important during CPR?",
+   options:["It has no real effect on outcomes","It allows the heart to refill with blood between compressions, improving the effectiveness of subsequent compressions","It slows down the compression rate unnecessarily","It is only relevant for pediatric patients"],
+   correct:1, explain:"Full recoil lets the heart's chambers refill between compressions — leaning on the chest between compressions reduces that refill and lowers the effectiveness of CPR."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"Why does current guidance emphasize minimizing interruptions in chest compressions?",
+   options:["Interruptions have no measurable effect on outcomes","Even brief pauses reduce blood flow and coronary perfusion pressure, which can take time to rebuild once compressions resume","Interruptions are required every 30 seconds by protocol","Interruptions improve oxygenation"],
+   correct:1, explain:"Coronary perfusion pressure built up during compressions drops quickly with any pause and takes time to rebuild — frequent interruptions meaningfully reduce overall CPR effectiveness."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"When assessing a patient with chest pain using OPQRST, asking \"does the pain radiate anywhere, like to your arm or jaw?\" corresponds to which component?",
+   options:["Onset","Radiation","Severity","Time"],
+   correct:1, explain:"Radiation asks whether and where the pain spreads to — a classic and clinically significant question for cardiac chest pain."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Diabetic patients are more likely than the general population to experience myocardial infarction with:",
+   options:["Classic, severe chest pain in nearly all cases","Little or no chest pain (a \"silent\" MI), due to diabetes-related nerve changes","No cardiac risk at all, since diabetes doesn't affect the heart","Symptoms that are always identical to non-diabetic patients"],
+   correct:1, explain:"Diabetes-related nerve damage can blunt pain perception, making silent or atypical MI presentations more common in diabetic patients."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Aspirin is often given (per protocol) to patients with suspected acute coronary syndrome primarily because it:",
+   options:["Relieves pain directly and completely","Has an antiplatelet effect that may help limit clot formation contributing to the blockage","Lowers blood pressure significantly","Has no relevant effect in this situation"],
+   correct:1, explain:"Aspirin's antiplatelet effect can help limit further clot formation at the site of a coronary blockage — it's not primarily given for pain relief."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"For a conscious, alert diabetic patient with confirmed hypoglycemia who can safely swallow, appropriate initial management often includes:",
+   options:["Withholding all treatment until ALS arrives","Oral glucose or a sugar source, per protocol","Immediate IV insulin","Aggressive hyperventilation"],
+   correct:1, explain:"A conscious, alert patient who can safely swallow can generally be given oral glucose or another sugar source per protocol — a fast, effective first step."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"For a hypoglycemic patient who is unresponsive and unable to protect their airway, the EMT should NOT:",
+   options:["Request ALS/advanced care as appropriate for glucose administration by other routes","Place oral glucose or any substance directly into the mouth of an unresponsive patient, due to aspiration risk","Monitor the airway closely","Position the patient to protect the airway"],
+   correct:1, explain:"An unresponsive patient who can't protect their own airway shouldn't have anything placed in their mouth — the aspiration risk is too high; other routes of glucose delivery require advanced care."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"In general terms, the two broad categories of stroke are:",
+   options:["Ischemic (blocked blood flow) and hemorrhagic (bleeding into the brain)","Only ischemic strokes exist","Only hemorrhagic strokes exist","Viral and bacterial strokes"],
+   correct:0, explain:"Strokes are broadly categorized as ischemic (a blockage cutting off blood flow) or hemorrhagic (bleeding into brain tissue)."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"Why is aspirin generally NOT given by EMTs for suspected stroke symptoms (unlike suspected cardiac chest pain)?",
+   options:["Aspirin has no relevant properties at all","Since a stroke could be hemorrhagic, an antiplatelet medication like aspirin could worsen bleeding, and the stroke type generally can't be determined in the field","Aspirin is more effective for stroke than for cardiac events","Stroke and cardiac chest pain are treated identically in every protocol"],
+   correct:1, explain:"Because the field can't distinguish ischemic from hemorrhagic stroke, giving an antiplatelet drug like aspirin carries real risk if the stroke turns out to be hemorrhagic — so it's avoided pending hospital imaging."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"A brief seizure characterized by a blank stare and momentary loss of awareness, without dramatic convulsive movements, is most consistent with:",
+   options:["A generalized tonic-clonic seizure","An absence seizure","Status epilepticus","A febrile seizure exclusively"],
+   correct:1, explain:"Absence seizures present as brief lapses in awareness without the dramatic motor activity of a generalized tonic-clonic seizure."},
+  {domain:"Cardiac & Medical", diff:"easy", q:"\"Status epilepticus\" generally refers to:",
+   options:["A single, brief seizure lasting a few seconds with full recovery","A prolonged seizure or repeated seizures without full recovery of consciousness in between, which is a serious emergency","A seizure that occurred years ago","A condition unrelated to seizures"],
+   correct:1, explain:"Status epilepticus describes a seizure emergency — prolonged or repeated seizure activity without a return to baseline — requiring prompt recognition and transport."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"The classic presentation of an opioid/narcotic overdose includes:",
+   options:["Dilated pupils, rapid breathing, agitation","Pinpoint (constricted) pupils, slow/shallow breathing, decreased level of consciousness","High fever and seizures exclusively","Normal vital signs with no changes"],
+   correct:1, explain:"The classic opioid overdose triad is pinpoint pupils, respiratory depression, and decreased consciousness."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Naloxone works by:",
+   options:["Directly increasing the patient's blood sugar","Reversing the effects of opioids by blocking/displacing them from their receptors","Sedating an agitated patient","Stopping all bleeding in the body"],
+   correct:1, explain:"Naloxone is an opioid antagonist — it competes with opioids at their receptor sites, reversing their effects, particularly respiratory depression."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"At the scene of a suspected overdose, it's valuable for EMS to look for:",
+   options:["Nothing beyond the patient's vital signs","Pill bottles, drug paraphernalia, or other scene clues that could indicate what substance may be involved, while maintaining scene safety","The patient's insurance card only","Ignoring any potential clues at the scene"],
+   correct:1, explain:"Scene clues can meaningfully inform treatment and hospital handoff, as long as gathering them doesn't compromise scene safety."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"A key feature that helps distinguish heat stroke from heat exhaustion is:",
+   options:["Heat stroke typically involves altered mental status/significant neurological changes, while heat exhaustion generally does not","Heat exhaustion is always more dangerous than heat stroke","Both conditions are identical in presentation and severity","Heat stroke only occurs in cold environments"],
+   correct:0, explain:"Altered mental status is a key differentiator — its presence suggests the more severe heat stroke rather than heat exhaustion."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"A patient with severe hypothermia should generally be handled:",
+   options:["Roughly, since it doesn't matter with hypothermic patients","Gently, since rough handling can potentially trigger a dangerous cardiac arrhythmia in a significantly hypothermic heart","The same as any other patient with no special precautions","Only while vigorously exercising the patient to warm them up"],
+   correct:1, explain:"A significantly cooled heart can be prone to dangerous arrhythmias, so severely hypothermic patients are handled and moved gently rather than roughly or vigorously exercised."},
+
+  {domain:"Trauma", diff:"medium", q:"A \"contrecoup\" brain injury occurs when:",
+   options:["The brain is injured only at the point of direct impact","The brain is injured on the side opposite the point of impact, from the brain moving and striking the opposite side of the skull","There is no brain injury at all","It only applies to penetrating trauma"],
+   correct:1, explain:"Contrecoup injury happens when the brain's momentum carries it into the skull on the side opposite the original impact."},
+  {domain:"Trauma", diff:"medium", q:"Understanding the \"kinematics of trauma\" (how the injury likely occurred) helps the EMT primarily by:",
+   options:["Determining who is at fault for the incident","Predicting likely injury patterns based on the mechanism, which helps guide assessment even before all injuries are visible","Replacing the need for any physical assessment","Determining transport billing codes"],
+   correct:1, explain:"Understanding the forces involved helps the EMT anticipate injuries that may not be immediately obvious, guiding a more thorough assessment."},
+  {domain:"Trauma", diff:"medium", q:"The key distinction between blunt and penetrating trauma is:",
+   options:["Blunt trauma involves an object breaking the skin; penetrating trauma does not","Penetrating trauma involves an object breaking the skin and entering the body; blunt trauma involves force without the skin necessarily being broken","There is no meaningful difference between the two","Penetrating trauma is always less severe than blunt trauma"],
+   correct:1, explain:"Penetrating trauma breaches the skin/body wall; blunt trauma transfers force without necessarily breaking the skin, though both can cause serious internal injury."},
+  {domain:"Trauma", diff:"medium", q:"In a gunshot wound, which statement is generally most accurate?",
+   options:["Exit wounds are always smaller than entrance wounds","Exit wounds, when present, are often (though not always) larger and more irregular than entrance wounds, but the EMT's priority is treatment, not forensic analysis","EMTs should focus on determining exact wound trajectories rather than treating the patient","Gunshot wounds never have identifiable entrance or exit points"],
+   correct:1, explain:"While exit wounds are often larger, this isn't universal, and regardless, the EMT's job is patient care, not forensic wound analysis — that's for later investigation."},
+  {domain:"Trauma", diff:"medium", q:"A basic principle of splinting a long bone fracture is to:",
+   options:["Immobilize only the exact point of the fracture","Immobilize the joint above and the joint below the injury site","Never assess pulses, motor function, or sensation before or after splinting","Apply the splint as tightly as possible regardless of circulation"],
+   correct:1, explain:"Effective splinting immobilizes the joints above and below the injury, not just the fracture site itself, to properly prevent movement at the injury."},
+  {domain:"Trauma", diff:"medium", q:"A traction splint is generally indicated for:",
+   options:["A closed, isolated mid-shaft femur fracture with no joint or pelvic involvement, per local protocol","Any injury to the hand","A suspected hip fracture with joint involvement","An open fracture near the knee joint, in most protocols"],
+   correct:0, explain:"Traction splints are generally used for isolated, closed mid-shaft femur fractures, not for joint injuries, hand injuries, or most open fractures near a joint."},
+  {domain:"Trauma", diff:"medium", q:"Distal pulse, motor function, and sensation (PMS) should be checked:",
+   options:["Only once, before the splint is applied","Both before and after splinting, to detect any change caused by the splinting process","Only after the patient reaches the hospital","PMS checks are not relevant to splinting"],
+   correct:1, explain:"Checking PMS both before and after splinting lets you catch any compromise the splint itself may have caused."},
+  {domain:"Trauma", diff:"medium", q:"Traumatic asphyxia, sometimes seen after severe crush injury to the chest, is characterized by:",
+   options:["A completely normal appearance with no visible signs","Severe bruising/discoloration and swelling of the head, neck, and upper chest from a sudden compressive force on the chest","Only affects the lower extremities","Is unrelated to chest trauma"],
+   correct:1, explain:"Traumatic asphyxia produces a dramatic, distinctive appearance — bruising and swelling of the head, neck, and upper chest — from sudden severe chest compression."},
+  {domain:"Trauma", diff:"medium", q:"A patient with multiple rib fractures on one side is at risk for which associated complications?",
+   options:["None; isolated rib fractures never cause other problems","Underlying lung injury such as pneumothorax or hemothorax, and pain limiting adequate breathing","Only skin bruising with no deeper concern","Immediate cardiac arrest in all cases"],
+   correct:1, explain:"Rib fractures can be associated with underlying lung injury, and pain from the fractures themselves can limit a patient's ability to breathe adequately."},
+  {domain:"Trauma", diff:"easy", q:"A hemothorax refers to:",
+   options:["Air in the pleural space","Blood accumulating in the pleural space, which can compress the lung and affect breathing/circulation","A completely normal finding after minor trauma","Fluid buildup in the abdomen only"],
+   correct:1, explain:"A hemothorax is blood collecting in the pleural space, which can compress lung tissue and reduce effective breathing and circulation."},
+  {domain:"Trauma", diff:"medium", q:"Which finding in a patient with blunt abdominal trauma would raise the highest concern for significant internal bleeding?",
+   options:["A normal, soft, non-tender abdomen with normal vital signs","A rigid, distended, tender abdomen with signs of shock","Mild surface bruising with no other findings","A patient who reports feeling completely fine"],
+   correct:1, explain:"A rigid, tender, distended abdomen combined with shock signs is a strong indicator of significant internal hemorrhage."},
+  {domain:"Trauma", diff:"medium", q:"For trauma involving the external genitalia, the EMT's general approach includes:",
+   options:["Ignoring the injury entirely","Controlling bleeding with direct pressure/dressings as appropriate, while maintaining patient dignity and privacy","Applying a tourniquet to the pelvis in every case","Delaying all care until arrival at the hospital"],
+   correct:1, explain:"Genital trauma is treated like other soft-tissue injuries — bleeding control with attention to dignity and privacy — not ignored or handled with unusual measures."},
+  {domain:"Trauma", diff:"hard", q:"The initial priority in managing a near-drowning patient is:",
+   options:["Immediate cervical spine immobilization in every single case regardless of the circumstances","Removing the patient from the water and addressing airway/breathing, with spinal precautions considered based on the specific mechanism","Delaying all care until the patient is fully dry","Withholding rescue breathing in all drowning cases"],
+   correct:1, explain:"Airway and breathing take priority; spinal precautions are applied based on the actual mechanism (e.g., a diving injury), not automatically in every drowning case."},
+  {domain:"Trauma", diff:"medium", q:"For a traumatic eye injury with the eye partially avulsed from its socket, the EMT should generally:",
+   options:["Push the eye back into place","Protect the eye in place with a moist dressing and rigid protective shield, without applying pressure, and transport promptly","Apply firm, direct pressure to the eye","Irrigate forcefully with a firehose-strength stream of water"],
+   correct:1, explain:"An avulsed eye is protected in place, not repositioned, with a moist dressing and rigid shield to prevent further pressure or contact injury."},
+  {domain:"Trauma", diff:"medium", q:"The initial management of a chemical burn to the skin generally involves:",
+   options:["Applying a neutralizing chemical directly to the area","Removing contaminated clothing and irrigating the area with large amounts of water (per protocol and the specific chemical involved)","Leaving the chemical in place and transporting immediately with no decontamination","Rubbing the area vigorously with a dry cloth"],
+   correct:1, explain:"Chemical burns are generally managed by removing contaminated clothing and irrigating with copious water, following protocol for the specific substance involved — attempting to neutralize chemically can worsen the injury."},
+  {domain:"Trauma", diff:"medium", q:"Electrical injuries are notable because:",
+   options:["The visible skin injury always accurately reflects the total internal damage","Visible burns at entry/exit points may be relatively small while significant internal tissue and organ damage can still be present","Electrical injuries never affect the heart","They are always completely benign"],
+   correct:1, explain:"Electrical current can cause extensive internal damage, including cardiac effects, that isn't reflected by the size of the visible skin burns."},
+  {domain:"Trauma", diff:"medium", q:"When responding to a lightning strike incident, EMS providers should:",
+   options:["Assume there is no ongoing risk once one strike has occurred","Remain aware that the scene may still be unsafe if the storm is ongoing, and take appropriate shelter/safety precautions before extended patient care","Stand in the open in the highest point of the area for a better view","Ignore weather conditions entirely"],
+   correct:1, explain:"An ongoing storm remains a real hazard to responders — scene safety includes appropriate shelter before committing to extended patient care."},
+  {domain:"Trauma", diff:"medium", q:"In a patient with multiple, significant injuries (multi-system trauma), the EMT's priority is generally to:",
+   options:["Treat every injury with equal, sequential attention regardless of severity","Prioritize identifying and managing immediate life threats (airway, breathing, severe bleeding) before addressing less urgent injuries","Only treat the most visually dramatic injury","Wait until all injuries are fully diagnosed before treating any of them"],
+   correct:1, explain:"Multi-system trauma management follows a priority-based approach — life threats first — rather than treating every injury equally or waiting for a complete picture."},
+  {domain:"Trauma", diff:"easy", q:"A general principle in suspected sports-related concussion is:",
+   options:["The athlete should immediately return to play if they insist they feel fine","The athlete should be removed from play and evaluated, since symptoms are not always immediately obvious and further injury risk is a concern","Concussions are never a concern in youth sports","No assessment is needed if the athlete can still walk"],
+   correct:1, explain:"Because concussion symptoms can be subtle or delayed, and a second impact soon after can be especially dangerous, the general principle is remove-and-evaluate rather than trusting a quick self-assessment."},
+  {domain:"Trauma", diff:"medium", q:"For most wounds with embedded surface debris (not a true impaled object), general initial EMS management involves:",
+   options:["Aggressively digging out all debris in the field regardless of depth","Controlling bleeding and covering the wound appropriately per protocol, without aggressive removal of deeply embedded material in the field","Ignoring the wound entirely","Suturing the wound in the field"],
+   correct:1, explain:"Field management focuses on bleeding control and appropriate covering, not aggressive extraction of embedded material, which is better handled in a controlled hospital setting."},
+
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"The first stage of labor is generally defined as beginning with:",
+   options:["The delivery of the placenta","The onset of regular contractions and cervical dilation, ending with full dilation","The baby's first cry","The cutting of the umbilical cord"],
+   correct:1, explain:"The first stage of labor spans from the start of regular contractions and cervical dilation through full dilation, before delivery of the baby itself."},
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"\"Crowning\" refers to:",
+   options:["The mother's contractions beginning","The baby's head (or presenting part) becoming visible at the vaginal opening, indicating imminent delivery","The delivery of the placenta","A complication requiring immediate surgery in all cases"],
+   correct:1, explain:"Crowning means the presenting part is visible at the opening — a sign delivery is imminent and transport should not be delayed for it."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Drying and stimulating a newborn immediately after birth serves to:",
+   options:["Have no real physiological purpose","Help prevent heat loss and often stimulates the newborn to begin breathing effectively","Clean the baby for aesthetic purposes only","Replace the need for any further assessment"],
+   correct:1, explain:"Drying reduces heat loss (newborns lose heat quickly) and the stimulation itself often helps trigger effective breathing."},
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"A breech presentation refers to:",
+   options:["The baby's head presenting first, as usual","The baby's buttocks or feet presenting first instead of the head, which can complicate delivery","A completely normal variant requiring no special consideration","The umbilical cord presenting first"],
+   correct:1, explain:"Breech presentation (buttocks or feet first) is an abnormal presentation that can complicate delivery and generally warrants prompt transport."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Initial EMS management of significant postpartum (after-delivery) bleeding often includes:",
+   options:["Ignoring the bleeding since it's expected after delivery","Uterine massage (per protocol) and treating for shock as appropriate, along with prompt transport","Packing the vagina tightly with gauze in all cases","Withholding all treatment until arrival at the hospital"],
+   correct:1, explain:"Some postpartum bleeding is expected, but significant hemorrhage is managed with measures like uterine massage per protocol, shock treatment, and prompt transport — not ignored."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Length-based resuscitation tapes (such as a Broselow tape) are used in pediatric emergencies primarily to:",
+   options:["Measure the child's exact age","Estimate a child's weight from their length/height to help guide appropriately sized equipment and medication dosing","Replace the need for any assessment","Determine transport destination only"],
+   correct:1, explain:"These tapes estimate weight from length, which helps quickly select appropriately sized equipment and guide weight-based dosing in a pediatric emergency."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"In children, cardiac arrest is more often the end result of:",
+   options:["A primary cardiac event, similar to adults, in the majority of cases","A respiratory problem that progresses to cardiac arrest if not addressed, more often than a primary cardiac cause","An event completely unrelated to breathing","A condition that never involves the respiratory system"],
+   correct:1, explain:"Unlike adults, pediatric cardiac arrest is more commonly the downstream result of a respiratory problem — which is part of why early, aggressive airway/breathing management matters so much in kids."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Croup in a young child classically presents with:",
+   options:["A high fever with no cough and a completely silent chest","A barking cough and stridor, often worse at night","Chest pain radiating to the arm","Severe abdominal pain"],
+   correct:1, explain:"Croup's classic presentation is a distinctive barking cough with stridor, often worsening at night."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"For a child with a fever but no other concerning findings, the EMT's general approach includes:",
+   options:["Assuming the child requires no assessment at all","A thorough assessment for any red-flag findings, supportive care, and transport per protocol/parental wishes","Immediate aggressive cooling with ice water immersion in every case","Assuming all fevers are minor and require no further evaluation"],
+   correct:1, explain:"Even a seemingly minor fever gets a thorough assessment for red flags — a fever alone isn't automatically dismissed, but it also doesn't call for aggressive cooling measures like ice water immersion."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"When caring for a patient with Down syndrome, an appropriate general approach includes:",
+   options:["Assuming the patient cannot participate at all in their own care","Communicating directly and respectfully with the patient at an appropriate level, while involving caregivers as needed","Speaking only to family members and never addressing the patient","Assuming all patients with Down syndrome have identical needs"],
+   correct:1, explain:"Direct, respectful communication with the patient — while still involving caregivers appropriately — respects the patient's autonomy rather than assuming incapacity."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"When assessing a patient with cerebral palsy, the EMT should keep in mind that:",
+   options:["Baseline muscle tone, movement patterns, or speech may differ from what's typical, so understanding the patient's normal baseline is valuable","All patients with cerebral palsy have identical presentations","Cerebral palsy always involves a complete inability to communicate","No special consideration is needed"],
+   correct:0, explain:"Cerebral palsy presentations vary widely, so knowing the patient's individual baseline (often from a caregiver) is key to recognizing what's actually new or abnormal."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"When responding to a call involving a patient with a valid, applicable DNR (Do Not Resuscitate) order, the EMT should generally:",
+   options:["Perform full resuscitation regardless of the valid order","Follow local protocol regarding valid DNR orders, which generally means honoring properly documented, applicable orders while still providing comfort care","Ignore any paperwork presented at the scene","Refuse to respond to the call at all"],
+   correct:1, explain:"A valid, applicable DNR is generally honored per local protocol, though comfort care continues — this isn't the same as withholding all care."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Elderly patients are more likely than younger patients to:",
+   options:["Take zero medications on average","Take multiple medications (polypharmacy), which can complicate assessment and increase risk of drug interactions or side effects","Have identical medication profiles to younger adults","Never experience medication-related complications"],
+   correct:1, explain:"Polypharmacy is common in elderly patients and can complicate both the presenting problem and the assessment itself."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Regarding consent for a minor patient in a true emergency, EMS generally:",
+   options:["Can never provide any care to a minor without a parent physically present","Can generally proceed under implied consent for genuine emergencies when a parent/guardian is not immediately available, per local protocol","Must always wait for a parent even if the child is in cardiac arrest","Treats consent for minors identically to non-emergency situations"],
+   correct:1, explain:"True emergencies generally allow EMS to proceed under implied consent when a parent isn't immediately available, per local protocol — waiting isn't required when a child's life is at risk."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"A normal respiratory rate for a healthy newborn is generally around:",
+   options:["4-8 breaths per minute","30-60 breaths per minute","100-120 breaths per minute","Respiratory rate does not apply to newborns"],
+   correct:1, explain:"Newborns breathe considerably faster than adults, typically in the range of about 30-60 breaths per minute."},
+
+  {domain:"EMS Operations", diff:"medium", q:"The Incident Command System (ICS) is used at emergency scenes primarily to:",
+   options:["Provide a standardized management structure for coordinating multiple responders/agencies","Replace the need for any communication between agencies","Only apply to fire department operations","Determine which agency receives credit for the response"],
+   correct:0, explain:"ICS provides a common, scalable management structure so multiple responders and agencies can coordinate effectively at any size of incident."},
+  {domain:"EMS Operations", diff:"medium", q:"\"Unified command\" in a multi-agency incident generally means:",
+   options:["Only one single agency is ever in charge, regardless of the situation","Representatives from multiple involved agencies jointly manage the incident using a shared set of objectives","No command structure is used at all","Command changes randomly throughout the incident"],
+   correct:1, explain:"Unified command allows multiple agencies with jurisdiction to jointly set objectives and manage a complex incident together, rather than one agency simply overriding the others."},
+  {domain:"EMS Operations", diff:"medium", q:"A \"rehab\" sector established at a large-scale incident is generally intended to:",
+   options:["Provide a discharge location for patients","Provide rest, rehydration, and medical monitoring for responders working the incident","Serve exclusively as a media staging area","Have no defined purpose"],
+   correct:1, explain:"Rehab sectors exist to protect the responders themselves — rest, fluids, and monitoring during physically demanding or prolonged incidents."},
+  {domain:"EMS Operations", diff:"medium", q:"A \"staging area\" at a multi-unit response is generally used to:",
+   options:["Hold arriving resources until they are assigned a specific task, to avoid scene congestion","Serve as the final treatment location for all patients","Replace the need for a triage area","Have no functional purpose"],
+   correct:0, explain:"Staging prevents scene congestion and keeps incoming resources organized and ready until command assigns them a specific task."},
+  {domain:"EMS Operations", diff:"easy", q:"An interfacility transport refers to:",
+   options:["Transporting a patient from the scene of an emergency to the first receiving hospital","Transporting a patient from one medical facility to another","A transport that never requires any medical monitoring","A transport type that does not exist in EMS"],
+   correct:1, explain:"Interfacility transport moves a patient between two medical facilities (e.g., a community hospital to a trauma center), distinct from a scene-to-hospital transport."},
+  {domain:"EMS Operations", diff:"medium", q:"Effective radio communication in EMS generally emphasizes:",
+   options:["Long, detailed narratives with excessive detail on every transmission","Clear, concise, organized reporting of pertinent information","Using as much slang and local jargon as possible","Avoiding any structure at all"],
+   correct:1, explain:"Good radio communication is clear, organized, and focused on what's actually pertinent — not padded with unnecessary detail or jargon."},
+  {domain:"EMS Operations", diff:"medium", q:"A verbal hand-off report to hospital staff generally includes:",
+   options:["Only the patient's name and insurance information","Patient's age/sex, chief complaint, pertinent history, assessment findings, treatment provided, and response to treatment","No information at all, since the PCR covers everything","Only the transport time"],
+   correct:1, explain:"A good hand-off gives receiving staff a concise but complete clinical picture — chief complaint, history, findings, treatment, and response — not just administrative details."},
+  {domain:"EMS Operations", diff:"medium", q:"Good Samaritan laws generally exist to:",
+   options:["Require all bystanders to render aid at an emergency","Provide some legal protection to those who render reasonable, good-faith emergency assistance","Only apply to licensed medical professionals","Have no relevance to EMS providers"],
+   correct:1, explain:"Good Samaritan laws are intended to protect people who reasonably and in good faith render emergency assistance, encouraging people to help without excessive fear of liability."},
+  {domain:"EMS Operations", diff:"easy", q:"An EMT's \"scope of practice\" refers to:",
+   options:["The specific skills and interventions they are legally authorized to perform based on their certification level and local protocols","Whatever the EMT personally feels comfortable doing","An unlimited set of medical interventions","A concept that only applies to paramedics, not EMTs"],
+   correct:0, explain:"Scope of practice is legally and protocol-defined — it's not a matter of personal comfort or preference, and it applies at every certification level, including EMT."},
+  {domain:"EMS Operations", diff:"easy", q:"\"Offline\" (standing order) medical direction generally refers to:",
+   options:["Real-time, direct communication with a physician during a call","Pre-established protocols approved in advance by a medical director, which EMTs follow without needing to call for permission during the call","A situation where no medical oversight exists at all","Medical direction that only applies after the call ends"],
+   correct:1, explain:"Standing orders are protocols pre-approved by medical direction that EMTs can act on directly, without needing live contact during the call."},
+  {domain:"EMS Operations", diff:"easy", q:"\"Online\" medical direction generally refers to:",
+   options:["Protocols that are only accessed via the internet with no live contact","Real-time communication with a physician (often by phone or radio) for specific orders during a call","A type of direction that has been phased out entirely in modern EMS","A concept unrelated to physician oversight"],
+   correct:1, explain:"Online medical direction means live, real-time contact with a physician for orders during a specific call, as distinct from pre-established standing orders."},
+  {domain:"EMS Operations", diff:"medium", q:"EMTs are generally considered mandatory reporters for which of the following?",
+   options:["Nothing; EMTs have no reporting obligations","Suspected abuse or neglect of vulnerable populations such as children or the elderly, per state law","Only motor vehicle collisions","Only patient refusals"],
+   correct:1, explain:"EMTs are typically mandatory reporters for suspected abuse or neglect of vulnerable populations, a legal obligation set by state law."},
+  {domain:"EMS Operations", diff:"medium", q:"A formal, structured group discussion held after a particularly difficult call, intended to help responders process the event, is generally known as:",
+   options:["A patient care report","A form of critical incident stress management/debriefing","A billing review","A scene size-up"],
+   correct:1, explain:"Critical incident stress management/debriefing gives responders structured support after especially difficult calls."},
+  {domain:"EMS Operations", diff:"medium", q:"The core principle behind body substance isolation (BSI) precautions is to:",
+   options:["Assume all body fluids from any patient are potentially infectious and take appropriate precautions accordingly","Only take precautions when a patient specifically states they have an infection","BSI is optional and rarely necessary","BSI only applies to patients with visible wounds"],
+   correct:0, explain:"BSI is built on the principle of treating every patient's body fluids as potentially infectious, regardless of what the patient reports or how they appear."},
+  {domain:"EMS Operations", diff:"medium", q:"If an EMT experiences a needle-stick injury or significant body fluid exposure on a call, the general appropriate response is to:",
+   options:["Ignore it unless symptoms develop","Follow the agency's exposure control plan, which generally includes reporting the exposure and seeking appropriate medical follow-up","Wait several weeks before mentioning it to anyone","Continue working with no further action needed"],
+   correct:1, explain:"Exposure incidents should be reported and followed up on promptly per the agency's exposure control plan — not ignored or delayed, since timely follow-up matters for post-exposure care."},
+
+  {domain:"Assessment", diff:"easy", q:"What does the \"S\" in the DCAP-BTLS trauma exam mnemonic stand for?",
+   options:["Swelling","Shock","Skin color","Symptoms"],
+   correct:0, explain:"DCAP-BTLS ends in Swelling — Deformities, Contusions, Abrasions, Punctures/Penetrations, Burns, Tenderness, Lacerations, Swelling."},
+  {domain:"Assessment", diff:"easy", q:"In the primary assessment, what does the \"C\" in the ABC framework stand for?",
+   options:["Consciousness","Circulation","Complaint","Communication"],
+   correct:1, explain:"ABC stands for Airway, Breathing, Circulation — the core sequence of the primary assessment."},
+  {domain:"Assessment", diff:"medium", q:"A patient is alert, oriented, and answering questions appropriately when you arrive. What is their AVPU status?",
+   options:["Alert","Verbal","Pain","Unresponsive"],
+   correct:0, explain:"A patient who is spontaneously oriented and interacting appropriately is classified as Alert, the highest AVPU level."},
+  {domain:"Assessment", diff:"medium", q:"During a call, a family member insists on answering all questions for an alert, oriented adult patient. What's the most appropriate EMT approach?",
+   options:["Only speak with the family member going forward","Politely redirect questions to the patient directly, while still welcoming relevant input from family","Refuse any input from family members entirely","End the assessment early due to the interruption"],
+   correct:1, explain:"An alert, competent adult patient's own answers take priority — family input can be valuable, but shouldn't replace directly engaging the patient."},
+  {domain:"Assessment", diff:"hard", q:"A patient's blood pressure was 130/84 ten minutes ago and is now 98/60, with no other obvious change. What does this trend most likely suggest?",
+   options:["A normal, expected fluctuation requiring no action","Possible early deterioration that warrants closer monitoring and reassessment","A measurement error that should be ignored","Improved perfusion"],
+   correct:1, explain:"A meaningful downward trend in blood pressure, even without other dramatic changes, can be an early warning sign — this is exactly why trending vital signs matters more than any single reading."},
+  {domain:"Assessment", diff:"medium", q:"Which of the following is part of scene size-up, rather than the primary assessment?",
+   options:["Forming a general impression","Determining the mechanism of injury","Checking AVPU","Assessing circulation"],
+   correct:1, explain:"Mechanism of injury/nature of illness is assessed during scene size-up, before patient contact — general impression, AVPU, and circulation come later, in the primary assessment."},
+  {domain:"Assessment", diff:"easy", q:"What is the primary purpose of a focused history and physical exam?",
+   options:["To replace the need for vital signs","To gather information and examine the patient specifically related to their chief complaint","To assess every organ system regardless of the complaint","To determine transport billing"],
+   correct:1, explain:"A focused exam concentrates on the area or system relevant to the chief complaint, rather than a comprehensive full-body exam."},
+  {domain:"Assessment", diff:"hard", q:"Two patients both have a heart rate of 110. One is calm and conversational; the other is anxious, pale, and diaphoretic. What does this comparison illustrate?",
+   options:["Heart rate alone is often not enough — the full clinical picture matters more than a single number","The calm patient must be faking their vital signs","Diaphoresis is irrelevant to assessment","Both patients require identical treatment based on heart rate alone"],
+   correct:0, explain:"The same vital sign number can mean very different things depending on the rest of the clinical picture — this is why assessment relies on the whole pattern of findings, not isolated numbers."},
+  {domain:"Assessment", diff:"medium", q:"A responsive patient with a laceration to the forearm and no other complaints or significant MOI should receive which type of secondary assessment?",
+   options:["A full rapid trauma assessment","A focused assessment of the forearm","No secondary assessment at all","A detailed assessment delayed until hospital arrival"],
+   correct:1, explain:"An isolated injury with no significant mechanism or other complaints calls for a focused assessment of that specific area."},
+
+  {domain:"Airway & Respiratory", diff:"easy", q:"What does \"LPM\" stand for when discussing oxygen flow rates?",
+   options:["Liters per minute","Lung pressure measurement","Low pressure mask","Liters per mask"],
+   correct:0, explain:"LPM = liters per minute, the standard unit for oxygen flow rate."},
+  {domain:"Airway & Respiratory", diff:"easy", q:"Which airway adjunct is generally better tolerated by a patient who still has a gag reflex?",
+   options:["Oropharyngeal airway (OPA)","Nasopharyngeal airway (NPA)","Endotracheal tube","Supraglottic airway"],
+   correct:1, explain:"An NPA is generally better tolerated than an OPA in patients with an intact gag reflex, since it doesn't sit against the back of the tongue and throat the same way."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"A patient is breathing at a rate of 10 with good depth and equal chest rise. What is the appropriate action?",
+   options:["Begin assisted ventilation with a BVM","Provide passive oxygen as indicated, no assisted ventilation needed","Withhold all oxygen","Perform immediate suctioning"],
+   correct:1, explain:"A rate of 10 with adequate depth is within a reasonable adult range — passive oxygen as indicated is appropriate, not assisted ventilation, which is for inadequate breathing."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"Which finding would most suggest a nasopharyngeal airway is inappropriate for a given patient?",
+   options:["The patient is unresponsive","Suspected basilar skull fracture","A clear airway with no secretions","A normal respiratory rate"],
+   correct:1, explain:"Suspected basilar skull fracture or significant midface trauma raises concern for inadvertent intracranial placement of an NPA."},
+  {domain:"Airway & Respiratory", diff:"hard", q:"A patient's oxygen saturation reads 97% on the pulse oximeter, but they appear cyanotic, confused, and are breathing rapidly with obvious distress. What should the EMT do?",
+   options:["Trust the pulse oximeter completely and withhold oxygen","Treat based on the overall clinical picture, not the number alone, since the reading may not reflect the patient's true status","Assume the patient is faking symptoms","Disconnect the pulse oximeter and ignore all further readings"],
+   correct:1, explain:"A pulse oximeter reading can be misleading in certain situations (like CO poisoning). When the number doesn't match the clinical picture, trust the patient's actual presentation and treat accordingly."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"What is the main purpose of the reservoir bag on a non-rebreather mask?",
+   options:["To filter the oxygen","To store a supply of high-concentration oxygen for the patient to inhale","To humidify the oxygen","To measure the patient's tidal volume"],
+   correct:1, explain:"The reservoir bag holds a reserve of oxygen so the patient inhales a higher concentration than room air alone, rather than diluting it with each breath."},
+  {domain:"Airway & Respiratory", diff:"easy", q:"Which of the following best describes stridor?",
+   options:["A high-pitched sound during inspiration, suggesting upper airway narrowing","A low-pitched rumbling sound during expiration","A completely silent chest","A normal breath sound in healthy adults"],
+   correct:0, explain:"Stridor is a high-pitched inspiratory sound associated with upper airway narrowing or obstruction."},
+  {domain:"Airway & Respiratory", diff:"hard", q:"A patient with a known asthma history is now quiet, with minimal wheezing audible and appears exhausted after a prolonged episode of labored breathing. What does the quieting of the wheeze most likely indicate?",
+   options:["The asthma attack is resolving on its own with no concern","Possible worsening airflow obstruction/impending respiratory failure, since less air movement can mean less wheeze to hear","A completely unrelated new problem","Nothing significant — silence is always reassuring"],
+   correct:1, explain:"Paradoxically, wheezing can become quieter as airflow worsens significantly, since there's less air movement to generate the sound — combined with exhaustion, this is a concerning finding, not a reassuring one."},
+  {domain:"Airway & Respiratory", diff:"medium", q:"What is the primary reason suction time is limited during airway suctioning?",
+   options:["To save battery on the suction unit","To avoid worsening the patient's hypoxia during the procedure","Suctioning has no time-related risk","To reduce noise during the procedure"],
+   correct:1, explain:"Suctioning also removes oxygen along with secretions, so prolonged suctioning risks worsening hypoxia — hence the time limit."},
+
+  {domain:"Cardiac & Medical", diff:"easy", q:"What does \"ACS\" commonly stand for in the context of cardiac emergencies?",
+   options:["Acute Coronary Syndrome","Advanced Cardiac Support","Airway Compromise Syndrome","Acute Circulatory Shock"],
+   correct:0, explain:"ACS = Acute Coronary Syndrome, an umbrella term covering conditions caused by reduced blood flow to the heart, including unstable angina and myocardial infarction."},
+  {domain:"Cardiac & Medical", diff:"easy", q:"What does \"DKA\" stand for?",
+   options:["Diabetic Ketoacidosis","Delayed Kidney Assessment","Direct Kinetic Airway","Diastolic Kinetic Arrhythmia"],
+   correct:0, explain:"DKA = Diabetic Ketoacidosis, a serious complication of hyperglycemia involving acidosis and dehydration."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"A patient reports chest pressure that started while shoveling snow and has continued for 20 minutes despite rest. What should the EMT be most concerned about?",
+   options:["This is almost certainly just muscle strain","This presentation is concerning for a possible acute cardiac event and warrants prompt assessment and transport","No concern is warranted since the patient is still talking","This can safely wait until the patient's next scheduled doctor visit"],
+   correct:1, explain:"Exertion-triggered chest pain that persists despite rest is a concerning pattern for ACS and should be treated as a potential cardiac emergency."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"A patient with a history of seizures has a seizure lasting 3 minutes, followed by a second seizure starting almost immediately without the patient regaining consciousness in between. How should this be classified and treated?",
+   options:["Two normal, separate seizures requiring no special urgency","Possible status epilepticus, a serious emergency requiring prompt transport and close airway monitoring","A sign the patient is faking the episode","An expected, low-concern pattern for anyone with a seizure history"],
+   correct:1, explain:"Seizures occurring back-to-back without a return to baseline consciousness meet the general concept of status epilepticus — a genuine emergency, not a routine event even for someone with a known seizure disorder."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Which finding would most support a diagnosis of anaphylaxis over a mild localized allergic reaction?",
+   options:["Itching limited to the exposure site","Stridor and hypotension following a bee sting","A single small area of redness","No symptoms beyond mild itching"],
+   correct:1, explain:"Stridor (airway involvement) and hypotension (cardiovascular involvement) indicate the systemic reaction characteristic of anaphylaxis, not a mild localized response."},
+  {domain:"Cardiac & Medical", diff:"easy", q:"Which pupil finding is classically associated with opioid overdose?",
+   options:["Dilated (large) pupils","Pinpoint (constricted) pupils","Unequal pupils only","Pupils that don't react to light at all"],
+   correct:1, explain:"Pinpoint pupils are a classic finding in opioid overdose, alongside respiratory depression and decreased consciousness."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"A patient with a history of anxiety presents with rapid breathing and tingling in the hands. Vital signs are otherwise normal, and symptoms began suddenly during an argument. What should still guide the EMT's approach?",
+   options:["Assume anxiety immediately and skip further assessment","Perform a reasonably thorough assessment to rule out other causes of rapid breathing before attributing it to anxiety, even though anxiety is a plausible explanation","Refuse to treat the patient since anxiety isn't a real medical concern","Withhold all further questions since the history sounds convincing"],
+   correct:1, explain:"Even when a story fits a benign explanation well, a reasonably thorough assessment matters — anxiety is a diagnosis of exclusion in the field, not a snap judgment based on history alone."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Why might an elderly patient with an infection not show a high fever, unlike a younger patient?",
+   options:["Elderly patients are never able to develop infections","Aging can blunt the body's typical fever response, so a normal or only mildly elevated temperature doesn't rule out serious infection","Elderly patients always run high baseline temperatures","This finding has no clinical significance"],
+   correct:1, explain:"Blunted fever response in elderly patients means a lack of high fever shouldn't be used to rule out a serious infection like sepsis — this is a recognized age-related assessment pitfall."},
+
+  {domain:"Trauma", diff:"easy", q:"What does \"MOI\" stand for in trauma assessment?",
+   options:["Mechanism of Injury","Multiple Organ Impact","Medical Officer Input","Mode of Intervention"],
+   correct:0, explain:"MOI = Mechanism of Injury, describing how the injury occurred and the forces involved."},
+  {domain:"Trauma", diff:"easy", q:"What is the general purpose of a cervical collar?",
+   options:["To control bleeding from neck wounds","To help limit motion of the cervical spine","To improve the patient's airway on its own","To monitor the patient's pulse"],
+   correct:1, explain:"A cervical collar helps limit cervical spine motion in a patient with a suspected spinal injury — it doesn't control bleeding or independently manage the airway."},
+  {domain:"Trauma", diff:"medium", q:"A patient has an open fracture with visible bone protruding through the skin. What is an appropriate general approach?",
+   options:["Push the bone back under the skin before splinting","Cover the wound appropriately and splint without attempting to reposition the bone, per protocol","Ignore the open wound and splint as if it were closed","Apply a tourniquet directly over the fracture site regardless of bleeding severity"],
+   correct:1, explain:"Open fractures are managed by appropriately covering the wound and splinting without pushing exposed bone back under the skin, which risks further contamination and injury."},
+  {domain:"Trauma", diff:"hard", q:"A patient was involved in a low-speed collision with no visible damage to the vehicle and denies pain, but was found unrestrained and thrown from the passenger seat onto the floorboard. How should the mechanism be interpreted?",
+   options:["Low vehicle damage means the mechanism is automatically minor","Being unrestrained and displaced within the vehicle can still represent a significant mechanism, regardless of visible vehicle damage","Only exterior vehicle damage matters for MOI assessment","No assessment beyond visual vehicle inspection is needed"],
+   correct:1, explain:"Occupant kinematics — what happened to the person inside the vehicle, not just the vehicle's exterior damage — is what actually determines injury risk. An unrestrained occupant thrown within the vehicle represents real energy transfer even with minimal visible vehicle damage."},
+  {domain:"Trauma", diff:"medium", q:"What is a key reason multiple rib fractures are taken seriously, even without visible external injury?",
+   options:["They never cause any internal complications","They can be associated with underlying lung injury not visible from the outside","They are purely a cosmetic concern","They always heal without any monitoring needed"],
+   correct:1, explain:"The real concern with rib fractures often isn't the bone itself, but the potential for underlying lung injury (like pneumothorax) that isn't visible externally."},
+  {domain:"Trauma", diff:"easy", q:"What is the general purpose of splinting an extremity injury?",
+   options:["To immobilize the injury, reduce pain, and help prevent further damage during movement","To increase the range of motion of the injured limb","To eliminate the need for any further hospital evaluation","To reduce the need for a PMS check"],
+   correct:0, explain:"Splinting stabilizes an injury to prevent further movement and damage, reduces pain, and protects surrounding tissue during handling and transport."},
+  {domain:"Trauma", diff:"hard", q:"A patient with a penetrating chest wound develops worsening respiratory distress, jugular venous distension, and tracheal deviation away from the injury side. What should the EMT suspect, and why do these three findings appear together?",
+   options:["Simple pneumothorax, and the findings are unrelated to each other","A developing tension pneumothorax — pressure building in the chest is both collapsing the lung and pushing central structures away, which also impedes venous return, explaining the JVD and tracheal shift together","A completely unrelated cardiac arrhythmia not linked to the chest wound","Anxiety-related hyperventilation, which independently causes all three findings"],
+   correct:1, explain:"In tension pneumothorax, rising intrathoracic pressure pushes central structures (trachea) away from the affected side, while also compressing the great veins, reducing venous return — which is what causes the jugular venous distension. These findings all stem from the same underlying pressure problem, not three separate issues."},
+  {domain:"Trauma", diff:"medium", q:"For a patient with a suspected pelvic fracture, why is minimizing movement of the pelvis especially important?",
+   options:["Pelvic fractures are rarely associated with significant bleeding","Excessive movement can worsen internal bleeding associated with an unstable pelvic fracture","Movement has no effect on pelvic fracture outcomes","Pelvic fractures never require any special handling"],
+   correct:1, explain:"An unstable pelvis has a large potential space for blood loss, and excessive movement can worsen that bleeding — this is why pelvic binders and gentle handling matter."},
+
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"What does \"APGAR\" primarily assess?",
+   options:["A newborn's condition immediately after birth","A pregnant patient's blood pressure trend","The mother's pain level during labor","The gestational age of the fetus"],
+   correct:0, explain:"The APGAR score is a quick assessment of a newborn's condition right after birth, based on appearance, pulse, grimace, activity, and respirations."},
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"What is a normal general timeframe for a full-term pregnancy?",
+   options:["Approximately 40 weeks","Approximately 20 weeks","Approximately 60 weeks","Approximately 12 weeks"],
+   correct:0, explain:"A full-term pregnancy is generally considered to be around 40 weeks."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Why do infants and young children have a higher risk of hypothermia compared to adults in similar conditions?",
+   options:["They have no meaningful risk difference from adults","They have a larger body surface area relative to their body mass, causing faster heat loss","They generate more body heat than adults","Hypothermia risk is unrelated to body size"],
+   correct:1, explain:"A higher surface-area-to-mass ratio means infants and young children lose heat more quickly relative to their size than adults do."},
+  {domain:"OB/Peds & Special Populations", diff:"hard", q:"A toddler presents with a spiral fracture of the femur, and the caregiver's explanation of a simple fall doesn't match the pattern or severity of the injury for the child's age and reported mechanism. What should this discrepancy prompt?",
+   options:["Immediate dismissal of the caregiver's account with an accusatory approach on scene","Recognizing this as a potential red flag for abuse, documenting objectively, and following the appropriate reporting process without confronting the caregiver in the field","No action, since fractures in toddlers are always accidental","Refusing to treat the child until the story is verified"],
+   correct:1, explain:"A mismatch between injury severity/pattern and the reported mechanism is a recognized red flag. The EMT's role is objective documentation and appropriate reporting — not confrontation or accusation on scene, which isn't the EMT's role and could compromise both care and any investigation."},
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Why is the Pediatric Assessment Triangle performed before any hands-on contact with the child?",
+   options:["It has no real clinical value","It provides a rapid, non-threatening initial impression that can guide urgency, without upsetting the child before a more detailed exam","Hands-on contact is never appropriate with pediatric patients","It replaces the need for any further assessment"],
+   correct:1, explain:"Assessing appearance, breathing, and circulation from across the room lets the EMT form a rapid initial impression and gauge urgency without immediately upsetting or startling the child."},
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"Which of the following is a normal, expected part of most vaginal deliveries?",
+   options:["The presence of some blood and amniotic fluid","The complete absence of any fluid","A guaranteed complication requiring surgery","An automatic need for neonatal resuscitation in every birth"],
+   correct:0, explain:"Some blood and amniotic fluid are a normal, expected part of a typical vaginal delivery."},
+  {domain:"OB/Peds & Special Populations", diff:"hard", q:"A caregiver for a nonverbal adult with a significant cognitive disability reports the patient is \"not acting like themselves.\" There are no obvious vital sign abnormalities or visible injuries. How should the EMT weigh this information?",
+   options:["Dismiss the report since there's no objective abnormality found", "Treat the caregiver's knowledge of the patient's baseline as a valuable, legitimate data point, since subtle changes may not show up in standard objective findings alone", "Require the patient to verbally confirm the complaint before proceeding", "Refuse care since the patient cannot describe their own symptoms"],
+   correct:1, explain:"For a nonverbal patient, a caregiver's knowledge of the person's normal baseline behavior is genuinely valuable clinical information — subtle but real changes can precede objective findings on standard vital signs or exam."},
+
+  {domain:"EMS Operations", diff:"easy", q:"What does \"PPE\" stand for?",
+   options:["Personal Protective Equipment","Patient Priority Evaluation","Primary Provider Examination","Physical Protection Escort"],
+   correct:0, explain:"PPE = Personal Protective Equipment — gloves, eye protection, masks, gowns, etc., used to protect the provider."},
+  {domain:"EMS Operations", diff:"easy", q:"What does \"MCI\" stand for in EMS operations?",
+   options:["Multiple-Casualty Incident","Medical Command Interface","Mobile Care Initiative","Mandatory Crew Instruction"],
+   correct:0, explain:"MCI = Multiple-Casualty Incident, an event with more patients than the initially available resources can immediately treat and transport."},
+  {domain:"EMS Operations", diff:"medium", q:"Why do most EMS agencies require a completed patient care report even when a patient refuses transport?",
+   options:["It's optional and rarely matters for refusals","Refusals still carry legal and clinical significance, and documentation protects both the patient's record and the provider","Refusal calls don't need any documentation at all","Documentation is only required for patients who are transported"],
+   correct:1, explain:"A refusal still needs to be documented — it's a decision with real legal and clinical weight, and proper documentation protects everyone involved."},
+  {domain:"EMS Operations", diff:"hard", q:"At a multi-vehicle incident, the first-arriving crew begins detailed treatment on the first patient they find, missing a more critically injured patient in a vehicle further from the road. What does this scenario illustrate about incident priorities?",
+   options:["This was the correct approach since the first patient found should always be treated first","This illustrates why an initial scene size-up and triage assessment across the whole scene should generally precede committing to detailed treatment of one patient in a multi-patient incident","Detailed treatment should always come before any scene survey, regardless of patient count","This scenario has no operational lesson"],
+   correct:1, explain:"Committing early to one patient's detailed care in a multi-patient scene risks missing a more critical patient elsewhere — a broader initial size-up and triage pass helps ensure resources go where they're needed most first."},
+  {domain:"EMS Operations", diff:"medium", q:"What is the general purpose of a written or standing protocol in EMS?",
+   options:["To eliminate the need for any clinical judgment","To provide pre-approved guidance for common situations so care isn't delayed by needing to call for orders every time","Protocols only apply to paramedics, never EMTs","To replace the need for training entirely"],
+   correct:1, explain:"Standing protocols let EMTs act on pre-approved guidance without needing to call for permission for every common situation, while still requiring sound clinical judgment in applying them."}
+
+  {domain:"Cardiac & Medical", diff:"medium", q:"A patient with known heart failure presents with worsening shortness of breath, especially when lying flat, and swelling in both ankles. What does this presentation most likely suggest?",
+   options:["A simple ankle sprain unrelated to the cardiac history","Worsening heart failure with fluid buildup, warranting prompt assessment and transport","A guaranteed allergic reaction","No clinical significance given the existing diagnosis"],
+   correct:1, explain:"Difficulty breathing when lying flat (orthopnea) combined with peripheral swelling in a heart failure patient suggests worsening fluid overload, a legitimate emergency."},
+  {domain:"Cardiac & Medical", diff:"easy", q:"What does \"AMS\" commonly stand for in EMS documentation?",
+   options:["Altered Mental Status","Acute Metabolic Syndrome","Airway Management System","Advanced Medical Support"],
+   correct:0, explain:"AMS = Altered Mental Status, a common finding across many medical emergencies."},
+  {domain:"Cardiac & Medical", diff:"hard", q:"A patient taking a beta-blocker medication is in early shock from blood loss, but their heart rate remains only mildly elevated instead of showing the expected significant tachycardia. What explains this discrepancy?",
+   options:["The patient isn't actually in shock, since the heart rate looks normal","Beta-blockers can blunt the normal compensatory heart rate response to shock, so heart rate alone may under-represent the severity in these patients","Beta-blockers have no relevant effect on heart rate","This medication makes shock impossible to develop"],
+   correct:1, explain:"Beta-blockers blunt the sympathetic-driven tachycardia response, meaning a patient on this medication can be in significant shock without showing the dramatic heart rate elevation typically expected — a good example of why medications matter to interpreting vital signs."},
+  {domain:"Cardiac & Medical", diff:"medium", q:"Why is it important to ask about a patient's use of erectile dysfunction medications before assisting with nitroglycerin?",
+   options:["It's not relevant to nitroglycerin administration","Combining the two can cause a severe, dangerous drop in blood pressure","ED medications increase nitroglycerin's effectiveness with no added risk","This only matters for female patients"],
+   correct:1, explain:"Certain ED medications combined with nitroglycerin can cause a severe, potentially life-threatening drop in blood pressure — this is a standard safety check before nitroglycerin administration."},
+
+  {domain:"Trauma", diff:"medium", q:"A patient with a suspected c-spine injury needs their airway opened, but you're also managing significant external bleeding. What is the correct general priority?",
+   options:["Bleeding control always comes before airway management, regardless of severity", "Airway takes priority in the standard ABC framework, but severe, immediately life-threatening hemorrhage may be addressed essentially simultaneously depending on training and protocol","Neither should be addressed until the patient is fully immobilized","Only one of the two can ever be managed by a single EMT"],
+   correct:1, explain:"Airway remains the traditional first priority in ABC, though current teaching increasingly recognizes that catastrophic, immediately life-threatening bleeding may need essentially simultaneous attention — a nuance worth discussing with your specific program."},
+  {domain:"Trauma", diff:"easy", q:"What is the general purpose of a cold pack or ice application to a closed soft-tissue injury?",
+   options:["To reduce swelling and pain","To increase blood flow to the area","To sterilize the wound","To replace the need for any splinting"],
+   correct:0, explain:"Cold application to a closed injury generally helps reduce swelling and pain through vasoconstriction, not to increase blood flow or sterilize anything."},
+  {domain:"Trauma", diff:"hard", q:"A patient involved in a high-speed crash has no external signs of injury and normal initial vital signs, but the mechanism involved significant deceleration forces. What should guide the EMT's index of suspicion?",
+   options:["Normal vital signs and no visible injury mean serious injury can be ruled out","Significant deceleration forces can cause serious internal injury without immediately obvious external signs or vital sign changes, so a high index of suspicion and thorough assessment remain warranted","Only visible injuries matter for triage decisions","Vital signs are the only reliable indicator of injury severity"],
+   correct:1, explain:"Internal injuries from significant deceleration forces can exist without early external signs or vital sign changes — compensated shock can look deceptively normal at first, which is why mechanism alone can justify a high index of suspicion even with reassuring initial findings."},
+  {domain:"Trauma", diff:"medium", q:"Why is early recognition of a significant mechanism of injury valuable, even in a patient who currently has no complaints?",
+   options:["It has no practical value if the patient feels fine","It can prompt closer monitoring and a lower threshold for a more thorough assessment, since injuries aren't always immediately symptomatic","Patients with no complaints never have significant injuries","Mechanism of injury is only relevant after symptoms appear"],
+   correct:1, explain:"Some serious injuries don't produce immediate symptoms — recognizing a significant mechanism early keeps the EMT appropriately alert even before symptoms might develop."},
+
+  {domain:"OB/Peds & Special Populations", diff:"medium", q:"Why might a pregnant patient in a car crash need extra attention to positioning and monitoring compared to a non-pregnant patient with a similar mechanism?",
+   options:["Pregnancy has no effect on trauma assessment or positioning","Physiologic changes of pregnancy (like increased blood volume and altered baseline vitals) and the presence of a second patient (the fetus) both affect assessment and care","Pregnant patients should always be treated identically to non-pregnant patients in every respect","Pregnancy makes injury from trauma impossible"],
+   correct:1, explain:"Pregnancy changes maternal physiology in ways that affect how shock and other findings present, and there's a second patient (the fetus) to consider — both are reasons trauma in pregnancy gets extra attention."},
+
+  {domain:"EMS Operations", diff:"medium", q:"Why might an EMS system use tiered dispatch, sending different response levels based on the reported nature of the call?",
+   options:["It has no operational benefit","It helps allocate limited resources more efficiently, sending higher-level or faster responses to calls that are more likely to be time-critical","All calls should always receive an identical response regardless of complaint","Tiered dispatch is illegal in most jurisdictions"],
+   correct:1, explain:"Tiered dispatch helps systems allocate resources — like faster response or higher level of care — toward calls more likely to need it, rather than treating every call identically."},
+  {domain:"EMS Operations", diff:"easy", q:"What does \"BSI\" stand for?",
+   options:["Body Substance Isolation","Basic Skills Inventory","Blood Sample Identification","Baseline Symptom Index"],
+   correct:0, explain:"BSI = Body Substance Isolation, the practice of treating all body fluids as potentially infectious."},
+  {domain:"EMS Operations", diff:"hard", q:"An EMS crew is dispatched to a scene later found to involve an active, ongoing physical altercation that wasn't reported by the caller. What does this scenario most directly illustrate about scene safety?",
+   options:["Dispatch information can be incomplete or inaccurate, so ongoing situational awareness on approach and at the scene matters even when the call doesn't initially sound dangerous","Dispatch information is always fully reliable, so no further vigilance is needed","EMS crews should never trust dispatch information at all","This scenario has no bearing on real EMS operations"],
+   correct:0, explain:"Dispatch information is a starting point, not a guarantee — maintaining situational awareness throughout approach and patient contact matters precisely because the reported nature of a call can turn out to be incomplete or wrong."},
+  {domain:"EMS Operations", diff:"medium", q:"Why do many EMS systems track response time intervals as a quality metric?",
+   options:["Response time has no connection to patient outcomes in any situation","For genuinely time-critical conditions, faster response can meaningfully affect outcomes, making response time intervals a useful (though not perfect) system performance metric","Response time is tracked only for billing purposes","Tracking response times is purely a historical formality with no current use"],
+   correct:1, explain:"For time-critical conditions like cardiac arrest, response time can meaningfully affect outcomes, which is part of why EMS systems commonly track it as one (imperfect but useful) quality metric among others."}
+
+  {domain:"OB/Peds & Special Populations", diff:"easy", q:"What is a normal general range for a newborn's blood glucose shortly after birth, in broad terms?",
+   options:["Newborns generally maintain glucose within a range that's monitored closely, since both low and high extremes can be concerning","Newborn glucose is never monitored or relevant","Any glucose level is considered normal for a newborn","Newborns cannot have low blood glucose"],
+   correct:0, explain:"Newborn glucose regulation is actively monitored since both hypoglycemia and significant hyperglycemia can occur and matter clinically in the immediate newborn period."}
+];
+
+let mode = 'full'; // 'full', 'review', 'domain', or 'flashcard'
+let selectedDomain = null;
+let activeIndices = []; // maps position-in-quiz -> index into QUESTIONS
+let current = 0;
+let answers = [];
+let startTime = null;
+let timerInterval = null;
+const TIME_LIMIT_MS = 2 * 60 * 60 * 1000;
+let TARGET_PACE_MS = TIME_LIMIT_MS / 100;
+
+// Domain-balanced random draw: each full exam pulls this many questions
+// from each domain, randomly, from the full question pool.
+const DOMAIN_TARGETS = {
+  "Assessment": 15,
+  "Airway & Respiratory": 15,
+  "Cardiac & Medical": 20,
+  "Trauma": 20,
+  "OB/Peds & Special Populations": 15,
+  "EMS Operations": 15
+};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function filterPoolByDifficulty(pool, diffFilter, count){
+  if(!diffFilter || diffFilter === 'all') return pool;
+  const filtered = pool.filter(i => QUESTIONS[i].diff === diffFilter);
+  if(filtered.length >= count) return filtered;
+  // Not enough at this difficulty — fill the remainder from the rest of the pool
+  const filteredSet = new Set(filtered);
+  const rest = shuffle(pool.filter(i => !filteredSet.has(i)));
+  return filtered.concat(rest);
+}
+
+function buildRandomExamIndices(diffFilter){
+  const byDomain = {};
+  QUESTIONS.forEach((q, i) => {
+    if(!byDomain[q.domain]) byDomain[q.domain] = [];
+    byDomain[q.domain].push(i);
+  });
+  let selected = [];
+  Object.entries(DOMAIN_TARGETS).forEach(([domain, count]) => {
+    let pool = shuffle(byDomain[domain] || []);
+    pool = filterPoolByDifficulty(pool, diffFilter, count);
+    selected = selected.concat(pool.slice(0, count));
+  });
+  return shuffle(selected);
+}
+
+const introScreen = document.getElementById('introScreen');
+const quizScreen = document.getElementById('quizScreen');
+const resultsScreen = document.getElementById('resultsScreen');
+const STORAGE_KEY = 'nremt_exam100_best';
+const MISSED_KEY = 'nremt_exam100_missed';
+const HISTORY_KEY = 'nremt_exam100_history';
+
+function loadHistory(){
+  const raw = localStorage.getItem(HISTORY_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveHistoryEntry(entry){
+  const history = loadHistory();
+  history.push(entry);
+  while(history.length > 20) history.shift();
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+function renderProgressChart(){
+  const history = loadHistory();
+  const panel = document.getElementById('progressPanel');
+  const toggle = document.getElementById('progressToggle');
+  if(history.length === 0){
+    toggle.style.display = 'none';
+    return;
+  }
+  toggle.style.display = 'block';
+  toggle.textContent = `View progress (${history.length} attempt${history.length===1?'':'s'}) \u2193`;
+
+  const pcts = history.map(h => Math.round(h.score / h.total * 100));
+  const avg = Math.round(pcts.reduce((a,b)=>a+b,0) / pcts.length);
+  const best = Math.max(...pcts);
+
+  const w = 300, h = 100, pad = 6;
+  const max = 100, min = 0;
+  const stepX = pcts.length > 1 ? (w - pad*2) / (pcts.length - 1) : 0;
+  const pts = pcts.map((p,i) => {
+    const x = pad + i * stepX;
+    const y = h - pad - ((p - min) / (max - min)) * (h - pad*2);
+    return [x,y];
+  });
+  const line = pts.length > 1
+    ? pts.map((p,i) => (i===0?'M':'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ')
+    : `M${pts[0][0]},${pts[0][1]} L${pts[0][0]+0.01},${pts[0][1]}`;
+
+  const svg = `<svg class="progress-chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <path d="${line}" fill="none" stroke="#C1502E" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+    ${pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2" fill="#122033"/>`).join('')}
+  </svg>`;
+
+  const listHtml = history.slice().reverse().slice(0,8).map(hEntry => {
+    const pct = Math.round(hEntry.score / hEntry.total * 100);
+    const d = new Date(hEntry.date);
+    return `<div class="p-row"><span>${d.toLocaleDateString()}</span><span>${hEntry.score}/${hEntry.total} (${pct}%)</span></div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="progress-stats">
+      <span>Average: <b>${avg}%</b></span>
+      <span>Best: <b>${best}%</b></span>
+      <span>Attempts: <b>${history.length}</b></span>
+    </div>
+    ${svg}
+    <div class="progress-list">${listHtml}</div>
+  `;
+}
+
+document.getElementById('progressToggle').addEventListener('click', () => {
+  const panel = document.getElementById('progressPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+});
+
+function loadMissed(){
+  const raw = localStorage.getItem(MISSED_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveMissed(list){
+  localStorage.setItem(MISSED_KEY, JSON.stringify(list));
+}
+
+function refreshIntroState(){
+  const best = localStorage.getItem(STORAGE_KEY);
+  const line = document.getElementById('bestScoreLine');
+  if(best){
+    const data = JSON.parse(best);
+    line.textContent = `Your best score so far: ${data.score}/${QUESTIONS.length} (completed in ${formatDuration(data.timeMs)})`;
+  }
+  const missed = loadMissed();
+  document.getElementById('missedCount').textContent = missed.length;
+  document.getElementById('reviewBtn').disabled = missed.length === 0;
+  renderProgressChart();
+}
+refreshIntroState();
+
+function formatDuration(ms){
+  const totalSec = Math.floor(ms/1000);
+  const h = Math.floor(totalSec/3600);
+  const m = Math.floor((totalSec%3600)/60);
+  const s = totalSec%60;
+  return h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  mode = 'full';
+  const diffFilter = document.getElementById('difficultySelect').value;
+  activeIndices = buildRandomExamIndices(diffFilter);
+  TARGET_PACE_MS = TIME_LIMIT_MS / activeIndices.length;
+  beginQuiz(true);
+});
+
+document.getElementById('reviewBtn').addEventListener('click', () => {
+  const missed = loadMissed();
+  if(missed.length === 0) return;
+  mode = 'review';
+  activeIndices = missed.slice();
+  beginQuiz(false);
+});
+
+const DOMAIN_PROGRESS_KEY = 'nremt_domain_progress';
+function recordDomainProgress(domain, score, total){
+  const raw = localStorage.getItem(DOMAIN_PROGRESS_KEY);
+  const data = raw ? JSON.parse(raw) : {};
+  const pct = Math.round(score/total*100);
+  if(!data[domain]) data[domain] = {attempts:0, best:0, last:0, lastDate:null};
+  data[domain].attempts += 1;
+  data[domain].best = Math.max(data[domain].best, pct);
+  data[domain].last = pct;
+  data[domain].lastDate = Date.now();
+  localStorage.setItem(DOMAIN_PROGRESS_KEY, JSON.stringify(data));
+}
+
+document.getElementById('flashcardBtn').addEventListener('click', () => {
+  const domain = document.getElementById('domainSelect').value;
+  const diffFilter = document.getElementById('difficultySelect').value;
+  let pool = domain === 'all'
+    ? QUESTIONS.map((_,i) => i)
+    : QUESTIONS.map((q,i) => ({q,i})).filter(o => o.q.domain === domain).map(o => o.i);
+  if(diffFilter && diffFilter !== 'all'){
+    const filtered = pool.filter(i => QUESTIONS[i].diff === diffFilter);
+    if(filtered.length > 0) pool = filtered;
+  }
+  fcIndices = shuffle(pool);
+  fcCurrent = 0;
+  fcFlipped = false;
+  introScreen.style.display = 'none';
+  document.getElementById('flashcardScreen').style.display = 'block';
+  renderFlashcard();
+});
+
+let fcIndices = [];
+let fcCurrent = 0;
+let fcFlipped = false;
+
+function renderFlashcard(){
+  const q = QUESTIONS[fcIndices[fcCurrent]];
+  document.getElementById('fcProgressText').textContent = `Card ${fcCurrent+1} of ${fcIndices.length}`;
+  document.getElementById('fcDomain').innerHTML = `${q.domain}<span class="diff-badge ${q.diff}">${q.diff}</span>`;
+  document.getElementById('fcProgressFill').style.width = ((fcCurrent+1)/fcIndices.length*100) + '%';
+
+  const letters = ['A','B','C','D'];
+  document.getElementById('fcFront').innerHTML = `
+    <div style="margin-bottom:14px;">${q.q}</div>
+    <div style="font-size:13.5px;color:var(--muted);">
+      ${q.options.map((o,i) => `${letters[i]}) ${o}`).join('<br>')}
+    </div>
+  `;
+  document.getElementById('fcBack').innerHTML = `
+    <div class="answer">${letters[q.correct]}) ${q.options[q.correct]}</div>
+    <div class="explain">${q.explain}</div>
+  `;
+
+  fcFlipped = false;
+  document.getElementById('fcFront').style.display = 'block';
+  document.getElementById('fcBack').style.display = 'none';
+  document.getElementById('fcPrevBtn').disabled = fcCurrent === 0;
+  document.getElementById('fcNextBtn').textContent = fcCurrent === fcIndices.length-1 ? 'Shuffle & Restart' : 'Next';
+}
+
+document.getElementById('fcCard').addEventListener('click', () => {
+  fcFlipped = !fcFlipped;
+  document.getElementById('fcFront').style.display = fcFlipped ? 'none' : 'block';
+  document.getElementById('fcBack').style.display = fcFlipped ? 'block' : 'none';
+});
+
+document.getElementById('fcPrevBtn').addEventListener('click', () => {
+  if(fcCurrent > 0){ fcCurrent--; renderFlashcard(); }
+});
+document.getElementById('fcNextBtn').addEventListener('click', () => {
+  if(fcCurrent < fcIndices.length-1){
+    fcCurrent++;
+    renderFlashcard();
+  } else {
+    fcIndices = shuffle(fcIndices);
+    fcCurrent = 0;
+    renderFlashcard();
+  }
+});
+document.getElementById('flashcardExitBtn').addEventListener('click', () => {
+  if(confirm('Exit flashcard review?')){
+    document.getElementById('flashcardScreen').style.display = 'none';
+    introScreen.style.display = 'block';
+    refreshIntroState();
+  }
+});
+
+document.getElementById('domainStartBtn').addEventListener('click', () => {
+  const domain = document.getElementById('domainSelect').value;
+  const length = parseInt(document.getElementById('domainLength').value, 10);
+  const diffFilter = document.getElementById('difficultySelect').value;
+  let pool = domain === 'all'
+    ? QUESTIONS.map((_,i) => i)
+    : QUESTIONS.map((q,i) => ({q,i})).filter(o => o.q.domain === domain).map(o => o.i);
+  pool = filterPoolByDifficulty(shuffle(pool), diffFilter, length);
+  mode = 'domain';
+  selectedDomain = domain === 'all' ? null : domain;
+  activeIndices = shuffle(pool).slice(0, length);
+  beginQuiz(false);
+});
+
+function beginQuiz(withTimer){
+  current = 0;
+  answers = new Array(activeIndices.length).fill(null);
+  introScreen.style.display = 'none';
+  quizScreen.style.display = 'block';
+  document.getElementById('timerBar').style.display = withTimer ? 'block' : 'none';
+  const banner = document.getElementById('practiceBanner');
+  if(!withTimer){
+    banner.style.display = 'block';
+    banner.textContent = mode === 'review'
+      ? 'Missed-question review — untimed practice mode'
+      : `Domain drill: ${QUESTIONS[activeIndices[0]] ? QUESTIONS[activeIndices[0]].domain : ''} — untimed practice mode`;
+  } else {
+    banner.style.display = 'none';
+  }
+  startTime = Date.now();
+  renderQuestion();
+  renderJumpRow();
+  if(withTimer){
+    timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  }
+}
+
+function updateTimer(){
+  const elapsed = Date.now() - startTime;
+  const remaining = TIME_LIMIT_MS - elapsed;
+  const remEl = document.getElementById('timeRemaining');
+  const paceEl = document.getElementById('paceLine');
+
+  if(remaining <= 0){
+    remEl.textContent = '0:00:00';
+    remEl.classList.add('warn');
+    clearInterval(timerInterval);
+    showResults();
+    return;
+  }
+
+  remEl.textContent = formatDuration(remaining);
+  if(remaining < 10*60*1000) remEl.classList.add('warn');
+
+  const questionsSeen = Math.max(current+1, 1);
+  const avgPace = elapsed / questionsSeen;
+  const paceDiff = TARGET_PACE_MS - avgPace;
+  const paceSec = Math.round(avgPace/1000);
+  const targetSec = Math.round(TARGET_PACE_MS/1000);
+
+  if(paceDiff >= 0){
+    paceEl.textContent = `Pace: ${paceSec}s/question avg (target ${targetSec}s) — ahead of pace`;
+    paceEl.className = 'pace-line ahead';
+  } else {
+    paceEl.textContent = `Pace: ${paceSec}s/question avg (target ${targetSec}s) — behind pace`;
+    paceEl.className = 'pace-line behind';
+  }
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[activeIndices[current]];
+  document.getElementById('progressText').textContent = `Question ${current+1} of ${activeIndices.length}`;
+  document.getElementById('answeredText').textContent = `${answers.filter(a=>a!==null).length} answered`;
+  document.getElementById('progressFill').style.width = ((current+1)/activeIndices.length*100) + '%';
+  document.getElementById('qDomain').innerHTML = `${q.domain}<span class="diff-badge ${q.diff}">${q.diff}</span>`;
+  document.getElementById('qPrompt').textContent = q.q;
+
+  const letters = ['A','B','C','D'];
+  const optsEl = document.getElementById('qOptions');
+  optsEl.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (answers[current]===i ? ' selected' : '');
+    div.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+    div.addEventListener('click', () => {
+      answers[current] = i;
+      renderQuestion();
+      renderJumpRow();
+    });
+    optsEl.appendChild(div);
+  });
+
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').textContent = current === activeIndices.length-1 ? 'Finish' : 'Next';
+}
+
+function renderJumpRow(){
+  const row = document.getElementById('jumpRow');
+  row.innerHTML = '';
+  activeIndices.forEach((qIdx,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'jump-btn' + (i===current?' current':'') + (answers[i]!==null?' answered':'');
+    btn.textContent = i+1;
+    btn.addEventListener('click', () => { current = i; renderQuestion(); renderJumpRow(); });
+    row.appendChild(btn);
+  });
+}
+
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if(current > 0){ current--; renderQuestion(); renderJumpRow(); }
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(current < activeIndices.length-1){
+    current++;
+    renderQuestion();
+    renderJumpRow();
+  } else {
+    showResults();
+  }
+});
+document.getElementById('exitBtn').addEventListener('click', () => {
+  const msg = mode === 'full'
+    ? 'Exit this exam? Your progress on this attempt will not be saved (your best score and missed-question queue from previous attempts are unaffected).'
+    : 'Exit this session? Progress on this session will not be saved.';
+  if(confirm(msg)){
+    clearInterval(timerInterval);
+    quizScreen.style.display = 'none';
+    document.getElementById('timerBar').style.display = 'none';
+    document.getElementById('practiceBanner').style.display = 'none';
+    introScreen.style.display = 'block';
+    refreshIntroState();
+  }
+});
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  if(confirm('Submit now? You can still review all questions and answers after.')){
+    showResults();
+  }
+});
+
+let allReviewData = [];
+
+function showResults(){
+  clearInterval(timerInterval);
+  const elapsed = Date.now() - startTime;
+  quizScreen.style.display = 'none';
+  document.getElementById('timerBar').style.display = 'none';
+  document.getElementById('practiceBanner').style.display = 'none';
+  resultsScreen.style.display = 'block';
+
+  let score = 0;
+  const domainStats = {};
+  let missedSet = new Set(loadMissed());
+
+  activeIndices.forEach((qIdx,i) => {
+    const q = QUESTIONS[qIdx];
+    if(!domainStats[q.domain]) domainStats[q.domain] = {correct:0,total:0};
+    domainStats[q.domain].total++;
+    const correct = answers[i] === q.correct;
+    if(correct){
+      score++;
+      domainStats[q.domain].correct++;
+      missedSet.delete(qIdx);
+    } else {
+      missedSet.add(qIdx);
+    }
+  });
+  saveMissed(Array.from(missedSet));
+
+  document.getElementById('scoreBig').textContent = `${score}/${activeIndices.length}`;
+  document.getElementById('scoreSub').textContent = `${Math.round(score/activeIndices.length*100)}% correct — completed in ${formatDuration(elapsed)}`;
+
+  const breakdownEl = document.getElementById('domainBreakdown');
+  breakdownEl.innerHTML = Object.entries(domainStats).map(([d,s]) =>
+    `<div class="row"><span>${d}</span><span>${s.correct}/${s.total}</span></div>`
+  ).join('');
+
+  const clearedNote = document.getElementById('clearedNote');
+  if(mode === 'review' && missedSet.size === 0){
+    clearedNote.style.display = 'block';
+    clearedNote.textContent = "You've cleared your entire missed-question queue. Nice work — take the full exam again to build a new one, or just keep it clean.";
+  } else if(mode === 'review'){
+    clearedNote.style.display = 'block';
+    clearedNote.textContent = `${missedSet.size} question${missedSet.size===1?'':'s'} still in your review queue for next time.`;
+  } else {
+    clearedNote.style.display = 'none';
+  }
+
+  if(mode === 'full'){
+    const best = localStorage.getItem(STORAGE_KEY);
+    const bestData = best ? JSON.parse(best) : null;
+    if(!bestData || score > bestData.score){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({score, timeMs: elapsed}));
+    }
+    saveHistoryEntry({score, total: activeIndices.length, timeMs: elapsed, date: Date.now()});
+  }
+
+  if(mode === 'domain' && selectedDomain){
+    recordDomainProgress(selectedDomain, score, activeIndices.length);
+  }
+
+  const letters = ['A','B','C','D'];
+  allReviewData = activeIndices.map((qIdx,i) => {
+    const q = QUESTIONS[qIdx];
+    const userAns = answers[i];
+    const isCorrect = userAns === q.correct;
+    return {q, userAns, isCorrect, letters};
+  });
+  document.querySelectorAll('.filter-row button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.filter-row button[data-filter="all"]').classList.add('active');
+  renderReview('all');
+}
+
+function renderReview(filter){
+  const reviewEl = document.getElementById('reviewList');
+  let items = allReviewData;
+  if(filter === 'incorrect') items = allReviewData.filter(d => !d.isCorrect && d.userAns !== null);
+  if(filter === 'unanswered') items = allReviewData.filter(d => d.userAns === null);
+
+  reviewEl.innerHTML = items.map(({q,userAns,isCorrect,letters}) => `
+      <div class="review-item">
+        <div class="r-domain">${q.domain}<span class="diff-badge ${q.diff}">${q.diff}</span></div>
+        <div class="r-q">${q.q}</div>
+        <div class="r-answer ${isCorrect ? 'correct' : 'incorrect'}">
+          Your answer: ${userAns!==null ? letters[userAns]+') '+q.options[userAns] : 'Not answered'} ${isCorrect ? '✓' : '✗'}
+        </div>
+        ${!isCorrect ? `<div class="r-answer correct">Correct answer: ${letters[q.correct]}) ${q.options[q.correct]}</div>` : ''}
+        <div class="r-explain">${q.explain}</div>
+      </div>
+  `).join('');
+}
+
+document.querySelectorAll('.filter-row button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-row button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderReview(btn.dataset.filter);
+  });
+});
+
+document.getElementById('retryBtn').addEventListener('click', () => {
+  resultsScreen.style.display = 'none';
+  introScreen.style.display = 'block';
+  refreshIntroState();
+});
+</script>
+</body>
+</html>

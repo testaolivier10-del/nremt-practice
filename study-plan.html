@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Plan — NREMT-EMT Prep</title>
+<meta name="description" content="A suggested study path and pacing planner for NREMT-EMT exam prep.">
+<style>
+  :root{
+    --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
+    --line:#DCE0DE; --ink:#1A1F1D; --muted:#5C645F; --good:#2F7A4F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.6;}
+  .wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
+  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+  .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 20px;}
+  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
+  .site-nav a{color:var(--accent);text-decoration:none;}
+  .site-nav a:hover{text-decoration:underline;}
+  h2{font-size:20px;font-weight:600;margin:36px 0 12px;}
+
+  .path-step{
+    display:flex;gap:14px;background:var(--white);border:1px solid var(--line);border-radius:6px;
+    padding:16px 18px;margin-bottom:10px;align-items:flex-start;
+  }
+  .path-step .num{
+    font-family:'SFMono-Regular',monospace;color:var(--accent);font-weight:600;font-size:14px;flex-shrink:0;
+  }
+  .path-step .content h3{margin:0 0 4px;font-size:15.5px;}
+  .path-step .content p{margin:0;font-size:13.5px;color:var(--muted);}
+  .path-step .content a{color:var(--navy);}
+
+  .planner-box{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:20px 22px;margin-bottom:20px;}
+  .planner-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
+  .planner-row label{font-size:14px;color:var(--muted);}
+  .planner-row input{
+    width:80px;padding:9px 10px;border:1px solid var(--line);border-radius:4px;
+    font-family:'SFMono-Regular',monospace;font-size:15px;
+  }
+  .planner-row button{
+    padding:10px 18px;background:var(--navy);color:var(--white);border:none;border-radius:4px;
+    font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .plan-output{font-size:14.5px;line-height:1.7;display:none;}
+  .plan-output.show{display:block;}
+  .plan-output ul{margin:8px 0;padding-left:20px;}
+
+  .progress-box{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:20px 22px;margin-bottom:20px;}
+  .domain-row{
+    display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .domain-row:last-child{border-bottom:none;}
+  .domain-row .bar-track{flex:1;height:6px;background:var(--line);border-radius:3px;margin:0 12px;overflow:hidden;}
+  .domain-row .bar-fill{height:100%;background:var(--accent);}
+  .domain-row .pct{font-family:'SFMono-Regular',monospace;color:var(--muted);width:60px;text-align:right;flex-shrink:0;}
+  .domain-row .name{width:150px;flex-shrink:0;}
+  .empty-note{font-size:13.5px;color:var(--muted);}
+
+  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Study Plan</h1>
+  <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a></div>
+  <p class="lede">A suggested order to work through this site's material, plus a pacing planner based on how many days you have left.</p>
+
+  <h2>Suggested path</h2>
+
+  <div class="path-step">
+    <div class="num">1</div>
+    <div class="content">
+      <h3>Learn the frameworks first</h3>
+      <p>Start with the <a href="mnemonics.html">key mnemonics</a> — SAMPLE, OPQRST, AVPU, and the rest. These show up constantly in the practice questions, so having them solid first makes everything after this faster.</p>
+    </div>
+  </div>
+
+  <div class="path-step">
+    <div class="num">2</div>
+    <div class="content">
+      <h3>Drill by domain</h3>
+      <p>Use the <a href="index.html">domain-specific mini quizzes</a> to work through each of the six domains individually. This is where you actually find your weak spots, before committing to a full timed exam.</p>
+    </div>
+  </div>
+
+  <div class="path-step">
+    <div class="num">3</div>
+    <div class="content">
+      <h3>Take a full timed exam</h3>
+      <p>Once you've drilled each domain at least once, take the <a href="index.html">full 100-question timed exam</a> to practice pacing and stamina under real exam-like conditions.</p>
+    </div>
+  </div>
+
+  <div class="path-step">
+    <div class="num">4</div>
+    <div class="content">
+      <h3>Clear your missed-question queue</h3>
+      <p>After each attempt, work through the <a href="index.html">missed-question review</a> until it's empty. This is the highest-leverage single habit on this site — it directly targets what you actually got wrong.</p>
+    </div>
+  </div>
+
+  <div class="path-step">
+    <div class="num">5</div>
+    <div class="content">
+      <h3>Review the psychomotor side separately</h3>
+      <p>Everything above covers the cognitive exam. Don't forget the <a href="skillsheets.html">psychomotor skills study guide</a> for the hands-on skills week — it's a genuinely separate exam with its own prep.</p>
+    </div>
+  </div>
+
+  <h2>How much time do you have?</h2>
+  <div class="planner-box">
+    <div class="planner-row">
+      <label for="daysInput">Days until your exam:</label>
+      <input type="number" id="daysInput" min="1" placeholder="e.g. 10">
+      <button id="planBtn">Build my plan</button>
+    </div>
+    <div class="plan-output" id="planOutput"></div>
+  </div>
+
+  <h2>Your domain progress</h2>
+  <div class="progress-box" id="progressBox">
+    <div class="empty-note">No domain quizzes completed yet on this device. Progress here fills in as you complete domain drills on the practice exam page.</div>
+  </div>
+
+  <footer>
+    <p>Progress and plan data are stored only in your browser (localStorage) and aren't sent anywhere. Clearing your browser data will reset them.</p>
+  </footer>
+</div>
+
+<script>
+  const DOMAINS = ["Assessment","Airway & Respiratory","Cardiac & Medical","Trauma","OB/Peds & Special Populations","EMS Operations"];
+
+  function renderDomainProgress(){
+    const raw = localStorage.getItem('nremt_domain_progress');
+    const data = raw ? JSON.parse(raw) : {};
+    const box = document.getElementById('progressBox');
+    const attempted = DOMAINS.filter(d => data[d]);
+    if(attempted.length === 0) return;
+
+    box.innerHTML = DOMAINS.map(d => {
+      const entry = data[d];
+      const pct = entry ? entry.best : 0;
+      const label = entry ? `${entry.best}% best` : 'Not started';
+      return `
+        <div class="domain-row">
+          <span class="name">${d}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <span class="pct">${label}</span>
+        </div>
+      `;
+    }).join('');
+  }
+  renderDomainProgress();
+
+  document.getElementById('planBtn').addEventListener('click', () => {
+    const days = parseInt(document.getElementById('daysInput').value, 10);
+    const output = document.getElementById('planOutput');
+    if(!days || days < 1){ return; }
+
+    let html = '';
+    if(days <= 3){
+      html = `
+        <p><b>Tight timeline (${days} day${days===1?'':'s'}).</b> Focus on breadth over depth:</p>
+        <ul>
+          <li>Skim the mnemonics page once, today, for a fast refresher</li>
+          <li>Run one 20-question domain drill per remaining day, prioritizing domains you feel weakest in</li>
+          <li>Take one full timed exam with at least a day of buffer before your actual exam</li>
+          <li>Spend any remaining time entirely in the missed-question review queue</li>
+        </ul>
+      `;
+    } else if(days <= 10){
+      html = `
+        <p><b>${days} days out.</b> A reasonable working plan:</p>
+        <ul>
+          <li>Day 1: mnemonics page, then one domain drill</li>
+          <li>Days 2-${Math.max(2,days-4)}: rotate through the remaining domains, one drill per day</li>
+          <li>Last 3-4 days: alternate full timed exams with missed-question review sessions</li>
+          <li>Final day: light review only — mnemonics and skill sheet guide, no new full exams</li>
+        </ul>
+      `;
+    } else {
+      html = `
+        <p><b>${days} days out — plenty of runway.</b> No need to cram:</p>
+        <ul>
+          <li>Spend the first week on mnemonics plus one domain drill every day or two</li>
+          <li>Add a full timed exam roughly once a week to check pacing and stamina</li>
+          <li>Keep the missed-question queue near zero throughout, rather than saving it for the end</li>
+          <li>In the final week, shift to mostly full exams and review, easing off in the last day or two</li>
+        </ul>
+      `;
+    }
+    output.innerHTML = html;
+    output.classList.add('show');
+  });
+</script>
+</body>
+</html>
