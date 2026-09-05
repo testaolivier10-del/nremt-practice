@@ -90,6 +90,17 @@
     border-radius:4px;font-family:inherit;font-size:14.5px;cursor:pointer;
   }
   .domain-btn:hover{background:#EEF1F6;}
+  .adaptive-box{border-color:var(--navy);}
+  .adaptive-box .domain-quiz-title{display:flex;align-items:center;gap:8px;}
+  .adaptive-tag{
+    font-family:'SFMono-Regular',monospace;font-size:10px;letter-spacing:0.03em;text-transform:uppercase;
+    background:var(--navy);color:var(--white);padding:2px 7px;border-radius:20px;
+  }
+  .adaptive-copy{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 14px;}
+  .adaptive-box .domain-quiz-row{margin-bottom:0;}
+  .adaptive-box select{flex:0 0 140px;}
+  .adaptive-box .domain-btn{background:var(--navy);color:var(--white);border-color:var(--navy);}
+  .adaptive-box .domain-btn:hover{background:var(--navy2);}
   .progress-toggle{
     display:block;margin:14px auto 0;background:none;border:none;
     font-family:'SFMono-Regular',monospace;font-size:12.5px;color:var(--muted);
@@ -193,6 +204,7 @@
   .readiness-card .r-sub{color:#D7DEE4;font-size:13px;margin-top:10px;line-height:1.5;}
   .readiness-card .r-note{color:#8A97A3;font-size:11.5px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);}
   .readiness-update{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.15);}
+  .readiness-update .r-sub{color:#D7DEE4;font-size:12.5px;margin-top:6px;line-height:1.5;}
   .readiness-update .r-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
   .readiness-update .r-num{font-size:22px;font-weight:600;font-family:'SFMono-Regular',monospace;}
   .readiness-update .r-tag{font-size:11px;color:#8A97A3;text-transform:uppercase;letter-spacing:0.04em;}
@@ -262,6 +274,20 @@
       <span>Review Missed Questions</span>
       <span class="count" id="missedCount">0</span>
     </button>
+
+    <div class="domain-quiz-box adaptive-box">
+      <div class="domain-quiz-title">Adaptive Practice <span class="adaptive-tag">retargets live</span></div>
+      <p class="adaptive-copy">Each question is picked based on your performance so far — weighted toward domains and specific questions you've gotten wrong before, with difficulty nudged up or down as you answer. It re-targets after every question, not just at the start.</p>
+      <div class="domain-quiz-row">
+        <select id="adaptiveLength">
+          <option value="15">15 questions</option>
+          <option value="20" selected>20 questions</option>
+          <option value="30">30 questions</option>
+          <option value="50">50 questions</option>
+        </select>
+        <button class="domain-btn" id="adaptiveStartBtn">Start Adaptive Practice</button>
+      </div>
+    </div>
 
     <div class="domain-quiz-box">
       <div class="domain-quiz-title">Or drill one domain</div>
@@ -1768,17 +1794,10 @@ function computeReadiness(){
   pcts.forEach((p,i) => { const w = i + 1; weightedSum += p * w; weightTotal += w; });
   const weightedAvg = weightedSum / weightTotal;
 
-  // Aggregate per-domain accuracy across every attempt that recorded it (older
-  // entries saved before this feature existed won't have domainStats, and that's fine).
-  const domainAgg = {};
-  history.forEach(h => {
-    if(!h.domainStats) return;
-    Object.entries(h.domainStats).forEach(([d,s]) => {
-      if(!domainAgg[d]) domainAgg[d] = {correct:0, total:0};
-      domainAgg[d].correct += s.correct;
-      domainAgg[d].total += s.total;
-    });
-  });
+  // Per-domain accuracy aggregated across every mode you've practiced in (full exams,
+  // domain drills, adaptive sessions, review) — not just full-exam attempts — so
+  // targeted practice in a weak area is reflected here even between full exams.
+  const domainAgg = loadDomainStatsAll();
   let weakestDomain = null, weakestPct = null, penaltyApplied = false;
   const domainEntries = Object.entries(domainAgg).filter(([,s]) => s.total >= 5);
   let adjusted = weightedAvg;
@@ -1830,7 +1849,9 @@ function renderReadiness(targetId, opts){
   if(!el) return;
   const r = computeReadiness();
   if(!r.available){
-    el.innerHTML = opts.compact ? '' : `<div class="readiness-empty">Take a full practice exam to see your estimated readiness score here.</div>`;
+    el.innerHTML = opts.compact
+      ? `<div class="readiness-update"><div class="r-sub">Take a full practice exam to unlock your estimated readiness score.</div></div>`
+      : `<div class="readiness-empty">Take a full practice exam to see your estimated readiness score here.</div>`;
     return;
   }
   const subParts = [`Recent average ${r.weightedAvg}% across ${r.attempts} full exam${r.attempts===1?'':'s'}`];
@@ -1917,6 +1938,78 @@ document.getElementById('progressToggle').addEventListener('click', () => {
   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 });
 
+// Per-question mastery tracking (a simple Leitner-style level 0-5) — this is the
+// data the Adaptive Practice algorithm reads to decide what to ask next, and it's
+// updated by every mode (full exam, domain drill, review, adaptive), not just
+// adaptive sessions, so the algorithm benefits from everything you've ever answered.
+const MASTERY_KEY = 'nremt_mastery';
+function loadMastery(){
+  const raw = localStorage.getItem(MASTERY_KEY);
+  return raw ? JSON.parse(raw) : {};
+}
+function updateMastery(qIdx, correct){
+  const m = loadMastery();
+  const rec = m[qIdx] || {level:0, timesCorrect:0, timesWrong:0, lastSeen:0};
+  if(correct){
+    rec.level = Math.min(5, rec.level + 1);
+    rec.timesCorrect++;
+  } else {
+    rec.level = 0;
+    rec.timesWrong++;
+  }
+  rec.lastSeen = Date.now();
+  m[qIdx] = rec;
+  localStorage.setItem(MASTERY_KEY, JSON.stringify(m));
+}
+// A "mastered" item that hasn't been seen in a while gradually becomes due again —
+// a lightweight stand-in for spaced-repetition scheduling, without literal calendar
+// scheduling (this is a study tool used in short sessions, not a daily-review app).
+function effectiveMasteryLevel(rec){
+  if(!rec) return 0;
+  const daysSince = (Date.now() - rec.lastSeen) / 86400000;
+  const decay = Math.floor(daysSince / 4);
+  return Math.max(0, rec.level - decay);
+}
+
+// Per-domain accuracy aggregated across EVERY mode (not just full exams) — this is
+// the shared source of truth for "which domains are actually weak," used by both
+// Adaptive Practice's question weighting and the readiness score's weak-domain check.
+const DOMAIN_STATS_KEY = 'nremt_domain_stats_all';
+function loadDomainStatsAll(){
+  const raw = localStorage.getItem(DOMAIN_STATS_KEY);
+  return raw ? JSON.parse(raw) : {};
+}
+function recordDomainStatsAll(domainStats){
+  const agg = loadDomainStatsAll();
+  Object.entries(domainStats).forEach(([d,s]) => {
+    if(!agg[d]) agg[d] = {correct:0, total:0};
+    agg[d].correct += s.correct;
+    agg[d].total += s.total;
+  });
+  localStorage.setItem(DOMAIN_STATS_KEY, JSON.stringify(agg));
+}
+function domainAccuracyPct(){
+  const agg = loadDomainStatsAll();
+  const pct = {};
+  Object.entries(agg).forEach(([d,s]) => { pct[d] = s.total > 0 ? s.correct / s.total * 100 : null; });
+  return pct;
+}
+// One-time migration so users who already had full-exam history (recorded before
+// this cross-mode aggregate existed) don't lose that domain signal.
+function migrateDomainStatsIfNeeded(){
+  if(localStorage.getItem(DOMAIN_STATS_KEY)) return;
+  const agg = {};
+  loadHistory().forEach(h => {
+    if(!h.domainStats) return;
+    Object.entries(h.domainStats).forEach(([d,s]) => {
+      if(!agg[d]) agg[d] = {correct:0, total:0};
+      agg[d].correct += s.correct;
+      agg[d].total += s.total;
+    });
+  });
+  if(Object.keys(agg).length) localStorage.setItem(DOMAIN_STATS_KEY, JSON.stringify(agg));
+}
+
 function loadMissed(){
   const raw = localStorage.getItem(MISSED_KEY);
   return raw ? JSON.parse(raw) : [];
@@ -1938,6 +2031,7 @@ function refreshIntroState(){
   renderProgressChart();
   renderReadiness('readinessCard');
 }
+migrateDomainStatsIfNeeded();
 refreshIntroState();
 
 function formatDuration(ms){
@@ -2065,18 +2159,108 @@ document.getElementById('domainStartBtn').addEventListener('click', () => {
   beginQuiz(false);
 });
 
+// ---- Adaptive Practice ----
+// Unlike the domain drill (a fixed set picked once, by hand) this builds the session
+// one question at a time: after every answer it re-weights the remaining pool toward
+// whatever domain you're currently weakest in (blending long-term history with how
+// this session itself is going) and nudges a target difficulty up or down based on
+// whether you got the last question right, so the session actually retargets live
+// instead of just being a static list generated at the start.
+const DIFF_TO_NUM = {easy:0, medium:1, hard:2};
+let adaptiveState = null;
+
+function adaptiveDomainWeight(domain){
+  const historical = adaptiveState.historicalAcc[domain];
+  const s = adaptiveState.sessionDomainStats[domain];
+  const sessionAcc = s && s.total > 0 ? s.correct / s.total * 100 : null;
+  // Blend in session-so-far accuracy once there's enough of it to mean something,
+  // so a bad run on one domain right now pulls next picks toward it immediately —
+  // not just whatever your accuracy looked like coming into this session.
+  let acc;
+  if(sessionAcc !== null && s.total >= 3){
+    const sessionWeight = Math.min(0.7, s.total / 10);
+    acc = historical !== null && historical !== undefined
+      ? historical * (1 - sessionWeight) + sessionAcc * sessionWeight
+      : sessionAcc;
+  } else {
+    acc = historical;
+  }
+  if(acc == null) return 60; // no data yet on this domain — sample it at a moderate rate
+  return Math.max(10, 100 - acc);
+}
+
+function pickNextAdaptiveQuestion(){
+  const mastery = loadMastery();
+  const targetRounded = Math.round(adaptiveState.targetDifficulty);
+  const candidates = [];
+  QUESTIONS.forEach((q, i) => {
+    if(adaptiveState.sessionSeen.has(i)) return;
+    const lvl = effectiveMasteryLevel(mastery[i]);
+    const itemFactor = 6 - lvl; // less-mastered items are weighted higher
+    const dWeight = adaptiveDomainWeight(q.domain);
+    const diffFactor = DIFF_TO_NUM[q.diff] === targetRounded ? 2 : 1;
+    candidates.push({i, weight: dWeight * itemFactor * diffFactor});
+  });
+  if(candidates.length === 0) return null;
+  const totalWeight = candidates.reduce((a,c) => a + c.weight, 0);
+  let r = Math.random() * totalWeight;
+  for(const c of candidates){
+    r -= c.weight;
+    if(r <= 0){ adaptiveState.sessionSeen.add(c.i); return c.i; }
+  }
+  const last = candidates[candidates.length - 1];
+  adaptiveState.sessionSeen.add(last.i);
+  return last.i;
+}
+
+function updateAdaptiveDifficulty(q, correct){
+  const d = DIFF_TO_NUM[q.diff];
+  const delta = correct ? (0.15 + d * 0.1) : -(0.2 + (2 - d) * 0.1);
+  adaptiveState.targetDifficulty = Math.max(0, Math.min(2, adaptiveState.targetDifficulty + delta));
+}
+
+function recordAdaptiveAnswer(qIdx, correct){
+  const q = QUESTIONS[qIdx];
+  updateMastery(qIdx, correct);
+  if(!adaptiveState.sessionDomainStats[q.domain]) adaptiveState.sessionDomainStats[q.domain] = {correct:0, total:0};
+  adaptiveState.sessionDomainStats[q.domain].total++;
+  if(correct) adaptiveState.sessionDomainStats[q.domain].correct++;
+  updateAdaptiveDifficulty(q, correct);
+}
+
+document.getElementById('adaptiveStartBtn').addEventListener('click', () => {
+  const length = parseInt(document.getElementById('adaptiveLength').value, 10);
+  mode = 'adaptive';
+  selectedDomain = null;
+  adaptiveState = {
+    length,
+    targetDifficulty: 1,
+    sessionSeen: new Set(),
+    sessionDomainStats: {},
+    historicalAcc: domainAccuracyPct(),
+  };
+  const first = pickNextAdaptiveQuestion();
+  activeIndices = first !== null ? [first] : [];
+  beginQuiz(false);
+});
+
 function beginQuiz(withTimer){
   current = 0;
-  answers = new Array(activeIndices.length).fill(null);
+  const totalLen = mode === 'adaptive' ? adaptiveState.length : activeIndices.length;
+  answers = new Array(totalLen).fill(null);
   introScreen.style.display = 'none';
   quizScreen.style.display = 'block';
   document.getElementById('timerBar').style.display = withTimer ? 'block' : 'none';
   const banner = document.getElementById('practiceBanner');
   if(!withTimer){
     banner.style.display = 'block';
-    banner.textContent = mode === 'review'
-      ? 'Missed-question review — untimed practice mode'
-      : `Domain drill: ${QUESTIONS[activeIndices[0]] ? QUESTIONS[activeIndices[0]].domain : ''} — untimed practice mode`;
+    if(mode === 'review'){
+      banner.textContent = 'Missed-question review — untimed practice mode';
+    } else if(mode === 'adaptive'){
+      banner.textContent = 'Adaptive Practice — untimed, retargets after every question';
+    } else {
+      banner.textContent = `Domain drill: ${QUESTIONS[activeIndices[0]] ? QUESTIONS[activeIndices[0]].domain : ''} — untimed practice mode`;
+    }
   } else {
     banner.style.display = 'none';
   }
@@ -2122,10 +2306,11 @@ function updateTimer(){
 }
 
 function renderQuestion(){
+  const totalLen = mode === 'adaptive' ? adaptiveState.length : activeIndices.length;
   const q = QUESTIONS[activeIndices[current]];
-  document.getElementById('progressText').textContent = `Question ${current+1} of ${activeIndices.length}`;
+  document.getElementById('progressText').textContent = `Question ${current+1} of ${totalLen}`;
   document.getElementById('answeredText').textContent = `${answers.filter(a=>a!==null).length} answered`;
-  document.getElementById('progressFill').style.width = ((current+1)/activeIndices.length*100) + '%';
+  document.getElementById('progressFill').style.width = ((current+1)/totalLen*100) + '%';
   document.getElementById('qDomain').innerHTML = `${q.domain}<span class="diff-badge ${q.diff}">${q.diff}</span>`;
   document.getElementById('qPrompt').textContent = q.q;
 
@@ -2145,7 +2330,7 @@ function renderQuestion(){
   });
 
   document.getElementById('prevBtn').disabled = current === 0;
-  document.getElementById('nextBtn').textContent = current === activeIndices.length-1 ? 'Finish' : 'Next';
+  document.getElementById('nextBtn').textContent = current === totalLen-1 ? 'Finish' : 'Next';
 }
 
 function renderJumpRow(){
@@ -2164,7 +2349,19 @@ document.getElementById('prevBtn').addEventListener('click', () => {
   if(current > 0){ current--; renderQuestion(); renderJumpRow(); }
 });
 document.getElementById('nextBtn').addEventListener('click', () => {
-  if(current < activeIndices.length-1){
+  const totalLen = mode === 'adaptive' ? adaptiveState.length : activeIndices.length;
+  const atFrontier = current === activeIndices.length - 1;
+
+  if(mode === 'adaptive' && atFrontier){
+    const qIdx = activeIndices[current];
+    recordAdaptiveAnswer(qIdx, answers[current] === QUESTIONS[qIdx].correct);
+  }
+
+  if(current < totalLen - 1){
+    if(atFrontier && mode === 'adaptive'){
+      const next = pickNextAdaptiveQuestion();
+      if(next !== null) activeIndices.push(next);
+    }
     current++;
     renderQuestion();
     renderJumpRow();
@@ -2218,8 +2415,12 @@ function showResults(){
     } else {
       missedSet.add(qIdx);
     }
+    // Adaptive sessions already update mastery live, per-question, as they go —
+    // every other mode records it here in bulk instead.
+    if(mode !== 'adaptive') updateMastery(qIdx, correct);
   });
   saveMissed(Array.from(missedSet));
+  recordDomainStatsAll(domainStats);
 
   document.getElementById('scoreBig').textContent = `${score}/${activeIndices.length}`;
   document.getElementById('scoreSub').textContent = `${Math.round(score/activeIndices.length*100)}% correct — completed in ${formatDuration(elapsed)}`;
@@ -2247,13 +2448,16 @@ function showResults(){
       localStorage.setItem(STORAGE_KEY, JSON.stringify({score, total: activeIndices.length, timeMs: elapsed}));
     }
     saveHistoryEntry({score, total: activeIndices.length, timeMs: elapsed, date: Date.now(), domainStats});
-    renderReadiness('readinessUpdate', {compact: true});
-  } else {
-    document.getElementById('readinessUpdate').innerHTML = '';
   }
 
   if(mode === 'domain' && selectedDomain){
     recordDomainProgress(selectedDomain, score, activeIndices.length);
+  }
+
+  if(mode === 'full' || mode === 'domain' || mode === 'adaptive'){
+    renderReadiness('readinessUpdate', {compact: true});
+  } else {
+    document.getElementById('readinessUpdate').innerHTML = '';
   }
 
   const letters = ['A','B','C','D'];
