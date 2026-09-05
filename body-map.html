@@ -53,21 +53,29 @@
     cursor:pointer;stroke:var(--navy);stroke-width:0.25;transition:opacity .12s ease;
   }
   .organ-shape:hover{opacity:.7;}
+  .organ-shape:focus{outline:none;}
   .organ-shape.selected{
     fill:var(--accent) !important;opacity:1;stroke:var(--ink) !important;stroke-width:0.55 !important;
   }
   .organ-shape.sys-hidden{display:none;}
 
+  /* "spine" is a decorative, non-clickable landmark path (the vertebral column outline) —
+     without this it inherits the SVG default black fill and renders as a solid black bar. */
+  #spine{fill:var(--muted);opacity:.45;pointer-events:none;}
+
+  /* The posterior viewBox (35 units wide) is a much smaller coordinate space than the
+     anterior one (106 units wide) — the same absolute stroke-width/radius values would
+     render roughly 3x thicker/bigger there, so scale them down to match proportionally. */
+  #posteriorSvg .organ-shape{stroke-width:0.08;}
+  #posteriorSvg .organ-shape.selected{stroke-width:0.18 !important;}
+  #posteriorSvg .point-dot{stroke-width:0.13;}
+  #posteriorSvg .landmark-dot.selected, #posteriorSvg .point-dot.selected{stroke-width:0.2;}
+
   /* schematic posterior figure (temporary, until a skeleton illustration is added) */
   .body-fill{fill:var(--line);stroke:var(--navy);stroke-width:2;}
   .limb{fill:none;stroke:var(--navy);stroke-linecap:round;stroke-linejoin:round;}
 
-  .highlight-rect{
-    fill:var(--accent);stroke:var(--accent);stroke-width:.7;opacity:0;pointer-events:none;
-    transition:opacity .3s ease;stroke-dasharray:2.2 1.6;
-  }
-  .highlight-rect.active{opacity:.22;animation:hlPulse .5s ease-out;}
-  @keyframes hlPulse{0%{opacity:0;} 60%{opacity:.34;} 100%{opacity:.22;}}
+  .highlight-rect{display:none;}
   .landmark-dot{
     fill:var(--accent);stroke:var(--white);stroke-width:1.5;cursor:pointer;
     transform-box:fill-box;transform-origin:center;transition:transform .12s ease;
@@ -76,16 +84,16 @@
   .landmark-dot-group:focus, .point-dot-group:focus{outline:none;}
   .landmark-dot-group:focus .landmark-dot, .point-dot-group:focus .point-dot{transform:scale(1.5);stroke:var(--navy);}
   .landmark-dot.selected, .point-dot.selected{
-    fill:var(--accent);stroke:var(--navy);stroke-width:3;transform:scale(2.3);
-    animation:dotPop .35s ease-out;
+    fill:var(--accent);stroke:var(--ink);stroke-width:2;transform:scale(1.7);
+    animation:dotPop .3s ease-out;
   }
-  @keyframes dotPop{0%{transform:scale(1);} 55%{transform:scale(2.9);} 100%{transform:scale(2.3);}}
+  @keyframes dotPop{0%{transform:scale(1);} 55%{transform:scale(2);} 100%{transform:scale(1.7);}}
   .landmark-dot-group.hidden, .point-dot-group.hidden{display:none;}
   .point-dot{
     fill:var(--accent);stroke:var(--white);stroke-width:0.4;cursor:pointer;
     transform-box:fill-box;transform-origin:center;transition:transform .12s ease;
   }
-  .point-dot.selected{stroke-width:0.9;}
+  .point-dot.selected{stroke-width:0.6;}
 
   .inset-card{
     background:var(--white);border:1px solid var(--line);border-radius:6px;
@@ -3256,7 +3264,7 @@ function selectPoint(id){
   selected = {kind:'point', key:id};
   renderAnteriorPoints();
   const el = document.querySelector(`#anteriorPointLayer [data-id="${id}"] circle`);
-  zoomToRect('anteriorSvg','anteriorZoomGroup','anteriorHighlight',106.00675,195.36273, el, 3.0);
+  zoomToRect('anteriorSvg','anteriorZoomGroup','anteriorHighlight',106.00675,195.36273, el, 1.1);
   updateInfoPanel(p.system, p.name, p);
   clearInset();
   renderList();
@@ -3286,7 +3294,7 @@ function selectPosteriorPoint(id){
   selected = {kind:'postpoint', key:id};
   renderPosteriorPoints();
   const el = document.querySelector(`#posteriorPointLayer [data-id="${id}"] circle`);
-  zoomToRect('posteriorSvg','posteriorZoomGroup','posteriorHighlight',35,93, el, 3.0);
+  zoomToRect('posteriorSvg','posteriorZoomGroup','posteriorHighlight',35,93, el, 1.1);
   updateInfoPanel(p.system, p.name, p);
   if(p.inset){ currentInsetKey = p.inset; openInset(p.inset); } else { clearInset(); }
   renderList();
