@@ -308,7 +308,7 @@ function materialFor(kind){
 function loadModel(){
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  loader.load('assets/body3d.glb', (gltf) => {
+  loader.load('assets/body3d.glb?v=c6f44e5', (gltf) => {
     modelRoot = gltf.scene;
     modelRoot.traverse(obj => {
       if (!obj.isMesh) return;
