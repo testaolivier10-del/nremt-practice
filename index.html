@@ -228,6 +228,26 @@
     background:#E4F3E9;color:var(--good);padding:14px 16px;border-radius:5px;font-size:14px;margin-bottom:20px;
   }
 
+  .streak-card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-bottom:22px;}
+  .streak-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .streak-flame-block{display:flex;align-items:baseline;gap:6px;}
+  .streak-flame{font-size:20px;}
+  .streak-num{font-size:24px;font-weight:600;font-family:'SFMono-Regular',monospace;color:var(--ink);}
+  .streak-word{font-size:13px;color:var(--muted);}
+  .streak-gear{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);padding:2px 6px;}
+  .streak-gear:hover{color:var(--ink);}
+  .streak-goal-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);margin-bottom:6px;flex-wrap:wrap;gap:4px;}
+  .streak-done{color:var(--good);font-weight:600;}
+  .streak-warn{color:var(--accent);font-weight:600;}
+  .streak-track{background:var(--paper);border-radius:20px;height:6px;overflow:hidden;}
+  .streak-fill{background:var(--accent);height:100%;border-radius:20px;transition:width .3s ease;}
+  .streak-fill.met{background:var(--good);}
+  .streak-best{font-size:11.5px;color:var(--muted);margin-top:8px;}
+  .streak-settings{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);}
+  .streak-settings-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;color:var(--muted);flex-wrap:wrap;}
+  .streak-settings-row select{padding:6px 8px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:12.5px;background:var(--paper);color:var(--ink);}
+  .streak-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0;}
+
   .ad-slot{margin-top:36px;padding:18px;border:1px dashed var(--line);border-radius:4px;text-align:center;font-size:12px;color:#9AA19C;}
   footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
 </style>
@@ -238,6 +258,7 @@
   <div id="introScreen">
     <div class="top"><span class="tag">FULL PRACTICE EXAM</span></div>
     <div class="site-nav"><a href="study-plan.html">Study Plan</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a></div>
+    <div id="streakWidget"></div>
     <h1>NREMT-EMT Practice Exam — 100 Questions</h1>
     <p class="lede">A full-length practice exam matching the scale of the real NREMT-EMT cognitive exam. Each attempt randomly draws 100 questions from a 320-question pool — in the same domain proportions every time — so retaking it isn't just re-memorizing the same set. Includes a live 2-hour timer, pace tracker, difficulty filtering, and a review queue for questions you've missed.</p>
 
@@ -2010,6 +2031,192 @@ function migrateDomainStatsIfNeeded(){
   if(Object.keys(agg).length) localStorage.setItem(DOMAIN_STATS_KEY, JSON.stringify(agg));
 }
 
+// ---- Daily streaks, study goals & reminders ----
+const STREAK_KEY = 'nremt_streak';
+
+function dayKey(offsetDays){
+  const d = new Date();
+  if(offsetDays) d.setDate(d.getDate() + offsetDays);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function loadStreak(){
+  const raw = localStorage.getItem(STREAK_KEY);
+  const defaults = {
+    currentStreak: 0, longestStreak: 0, lastActiveDate: null, dailyCounts: {},
+    dailyGoal: 20, remindersEnabled: false, reminderHour: 18, lastNotifiedDate: null,
+  };
+  return raw ? Object.assign(defaults, JSON.parse(raw)) : defaults;
+}
+function saveStreak(s){ localStorage.setItem(STREAK_KEY, JSON.stringify(s)); }
+
+// Called with the number of questions/cards studied whenever real activity happens
+// (finishing a quiz session, answering an adaptive question, advancing a flashcard).
+// A calendar day only ever advances the streak once, no matter how many times this
+// fires that day.
+function recordStudyActivity(n){
+  if(!n) return;
+  const s = loadStreak();
+  const today = dayKey(0);
+  if(s.lastActiveDate !== today){
+    const yesterday = dayKey(-1);
+    s.currentStreak = (s.lastActiveDate === yesterday) ? s.currentStreak + 1 : 1;
+    s.lastActiveDate = today;
+    s.longestStreak = Math.max(s.longestStreak, s.currentStreak);
+  }
+  s.dailyCounts[today] = (s.dailyCounts[today] || 0) + n;
+  const keys = Object.keys(s.dailyCounts).sort();
+  while(keys.length > 60){ delete s.dailyCounts[keys.shift()]; }
+  saveStreak(s);
+  renderStreakWidget();
+}
+
+// The stored currentStreak reflects the streak as of lastActiveDate. If more than
+// one full day has passed since then with no activity, it's actually broken —
+// this derives what should be SHOWN right now without mutating storage (storage
+// only updates the next time the user actually does something).
+function streakStatus(){
+  const s = loadStreak();
+  const today = dayKey(0), yesterday = dayKey(-1);
+  const broken = s.lastActiveDate !== null && s.lastActiveDate !== today && s.lastActiveDate !== yesterday;
+  return {
+    display: broken ? 0 : s.currentStreak,
+    longest: s.longestStreak,
+    todayCount: s.dailyCounts[today] || 0,
+    goal: s.dailyGoal,
+    metToday: (s.dailyCounts[today] || 0) >= s.dailyGoal,
+  };
+}
+
+function formatHour12(h){
+  const period = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:00 ${period}`;
+}
+
+function handleRemindersToggle(checked){
+  const s = loadStreak();
+  if(!checked){
+    s.remindersEnabled = false;
+    saveStreak(s);
+    renderStreakWidget();
+    return;
+  }
+  if(typeof Notification === 'undefined'){
+    alert('Notifications are not supported in this browser.');
+    renderStreakWidget();
+    return;
+  }
+  if(Notification.permission === 'denied'){
+    alert("Notifications are blocked for this site in your browser's settings. Allow them there, then try again.");
+    renderStreakWidget();
+    return;
+  }
+  if(Notification.permission === 'granted'){
+    s.remindersEnabled = true;
+    saveStreak(s);
+    renderStreakWidget();
+    return;
+  }
+  Notification.requestPermission().then(perm => {
+    const s2 = loadStreak();
+    s2.remindersEnabled = (perm === 'granted');
+    saveStreak(s2);
+    renderStreakWidget();
+  });
+}
+
+// Best-effort only: this only fires while this browser tab (or another tab of this
+// site) is actually open — a static site with no backend can't push a notification
+// to a closed browser. Checked once on load and periodically while the tab is open.
+function maybeShowStudyReminder(){
+  const s = loadStreak();
+  if(!s.remindersEnabled) return;
+  if(typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const today = dayKey(0);
+  const todayCount = s.dailyCounts[today] || 0;
+  if(todayCount >= s.dailyGoal) return;
+  if(new Date().getHours() < s.reminderHour) return;
+  if(s.lastNotifiedDate === today) return;
+  try {
+    new Notification('Keep your streak going!', {
+      body: `You're at ${todayCount}/${s.dailyGoal} questions today — a quick session keeps it alive.`,
+    });
+  } catch(e) { /* some browsers restrict Notification outside a user gesture — ignore */ }
+  s.lastNotifiedDate = today;
+  saveStreak(s);
+}
+
+function renderStreakWidget(){
+  const el = document.getElementById('streakWidget');
+  if(!el) return;
+  const s = loadStreak();
+  const st = streakStatus();
+  const pct = Math.min(100, Math.round(st.todayCount / st.goal * 100));
+
+  let nudge;
+  if(st.metToday) nudge = `<span class="streak-done">Today's goal complete ✓</span>`;
+  else if(st.display > 0) nudge = `<span class="streak-warn">Practice today to keep your streak alive</span>`;
+  else nudge = `<span>Answer a few questions today to start a streak</span>`;
+
+  const hourOptions = [12,14,16,18,19,20,21].map(h =>
+    `<option value="${h}" ${s.reminderHour===h?'selected':''}>${formatHour12(h)}</option>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="streak-card">
+      <div class="streak-top">
+        <div class="streak-flame-block">
+          <span class="streak-flame">🔥</span>
+          <span class="streak-num">${st.display}</span>
+          <span class="streak-word">day${st.display===1?'':'s'}</span>
+        </div>
+        <button class="streak-gear" id="streakSettingsToggle" type="button" aria-label="Streak settings">&#9881;</button>
+      </div>
+      <div class="streak-goal-row">
+        <span>${st.todayCount}/${st.goal} questions today</span>
+        ${nudge}
+      </div>
+      <div class="streak-track"><div class="streak-fill${st.metToday?' met':''}" style="width:${pct}%"></div></div>
+      ${st.longest > st.display ? `<div class="streak-best">Best streak: ${st.longest} day${st.longest===1?'':'s'}</div>` : ''}
+      <div class="streak-settings" id="streakSettings" style="display:none;">
+        <div class="streak-settings-row">
+          <label for="dailyGoalSelect">Daily goal</label>
+          <select id="dailyGoalSelect">
+            ${[10,20,30,50].map(g => `<option value="${g}" ${s.dailyGoal===g?'selected':''}>${g} questions/day</option>`).join('')}
+          </select>
+        </div>
+        <div class="streak-settings-row">
+          <label><input type="checkbox" id="remindersCb" ${s.remindersEnabled?'checked':''}> Remind me in-browser if I haven't hit my goal by</label>
+          <select id="reminderHourSelect">${hourOptions}</select>
+        </div>
+        <p class="streak-note">Browser reminders only fire while this tab or browser is open — a static site like this can't message you once it's fully closed. Your browser will ask permission the first time you turn this on.</p>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('streakSettingsToggle').addEventListener('click', () => {
+    const panel = document.getElementById('streakSettings');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+  document.getElementById('dailyGoalSelect').addEventListener('change', (e) => {
+    const st2 = loadStreak();
+    st2.dailyGoal = parseInt(e.target.value, 10);
+    saveStreak(st2);
+    renderStreakWidget();
+    document.getElementById('streakSettings').style.display = 'block';
+  });
+  document.getElementById('remindersCb').addEventListener('change', (e) => {
+    handleRemindersToggle(e.target.checked);
+    setTimeout(() => { const p = document.getElementById('streakSettings'); if(p) p.style.display = 'block'; }, 0);
+  });
+  document.getElementById('reminderHourSelect').addEventListener('change', (e) => {
+    const st2 = loadStreak();
+    st2.reminderHour = parseInt(e.target.value, 10);
+    saveStreak(st2);
+    document.getElementById('streakSettings').style.display = 'block';
+  });
+}
+
 function loadMissed(){
   const raw = localStorage.getItem(MISSED_KEY);
   return raw ? JSON.parse(raw) : [];
@@ -2030,9 +2237,12 @@ function refreshIntroState(){
   document.getElementById('reviewBtn').disabled = missed.length === 0;
   renderProgressChart();
   renderReadiness('readinessCard');
+  renderStreakWidget();
 }
 migrateDomainStatsIfNeeded();
 refreshIntroState();
+maybeShowStudyReminder();
+setInterval(maybeShowStudyReminder, 15*60*1000);
 
 function formatDuration(ms){
   const totalSec = Math.floor(ms/1000);
@@ -2128,6 +2338,7 @@ document.getElementById('fcPrevBtn').addEventListener('click', () => {
   if(fcCurrent > 0){ fcCurrent--; renderFlashcard(); }
 });
 document.getElementById('fcNextBtn').addEventListener('click', () => {
+  recordStudyActivity(1);
   if(fcCurrent < fcIndices.length-1){
     fcCurrent++;
     renderFlashcard();
@@ -2226,6 +2437,7 @@ function recordAdaptiveAnswer(qIdx, correct){
   adaptiveState.sessionDomainStats[q.domain].total++;
   if(correct) adaptiveState.sessionDomainStats[q.domain].correct++;
   updateAdaptiveDifficulty(q, correct);
+  recordStudyActivity(1);
 }
 
 document.getElementById('adaptiveStartBtn').addEventListener('click', () => {
@@ -2421,6 +2633,7 @@ function showResults(){
   });
   saveMissed(Array.from(missedSet));
   recordDomainStatsAll(domainStats);
+  if(mode !== 'adaptive') recordStudyActivity(activeIndices.length);
 
   document.getElementById('scoreBig').textContent = `${score}/${activeIndices.length}`;
   document.getElementById('scoreSub').textContent = `${Math.round(score/activeIndices.length*100)}% correct — completed in ${formatDuration(elapsed)}`;
