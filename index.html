@@ -182,6 +182,25 @@
   .score-card .sub{color:#B7C2CE;font-size:14px;margin-top:4px;}
   .domain-breakdown{display:grid;gap:8px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.15);}
   .domain-breakdown .row{display:flex;justify-content:space-between;font-size:13.5px;color:#D7DEE4;}
+
+  .readiness-card{background:var(--navy);color:var(--white);border-radius:6px;padding:22px 24px;margin:22px 0;}
+  .readiness-card .r-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .readiness-card .r-num{font-size:38px;font-weight:600;font-family:'SFMono-Regular',monospace;}
+  .readiness-card .r-label{font-size:14px;font-weight:600;padding:3px 9px;border-radius:20px;}
+  .readiness-card .r-label.tier-good{background:rgba(47,122,79,0.25);color:#8FE3AE;}
+  .readiness-card .r-label.tier-mid{background:rgba(193,80,46,0.22);color:#F0B08E;}
+  .readiness-card .r-label.tier-low{background:rgba(176,64,42,0.28);color:#F2A08F;}
+  .readiness-card .r-sub{color:#D7DEE4;font-size:13px;margin-top:10px;line-height:1.5;}
+  .readiness-card .r-note{color:#8A97A3;font-size:11.5px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);}
+  .readiness-update{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.15);}
+  .readiness-update .r-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .readiness-update .r-num{font-size:22px;font-weight:600;font-family:'SFMono-Regular',monospace;}
+  .readiness-update .r-tag{font-size:11px;color:#8A97A3;text-transform:uppercase;letter-spacing:0.04em;}
+  .readiness-update .r-label{font-size:12.5px;font-weight:600;padding:2px 8px;border-radius:20px;}
+  .readiness-update .r-label.tier-good{background:rgba(47,122,79,0.25);color:#8FE3AE;}
+  .readiness-update .r-label.tier-mid{background:rgba(193,80,46,0.22);color:#F0B08E;}
+  .readiness-update .r-label.tier-low{background:rgba(176,64,42,0.28);color:#F2A08F;}
+  .readiness-empty{margin:16px 0;padding:14px 16px;background:var(--white);border:1px dashed var(--line);border-radius:6px;font-size:13px;color:var(--muted);text-align:center;}
   .review-item{background:var(--white);border:1px solid var(--line);border-radius:5px;padding:18px 20px;margin-bottom:14px;}
   .review-item .r-domain{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:8px;}
   .review-item .r-q{font-size:16px;margin-bottom:12px;}
@@ -225,6 +244,8 @@
       <div class="row"><span>Time limit</span><span>2:00:00</span></div>
       <div class="row"><span>Target pace</span><span>~72 sec/question</span></div>
     </div>
+
+    <div id="readinessCard"></div>
 
     <div class="difficulty-row">
       <label for="difficultySelect">Difficulty</label>
@@ -326,6 +347,7 @@
       <div class="big" id="scoreBig">0/100</div>
       <div class="sub" id="scoreSub">0% correct — completed in 0:00:00</div>
       <div class="domain-breakdown" id="domainBreakdown"></div>
+      <div id="readinessUpdate"></div>
     </div>
     <div id="clearedNote" class="cleared-note" style="display:none;"></div>
     <div class="filter-row">
@@ -1729,6 +1751,118 @@ function saveHistoryEntry(entry){
   while(history.length > 20) history.shift();
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
+
+// Synthesizes full-exam attempt history into a single estimated pass-likelihood
+// number. This is a study-tool heuristic, not a statistical model of the real
+// NREMT (which is computer-adaptive) — it exists to give a rough, single-number
+// signal of "are you there yet," not a certified prediction.
+function computeReadiness(){
+  const history = loadHistory().filter(h => h.total > 0);
+  if(history.length === 0) return {available:false};
+
+  const n = history.length;
+  const pcts = history.map(h => h.score / h.total * 100);
+
+  // Recent attempts matter more than old ones: linear recency weighting.
+  let weightedSum = 0, weightTotal = 0;
+  pcts.forEach((p,i) => { const w = i + 1; weightedSum += p * w; weightTotal += w; });
+  const weightedAvg = weightedSum / weightTotal;
+
+  // Aggregate per-domain accuracy across every attempt that recorded it (older
+  // entries saved before this feature existed won't have domainStats, and that's fine).
+  const domainAgg = {};
+  history.forEach(h => {
+    if(!h.domainStats) return;
+    Object.entries(h.domainStats).forEach(([d,s]) => {
+      if(!domainAgg[d]) domainAgg[d] = {correct:0, total:0};
+      domainAgg[d].correct += s.correct;
+      domainAgg[d].total += s.total;
+    });
+  });
+  let weakestDomain = null, weakestPct = null, penaltyApplied = false;
+  const domainEntries = Object.entries(domainAgg).filter(([,s]) => s.total >= 5);
+  let adjusted = weightedAvg;
+  if(domainEntries.length > 0){
+    const withPct = domainEntries.map(([d,s]) => [d, s.correct / s.total * 100]);
+    withPct.sort((a,b) => a[1] - b[1]);
+    weakestDomain = withPct[0][0];
+    weakestPct = withPct[0][1];
+    const totalCorrect = domainEntries.reduce((a,[,s]) => a + s.correct, 0);
+    const totalQs = domainEntries.reduce((a,[,s]) => a + s.total, 0);
+    const overallDomainPct = totalCorrect / totalQs * 100;
+    // A weak domain drags real readiness down even if the overall average looks fine —
+    // NREMT requires competency across content areas, not just a good aggregate score.
+    // Only penalize the gap beyond a normal 15-point spread between domains.
+    const gap = overallDomainPct - weakestPct;
+    if(gap > 15){
+      adjusted -= (gap - 15) * 0.5;
+      penaltyApplied = true;
+    }
+  }
+  adjusted = Math.max(0, Math.min(100, adjusted));
+
+  // Logistic curve centered around ~72% (a commonly cited practice-exam benchmark
+  // for NREMT readiness), so scores well above it read as confident and scores
+  // well below it read as clearly not ready, with a smooth swing in between.
+  const rawProb = 1 / (1 + Math.exp(-0.13 * (adjusted - 72)));
+  // With very few attempts, hedge the estimate toward a neutral 50/50 rather than
+  // reporting false confidence off one data point.
+  const confidence = Math.min(1, n / 5);
+  const blendedProb = rawProb * confidence + 0.5 * (1 - confidence);
+  const probabilityPct = Math.max(2, Math.min(98, Math.round(blendedProb * 100)));
+
+  let label, tier;
+  if(probabilityPct >= 80){ label = 'On track'; tier = 'good'; }
+  else if(probabilityPct >= 55){ label = 'Within reach'; tier = 'mid'; }
+  else { label = 'Needs more practice'; tier = 'low'; }
+
+  return {
+    available: true, probabilityPct, label, tier, attempts: n,
+    weightedAvg: Math.round(weightedAvg),
+    weakestDomain, weakestPct: weakestPct !== null ? Math.round(weakestPct) : null,
+    penaltyApplied, lowConfidence: n < 3,
+  };
+}
+
+function renderReadiness(targetId, opts){
+  opts = opts || {};
+  const el = document.getElementById(targetId);
+  if(!el) return;
+  const r = computeReadiness();
+  if(!r.available){
+    el.innerHTML = opts.compact ? '' : `<div class="readiness-empty">Take a full practice exam to see your estimated readiness score here.</div>`;
+    return;
+  }
+  const subParts = [`Recent average ${r.weightedAvg}% across ${r.attempts} full exam${r.attempts===1?'':'s'}`];
+  if(r.weakestDomain) subParts.push(`weakest area: ${r.weakestDomain} (${r.weakestPct}%)`);
+  const note = r.lowConfidence
+    ? 'Based on very few attempts — take a few more full exams for a more reliable estimate.'
+    : 'A rough estimate from your practice history, not an official prediction of NREMT results.';
+
+  if(opts.compact){
+    el.innerHTML = `
+      <div class="readiness-update">
+        <div class="r-head">
+          <span class="r-tag">Updated readiness</span>
+          <span class="r-num">${r.probabilityPct}%</span>
+          <span class="r-label tier-${r.tier}">${r.label}</span>
+        </div>
+        <div class="r-sub">${subParts.join(' · ')}</div>
+      </div>
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="readiness-card">
+        <div class="r-head">
+          <span class="r-num">${r.probabilityPct}%</span>
+          <span class="r-label tier-${r.tier}">${r.label}</span>
+        </div>
+        <div class="r-sub">${subParts.join(' · ')}</div>
+        <div class="r-note">${note}</div>
+      </div>
+    `;
+  }
+}
 function renderProgressChart(){
   const history = loadHistory();
   const panel = document.getElementById('progressPanel');
@@ -1796,12 +1930,13 @@ function refreshIntroState(){
   const line = document.getElementById('bestScoreLine');
   if(best){
     const data = JSON.parse(best);
-    line.textContent = `Your best score so far: ${data.score}/${QUESTIONS.length} (completed in ${formatDuration(data.timeMs)})`;
+    line.textContent = `Your best score so far: ${data.score}/${data.total || 100} (completed in ${formatDuration(data.timeMs)})`;
   }
   const missed = loadMissed();
   document.getElementById('missedCount').textContent = missed.length;
   document.getElementById('reviewBtn').disabled = missed.length === 0;
   renderProgressChart();
+  renderReadiness('readinessCard');
 }
 refreshIntroState();
 
@@ -2109,9 +2244,12 @@ function showResults(){
     const best = localStorage.getItem(STORAGE_KEY);
     const bestData = best ? JSON.parse(best) : null;
     if(!bestData || score > bestData.score){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({score, timeMs: elapsed}));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({score, total: activeIndices.length, timeMs: elapsed}));
     }
-    saveHistoryEntry({score, total: activeIndices.length, timeMs: elapsed, date: Date.now()});
+    saveHistoryEntry({score, total: activeIndices.length, timeMs: elapsed, date: Date.now(), domainStats});
+    renderReadiness('readinessUpdate', {compact: true});
+  } else {
+    document.getElementById('readinessUpdate').innerHTML = '';
   }
 
   if(mode === 'domain' && selectedDomain){
