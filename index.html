@@ -207,6 +207,7 @@
   .domain-breakdown .topic-row{padding-left:16px;font-size:11.5px;color:#93A5B3;}
 
   .readiness-card{background:var(--navy);color:var(--white);border-radius:6px;padding:22px 24px;margin:22px 0;}
+  .readiness-card .r-tag{font-size:11px;color:#8A97A3;text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:6px;}
   .readiness-card .r-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
   .readiness-card .r-num{font-size:38px;font-weight:600;font-family:'SFMono-Regular',monospace;}
   .readiness-card .r-label{font-size:14px;font-weight:600;padding:3px 9px;border-radius:20px;}
@@ -2519,7 +2520,7 @@ function renderReadiness(targetId, opts){
     el.innerHTML = `
       <div class="readiness-update">
         <div class="r-head">
-          <span class="r-tag">Updated readiness</span>
+          <span class="r-tag">Updated pass probability</span>
           <span class="r-num">${r.probabilityPct}%</span>
           <span class="r-label tier-${r.tier}">${r.label}</span>
         </div>
@@ -2529,6 +2530,7 @@ function renderReadiness(targetId, opts){
   } else {
     el.innerHTML = `
       <div class="readiness-card">
+        <span class="r-tag">Estimated pass probability</span>
         <div class="r-head">
           <span class="r-num">${r.probabilityPct}%</span>
           <span class="r-label tier-${r.tier}">${r.label}</span>
