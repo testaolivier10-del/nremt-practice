@@ -49,17 +49,25 @@
 
   /* real anatomogram illustration */
   #human_male_outline{fill:var(--line);}
-  .organ-shape{cursor:pointer;stroke:var(--navy);stroke-width:0.25;transition:opacity .12s ease;}
+  .organ-shape{
+    cursor:pointer;stroke:var(--navy);stroke-width:0.25;transition:opacity .12s ease;
+  }
   .organ-shape:hover{opacity:.7;}
-  .organ-shape.selected{fill:var(--accent) !important;opacity:1;}
+  .organ-shape.selected{
+    fill:var(--accent) !important;opacity:1;stroke:var(--ink) !important;stroke-width:0.55 !important;
+  }
   .organ-shape.sys-hidden{display:none;}
 
   /* schematic posterior figure (temporary, until a skeleton illustration is added) */
   .body-fill{fill:var(--line);stroke:var(--navy);stroke-width:2;}
   .limb{fill:none;stroke:var(--navy);stroke-linecap:round;stroke-linejoin:round;}
 
-  .highlight-rect{fill:var(--accent);opacity:0;pointer-events:none;transition:opacity .3s ease;}
-  .highlight-rect.active{opacity:.16;}
+  .highlight-rect{
+    fill:var(--accent);stroke:var(--accent);stroke-width:.7;opacity:0;pointer-events:none;
+    transition:opacity .3s ease;stroke-dasharray:2.2 1.6;
+  }
+  .highlight-rect.active{opacity:.22;animation:hlPulse .5s ease-out;}
+  @keyframes hlPulse{0%{opacity:0;} 60%{opacity:.34;} 100%{opacity:.22;}}
   .landmark-dot{
     fill:var(--accent);stroke:var(--white);stroke-width:1.5;cursor:pointer;
     transform-box:fill-box;transform-origin:center;transition:transform .12s ease;
@@ -67,12 +75,17 @@
   .landmark-dot-group:hover .landmark-dot, .point-dot-group:hover .point-dot{transform:scale(1.5);}
   .landmark-dot-group:focus, .point-dot-group:focus{outline:none;}
   .landmark-dot-group:focus .landmark-dot, .point-dot-group:focus .point-dot{transform:scale(1.5);stroke:var(--navy);}
-  .landmark-dot.selected, .point-dot.selected{fill:var(--navy);transform:scale(1.6);}
+  .landmark-dot.selected, .point-dot.selected{
+    fill:var(--accent);stroke:var(--navy);stroke-width:3;transform:scale(2.3);
+    animation:dotPop .35s ease-out;
+  }
+  @keyframes dotPop{0%{transform:scale(1);} 55%{transform:scale(2.9);} 100%{transform:scale(2.3);}}
   .landmark-dot-group.hidden, .point-dot-group.hidden{display:none;}
   .point-dot{
     fill:var(--accent);stroke:var(--white);stroke-width:0.4;cursor:pointer;
     transform-box:fill-box;transform-origin:center;transition:transform .12s ease;
   }
+  .point-dot.selected{stroke-width:0.9;}
 
   .inset-card{
     background:var(--white);border:1px solid var(--line);border-radius:6px;
@@ -138,7 +151,7 @@
   <p class="lede">A real, illustrated human body — not a stick figure — with 70+ clickable organs, bones, and pulse points across every major system EMTs need. Click anything to zoom in and see its location, function, common emergencies, assessment findings, and field interventions.</p>
 
   <div class="warning">
-    <b>The anterior (front) view is a real, detailed anatomical illustration; the posterior (back) view is still a simplified placeholder</b> until a matching illustrated skeleton is added. Organ/bone positions and shapes are for study purposes — verify exact anatomy against a dedicated reference or your course materials.
+    <b>Both views are real, detailed anatomical illustrations</b> (from two different open-licensed sources — see attribution below), not to-scale medical renderings. Organ/muscle/bone positions are for study purposes — verify exact anatomy against a dedicated reference or your course materials.
   </div>
 
   <div class="controls">
@@ -2070,21 +2083,60 @@
         <g id="rule9LayerAnt" class="rule9-layer"></g>
       </g>
     </svg>
-    <svg id="posteriorSvg" class="body-svg view-hidden" viewBox="0 0 300 620" xmlns="http://www.w3.org/2000/svg">
+    <svg id="posteriorSvg" class="body-svg view-hidden" viewBox="37 0 35 93" xmlns="http://www.w3.org/2000/svg">
       <g id="posteriorZoomGroup">
-        <polyline class="limb" stroke-width="24" points="138,285 128,385 122,485 116,585"/>
-        <polyline class="limb" stroke-width="24" points="162,285 172,385 178,485 184,585"/>
-        <ellipse class="body-fill" cx="112" cy="598" rx="14" ry="8"/>
-        <ellipse class="body-fill" cx="188" cy="598" rx="14" ry="8"/>
-        <polyline class="limb" stroke-width="20" points="120,95 78,150 62,220 56,290"/>
-        <polyline class="limb" stroke-width="20" points="180,95 222,150 238,220 244,290"/>
-        <circle class="body-fill" cx="56" cy="295" r="11"/>
-        <circle class="body-fill" cx="244" cy="295" r="11"/>
-        <path class="body-fill" d="M108,220 L192,220 L182,290 L118,290 Z"/>
-        <rect class="body-fill" x="108" y="84" width="84" height="146" rx="20"/>
-        <rect class="body-fill" x="135" y="68" width="30" height="20" rx="4"/>
-        <circle class="body-fill" cx="150" cy="42" r="30"/>
-        <rect id="posteriorHighlight" class="highlight-rect" x="0" y="0" width="0" height="0" rx="14"/>
+        <g id="posteriorMuscleLayer">
+<path id="head-back" d="m 48.157455,6.3585449 0.44208,-0.14964 0.16111,0.16427 1.48163,4.0475101 2.32401,1.45118 2.39971,-1.52387 0.97577,-3.6896901 0.52752,-0.55908 0.23367,0.0981 0.24198,-3.34467 -2.03129,-2.31103004 -2.84509,-0.51629 -2.20422,0.52915 -1.93631,2.63077004 z"/>
+<path id="nape" d="m 52.369695,12.105075 -2.35767,-1.55045 -1.47119,-3.9514301 -0.60741,0.0403 0.27409,1.82447 0.97635,0.33932 0.7613,2.2157201 0.33017,1.06849 0.0895,2.14894 1.16448,0.008 0.10563,-0.70833 0.54716,-0.0606 z m 1.01793,1.47595 0.23768,0.64982 1.38107,-0.004 0.01,-2.38784 0.25971,-0.79061 0.57215,-2.1698001 0.76359,-0.41018 0.25158,-1.78416 -0.62859,0.0193 -1.08488,3.8998101 -2.39725,1.46684 0.2768,1.48507 z"/>
+<path id="traps-upper-left" d="M 49.625,14.629 L 49.688,12.005 L 48.974,13.157 L 44.594,14.654 L 45.945,16.925 L 51.222,16.925 L 51.183,14.550 Z"/>
+<path id="traps-mid-left" d="M 46.034,17.075 L 48.920,21.925 L 51.303,21.925 L 51.224,17.075 Z"/>
+<path id="traps-lower-left" d="M 49.009,22.075 L 49.572,23.022 L 51.403,28.104 L 51.305,22.075 Z"/>
+<path id="traps-upper-right" d="M 55.439,14.729 L 55.376,12.104 L 56.090,13.256 L 60.470,14.754 L 59.179,16.925 L 53.844,16.925 L 53.881,14.649 Z"/>
+<path id="traps-mid-right" d="M 59.089,17.075 L 56.204,21.925 L 53.763,21.925 L 53.842,17.075 Z"/>
+<path id="traps-lower-right" d="M 56.114,22.075 L 55.492,23.121 L 53.661,28.203 L 53.761,22.075 Z"/>
+<path id="lats-upper-left" d="M 44.144,15.285 L 39.888,20.286 L 39.426,22.749 L 41.263,21.510 L 44.025,20.355 L 45.663,23.400 L 49.103,23.400 Z"/>
+<path id="deltoid-rear-left" d="M 42.201,16.586 L 40.626,18.152 L 39.736,20.156 L 43.992,15.155 Z"/>
+<path id="lats-mid-left" d="M 45.771,23.600 L 45.872,23.789 L 47.009,29.286 L 47.023,30.400 L 51.080,30.400 L 51.053,28.314 L 49.185,23.600 Z"/>
+<path id="lats-lower-left" d="M 47.026,30.600 L 47.086,35.145 L 51.156,36.255 L 51.082,30.600 Z"/>
+<path id="deltoid-rear-right" d="M 62.863,16.686 L 64.438,18.251 L 65.328,20.255 L 61.073,15.254 Z"/>
+<path id="lats-upper-right" d="M 60.921,15.384 L 65.176,20.385 L 65.290,22.849 L 63.801,21.609 L 61.039,20.454 L 59.455,23.400 L 56.022,23.400 Z"/>
+<path id="lats-mid-right" d="M 59.347,23.600 L 59.192,23.888 L 58.055,29.385 L 58.042,30.400 L 53.986,30.400 L 54.012,28.413 L 55.918,23.600 Z"/>
+<path id="lats-lower-right" d="M 58.039,30.600 L 57.979,35.245 L 53.908,36.354 L 53.983,30.600 Z"/>
+<path id="triceps-long-left" d="M 43.593,21.039 L 44.920,23.967 L 43.615,25.653 L 43.186,27.069 L 39.209,29.802 Z"/>
+<path id="triceps-lateral-left" d="M 43.459,20.972 L 39.075,29.735 L 38.871,25.461 L 39.407,23.674 L 41.242,21.927 Z"/>
+<path id="hand-back-left" d="M 40.716955,42.424835 l -1.5182,0.0863 -0.78184,-0.65295 -1.16168,2.1855 -0.78414,3.34805 0.49892,0.20949 0.54632,-2.2158 0.50597,0.24175 -0.29779,2.5019 0.62936,0.22875 0.35546,-2.50096 0.56242,0.16536 -0.16126,2.77057 0.77674,0.30455 0.19056,-2.87291 0.45724,-0.0289 0.22827,2.64778 0.66597,0.24774 -0.0359,-4.56685 0.33693,-0.20224 1.39227,1.65147 0.32017,-0.35115 -0.77444,-2.03749 z"/>
+<path id="forearm-flexors-left" d="M 40.775,29.006 L 42.870,27.644 L 42.187,29.635 L 42.603,34.383 L 40.799,42.081 L 39.814,42.253 Z"/>
+<path id="forearm-extensors-left" d="M 39.665,42.242 L 38.305,41.501 L 37.998,34.491 L 38.635,31.429 L 39.245,30.209 L 40.625,28.994 Z"/>
+<path id="triceps-long-right" d="M 61.376,21.213 L 60.056,24.145 L 61.330,26.199 L 61.657,27.251 L 65.780,29.966 Z"/>
+<path id="triceps-lateral-right" d="M 61.510,21.146 L 65.914,29.899 L 66.108,25.624 L 65.568,23.839 L 63.729,22.096 Z"/>
+<path id="hand-back-right" d="M 64.301385,42.592325 l 1.51839,0.0828 0.78033,-0.65476 1.16673,2.18281 0.79187,3.34623 -0.49843,0.21064 -0.55144,-2.21453 -0.50541,0.24292 0.30356,2.5012 -0.62882,0.23021 -0.36124,-2.50014 -0.56203,0.16666 0.16765,2.77019 -0.77603,0.30634 -0.19719,-2.87245 -0.45732,-0.0278 -0.22215,2.64829 -0.66539,0.24928 0.0254,-4.56692 -0.3374,-0.20146 -1.38845,1.65469 -0.32098,-0.35041 0.76973,-2.03928 z"/>
+<path id="forearm-flexors-right" d="M 65.204,42.420 L 63.925,29.007 L 61.764,27.798 L 62.786,29.733 L 62.397,34.555 L 64.219,42.248 Z"/>
+<path id="forearm-extensors-right" d="M 64.075,28.993 L 65.353,42.405 L 66.712,41.663 L 67.002,34.653 L 66.358,31.591 L 65.745,30.373 Z"/>
+<path id="spine" d="m 51.733705,14.788555 0.53876,25.33066 0.48967,-0.0297 0.65658,-25.3387 -0.28147,-0.84188 -1.25059,-4.9e-4 z"/>
+<path id="lower-back-erectors-left" d="M 52.100,37.310 L 49.537,36.465 L 50.244,40.788 L 52.200,42.030 L 52.200,40.270 L 52.150,40.280 Z"/>
+<path id="lower-back-ql-left" d="M 49.389,36.490 L 46.240,35.460 L 44.720,39.420 L 50.096,40.812 Z"/>
+<path id="lower-back-erectors-right" d="M 52.800,42.030 L 52.800,40.270 L 52.850,40.260 L 52.900,37.290 L 55.289,36.625 L 54.805,40.801 Z"/>
+<path id="lower-back-ql-right" d="M 55.439,36.643 L 55.980,36.470 L 58.320,35.720 L 59.660,39.450 L 54.955,40.819 Z"/>
+<path id="gluteus-medius-left" d="M 50.191,41.481 L 44.740,39.690 L 43.830,41.580 L 43.431,44.301 Z"/>
+<path id="gluteus-maximus-left" d="M 50.249,41.619 L 43.489,44.439 L 44.410,50.520 L 47.180,51.030 L 51.620,49.090 L 52.200,49.480 L 52.200,42.880 Z"/>
+<path id="gluteus-medius-right" d="M 55.274,41.079 L 61.354,45.519 L 60.640,42.150 L 59.740,39.860 Z"/>
+<path id="gluteus-maximus-right" d="M 55.186,41.201 L 52.800,42.880 L 52.800,49.480 L 53.570,49.090 L 57.680,50.760 L 60.500,50.600 L 61.266,45.641 Z"/>
+<path id="knee-back-left" d="m 51.176145,64.073985 -1.20605,3.01461 0.70738,0.26558 0.89754,3.51771 -0.55801,-4.01191 z m -5.08496,-3.15003 0.63355,1.8609 0.16813,2.03261 0.61314,1.93117 -0.90585,-0.0851 -0.28534,2.15982 z"/>
+<path id="knee-back-right" d="m 54.019305,64.073985 1.20605,3.01461 -0.70737,0.26558 -0.89755,3.51771 0.55802,-4.01191 z m 5.08496,-3.15003 -0.63355,1.8609 -0.16813,2.03261 -0.61313,1.93117 0.90584,-0.0851 0.28534,2.15982 z"/>
+<path id="calves-gastroc-medial-left" d="M 50.568,67.512 L 51.669,72.509 L 51.379,75.532 L 51.292,76.825 L 48.983,76.825 Z"/>
+<path id="calves-gastroc-lateral-left" d="M 50.218,67.512 L 48.633,76.825 L 46.283,76.825 L 45.533,74.263 L 46.783,67.088 Z"/>
+<path id="calves-soleus-left" d="M 46.386,77.175 L 51.269,77.175 L 50.701,85.598 L 49.037,86.233 Z"/>
+<path id="calves-gastroc-medial-right" d="M 54.628,67.512 L 53.526,72.509 L 53.816,75.532 L 53.903,76.825 L 56.213,76.825 Z"/>
+<path id="calves-gastroc-lateral-right" d="M 54.978,67.512 L 56.563,76.825 L 58.912,76.825 L 59.662,74.263 L 58.412,67.088 Z"/>
+<path id="calves-soleus-right" d="M 53.927,77.175 L 58.810,77.175 L 56.158,86.233 L 54.495,85.598 Z"/>
+<path id="foot-back-left" d="M 50.933115,88.340995 l 0.85194,1.3581 0.37189,0.79238 -0.15588,1.21774 -0.76984,0.74446 -1.51185,0.12543 -1.1299,-0.29192 -0.24225,-0.95894 0.80765,-1.30405 -0.22562,-0.85987 0.29679,-0.84153 -0.0194,-1.81524 1.53568,-0.54817 z m -1.19598,0.4675 0.15943,1.25776 -0.6023,0.97431 m -0.54436,0.29544 1.06474,0.40084 1.55326,-0.65137 z"/>
+<path id="hamstrings-medial-left" d="M 49.550,50.504 L 51.751,49.461 L 52.389,49.692 L 52.424,51.499 L 52.499,56.145 L 50.521,62.188 L 50.997,63.602 L 49.569,66.897 L 48.755,66.754 Z"/>
+<path id="hamstrings-lateral-left" d="M 49.400,50.496 L 48.605,66.746 L 47.803,66.596 L 47.302,64.480 L 47.133,62.723 L 44.712,54.565 L 44.369,50.918 L 47.200,51.500 Z"/>
+<path id="foot-back-right" d="M 54.262335,88.340995 l -0.85194,1.3581 -0.37189,0.79238 0.15589,1.21774 0.76983,0.74446 1.51186,0.12543 1.12989,-0.29192 0.24225,-0.95894 -0.80765,-1.30405 0.22563,-0.85987 -0.29679,-0.84153 0.0194,-1.81524 -1.53568,-0.54817 z m 1.19598,0.4675 -0.15943,1.25776 0.6023,0.97431 m 0.54436,0.29544 -1.06474,0.40084 -1.55326,-0.65137 z"/>
+<path id="hamstrings-medial-right" d="M 57.425,51.196 L 56.565,66.806 L 55.759,66.965 L 54.331,63.670 L 54.807,62.256 L 52.829,56.213 L 52.904,51.567 L 52.956,49.769 L 53.520,49.498 Z"/>
+<path id="hamstrings-lateral-right" d="M 57.575,51.204 L 60.625,50.950 L 60.616,54.633 L 58.195,62.791 L 58.026,64.547 L 57.525,66.663 L 56.715,66.814 Z"/>
+        </g>
+        <rect id="posteriorHighlight" class="highlight-rect" x="0" y="0" width="0" height="0" rx="0.4"/>
         <g id="posteriorPointLayer"></g>
         <g id="rule9LayerPost" class="rule9-layer"></g>
       </g>
@@ -2115,7 +2167,7 @@
 
   <footer>
     <p>This module is a study aid, not a substitute for an anatomy/physiology textbook or your course's own protocols and reference materials. Field interventions described here are general EMT-B-level guidance — always follow your local protocols and medical direction, which take precedence over anything shown here.</p>
-    <p>Anterior body illustration adapted from the <a href="https://github.com/ebi-gene-expression-group/anatomogram" target="_blank" rel="noopener">Expression Atlas Anatomogram</a> (EMBL-EBI), licensed <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p>Anterior body illustration adapted from the <a href="https://github.com/ebi-gene-expression-group/anatomogram" target="_blank" rel="noopener">Expression Atlas Anatomogram</a> (EMBL-EBI), licensed <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Posterior muscle map adapted from <a href="https://github.com/vulovix/body-muscles" target="_blank" rel="noopener">body-muscles</a> by Ivan Vulović, licensed Apache 2.0.</p>
   </footer>
 </div>
 
@@ -2570,7 +2622,7 @@ const ORGAN_CONTENT = {
 
 
 const ANTERIOR_POINTS = [
-  {id:"p1", system:"msk", x:46, y:3, name:"Frontal bone",
+  {id:"p1", system:"msk", x:52, y:4, name:"Frontal bone",
    location:"The forehead region of the skull.",
    funct:"Protects the frontal lobes of the brain and forms the upper eye sockets.",
    path:"Fractures here can occur from direct frontal impact and may be associated with underlying brain injury.",
@@ -2582,19 +2634,19 @@ const ANTERIOR_POINTS = [
    path:"A common facial fracture site, especially from a direct blow or fall onto the chin.",
    findings:"Malocclusion (teeth not lining up normally), pain with jaw movement, or visible deformity/swelling along the jawline.",
    interv:"Monitor the airway closely (bilateral mandible fractures can compromise it), and use a jaw-thrust rather than head-tilt if spinal injury is also suspected."},
-  {id:"p3", system:"cardio", x:47, y:29, name:"Carotid artery",
+  {id:"p3", system:"cardio", x:50, y:28, name:"Carotid artery",
    location:"Either side of the neck, lateral to the trachea, beneath the jaw angle.",
    funct:"Carries oxygenated blood from the heart to the brain and face; the strongest centrally-located pulse in the body.",
    path:"Carotid artery disease/stenosis; it's also the pulse point checked for cardiac arrest.",
    findings:"Absent bilateral carotid pulse (with unresponsiveness and abnormal/absent breathing) confirms cardiac arrest; check gently, one side at a time.",
    interv:"If absent, begin CPR immediately per BLS protocol; never compress both sides at once or use excessive pressure."},
-  {id:"p4", system:"cardio", x:59, y:29, name:"Jugular vein",
+  {id:"p4", system:"cardio", x:57, y:28, name:"Jugular vein",
    location:"Along the side of the neck, running roughly parallel to the carotid artery.",
    funct:"Drains venous blood from the head back toward the heart.",
    path:"Distension (JVD) is associated with conditions that raise right-heart pressure, such as heart failure or tension pneumothorax.",
    findings:"Assess with the patient at roughly a 45-degree incline; flat neck veins with hypotension may instead suggest hypovolemia.",
    interv:"JVD combined with respiratory distress and unequal breath sounds should raise suspicion for tension pneumothorax — treat per protocol and transport promptly."},
-  {id:"p5", system:"msk", x:33, y:34, name:"Clavicle",
+  {id:"p5", system:"msk", x:42, y:31, name:"Clavicle",
    location:"The collarbone, running horizontally between the sternum and shoulder.",
    funct:"Connects the arm to the trunk skeleton and helps hold the shoulder in position.",
    path:"One of the most common fracture sites, especially from a fall onto an outstretched arm or the point of the shoulder.",
@@ -2624,19 +2676,19 @@ const ANTERIOR_POINTS = [
    path:"Can fracture or detach with forceful or misplaced chest compressions if pressure is applied directly to it.",
    findings:"Point tenderness at the very bottom of the sternum.",
    interv:"During CPR, center compressions on the chest, avoiding direct pressure on this fragile structure."},
-  {id:"p10", system:"cardio", x:18, y:60, name:"Brachial artery",
+  {id:"p10", system:"cardio", x:24, y:68, name:"Brachial artery",
    location:"Inside of the upper arm, between the biceps and triceps, above the elbow crease.",
    funct:"Main blood supply to the forearm and hand; used as the reference point for auscultating blood pressure.",
    path:"Can be injured in upper-arm fractures or lacerations, causing distal ischemia.",
    findings:"Preferred pulse-check site in an infant (in place of carotid); Korotkoff sounds are heard here during a manual BP.",
    interv:"Check before/after splinting a humerus fracture; direct pressure controls bleeding from this vessel."},
-  {id:"p11", system:"msk", x:13, y:50, name:"Humerus",
+  {id:"p11", system:"msk", x:28, y:58, name:"Humerus",
    location:"The single long bone of the upper arm, between the shoulder and elbow.",
    funct:"The longest bone in the arm, providing attachment points for the major arm and shoulder muscles.",
    path:"Fractures can occur mid-shaft (direct trauma) or near either end (falls); can injure the nearby brachial artery or radial nerve.",
    findings:"Deformity, swelling, pain, and possibly an altered distal pulse or sensation if the nearby artery/nerve is involved.",
    interv:"Splint in the position found (or per protocol) with a rigid or sling-and-swathe splint, checking distal PMS before and after."},
-  {id:"p12", system:"cardio", x:8, y:96, name:"Radial artery",
+  {id:"p12", system:"cardio", x:11, y:93, name:"Radial artery",
    location:"Wrist, on the thumb side, just proximal to the base of the thumb.",
    funct:"Supplies the hand; used to gauge adequacy of central perfusion (a palpable radial pulse is a rough field indicator of an adequate systolic BP).",
    path:"Distal pulse loss from a wrist/forearm fracture or from a proximal tourniquet.",
@@ -2660,7 +2712,7 @@ const ANTERIOR_POINTS = [
    path:"An unstable pelvic fracture is life-threatening due to the risk of massive internal hemorrhage from the vessels running through this highly vascular area.",
    findings:"Pain, instability, or deformity on gentle assessment; avoid rocking or repeatedly springing the pelvis, which can worsen bleeding.",
    interv:"Apply a pelvic binder per protocol, minimize movement, treat for shock, and prioritize rapid transport."},
-  {id:"p16", system:"cardio", x:44, y:105, name:"Femoral artery",
+  {id:"p16", system:"cardio", x:41, y:104, name:"Femoral artery",
    location:"Groin crease, midway between the hip bone and pubic bone.",
    funct:"Main blood supply to the leg; a large, easily-palpated central pulse.",
    path:"Site of major hemorrhage in proximal leg/groin trauma; also a common IV access/catheterization site in-hospital.",
@@ -2684,13 +2736,13 @@ const ANTERIOR_POINTS = [
    path:"Common fracture site in falls, direct blows, or twisting injuries to the lower leg; can be open or closed.",
    findings:"Deformity, swelling, pain, and possible bone protrusion in an open fracture.",
    interv:"Splint to immobilize the joint above and below the injury, check distal PMS before and after, and control any bleeding from an open fracture."},
-  {id:"p20", system:"msk", x:41, y:186, name:"Medial malleolus",
+  {id:"p20", system:"msk", x:46, y:186, name:"Medial malleolus",
    location:"The bony bump on the inner ankle, at the end of the shin bone (tibia).",
    funct:"Forms part of the ankle joint and helps stabilize it.",
    path:"A common site of ankle fracture and sprain, especially from a twisting injury.",
    findings:"Pain, swelling, and tenderness over the inner ankle; may be accompanied by deformity in a significant fracture.",
    interv:"Splint the ankle in the position found, and check the posterior tibial and dorsalis pedis pulses before and after."},
-  {id:"p21", system:"cardio", x:39, y:193, name:"Dorsalis pedis",
+  {id:"p21", system:"cardio", x:43, y:193, name:"Dorsalis pedis",
    location:"Top of the foot, between the first and second metatarsal bones.",
    funct:"One of the two standard distal pulse points in the foot.",
    path:"Can be congenitally absent in a small percentage of people, so use the posterior tibial as the alternate check.",
@@ -2699,68 +2751,230 @@ const ANTERIOR_POINTS = [
 ];
 
 
-const POSTERIOR_LANDMARKS = [
-{id:30, view:"posterior", system:"msk", zone:"head", x:150, y:25, label:"Occipital bone",
+// Real per-shape display names (from body-muscles' BACK_MUSCLES data).
+const MUSCLE_DISPLAY_NAMES = {
+  "head-back":"Head (Posterior)",
+  "nape":"Nape",
+  "traps-upper-left":"Left Trapezius (Upper)",
+  "traps-mid-left":"Left Trapezius (Mid)",
+  "traps-lower-left":"Left Trapezius (Lower)",
+  "traps-upper-right":"Right Trapezius (Upper)",
+  "traps-mid-right":"Right Trapezius (Mid)",
+  "traps-lower-right":"Right Trapezius (Lower)",
+  "lats-upper-left":"Left Lats (Upper)",
+  "deltoid-rear-left":"Left Rear Deltoid",
+  "lats-mid-left":"Left Lats (Mid)",
+  "lats-lower-left":"Left Lats (Lower)",
+  "deltoid-rear-right":"Right Rear Deltoid",
+  "lats-upper-right":"Right Lats (Upper)",
+  "lats-mid-right":"Right Lats (Mid)",
+  "lats-lower-right":"Right Lats (Lower)",
+  "triceps-long-left":"Left Triceps (Long Head)",
+  "triceps-lateral-left":"Left Triceps (Lateral Head)",
+  "hand-back-left":"Left Hand (Back)",
+  "forearm-flexors-left":"Forearm Flexors Left",
+  "forearm-extensors-left":"Forearm Extensors Left",
+  "triceps-long-right":"Right Triceps (Long Head)",
+  "triceps-lateral-right":"Right Triceps (Lateral Head)",
+  "hand-back-right":"Right Hand (Back)",
+  "forearm-flexors-right":"Forearm Flexors Right",
+  "forearm-extensors-right":"Forearm Extensors Right",
+  "spine":"Spine",
+  "lower-back-erectors-left":"Erector Spinae Left",
+  "lower-back-ql-left":"Quadratus Lumborum Left",
+  "lower-back-erectors-right":"Erector Spinae Right",
+  "lower-back-ql-right":"Quadratus Lumborum Right",
+  "gluteus-medius-left":"Gluteus Medius Left",
+  "gluteus-maximus-left":"Gluteus Maximus Left",
+  "gluteus-medius-right":"Gluteus Medius Right",
+  "gluteus-maximus-right":"Gluteus Maximus Right",
+  "knee-back-left":"Left Back Knee",
+  "knee-back-right":"Right Back Knee",
+  "calves-gastroc-medial-left":"Gastrocnemius Medial Left",
+  "calves-gastroc-lateral-left":"Gastrocnemius Lateral Left",
+  "calves-soleus-left":"Soleus Left",
+  "calves-gastroc-medial-right":"Gastrocnemius Medial Right",
+  "calves-gastroc-lateral-right":"Gastrocnemius Lateral Right",
+  "calves-soleus-right":"Soleus Right",
+  "foot-back-left":"Left Foot (Back)",
+  "hamstrings-medial-left":"Medial Hamstrings (Semis) Left",
+  "hamstrings-lateral-left":"Lateral Hamstrings (Biceps) Left",
+  "foot-back-right":"Right Foot (Back)",
+  "hamstrings-medial-right":"Medial Hamstrings (Semis) Right",
+  "hamstrings-lateral-right":"Lateral Hamstrings (Biceps) Right"
+};
+
+// Maps each real muscle-shape id (from body-muscles' BACK_MUSCLES data) to a
+// shared content group key. Many ids (left/right pairs, sub-heads of one muscle)
+// intentionally share one content entry — the display name still comes from
+// the shape's own real anatomical name.
+const MUSCLE_GROUP_MAP = {
+  "head-back":"headneck", "nape":"headneck",
+  "traps-upper-left":"traps", "traps-mid-left":"traps", "traps-lower-left":"traps",
+  "traps-upper-right":"traps", "traps-mid-right":"traps", "traps-lower-right":"traps",
+  "lats-upper-left":"lats", "lats-mid-left":"lats", "lats-lower-left":"lats",
+  "lats-upper-right":"lats", "lats-mid-right":"lats", "lats-lower-right":"lats",
+  "deltoid-rear-left":"deltoid", "deltoid-rear-right":"deltoid",
+  "triceps-long-left":"triceps", "triceps-lateral-left":"triceps",
+  "triceps-long-right":"triceps", "triceps-lateral-right":"triceps",
+  "hand-back-left":"handback", "hand-back-right":"handback",
+  "forearm-flexors-left":"forearmback", "forearm-extensors-left":"forearmback",
+  "forearm-flexors-right":"forearmback", "forearm-extensors-right":"forearmback",
+  "lower-back-erectors-left":"lowerback", "lower-back-ql-left":"lowerback",
+  "lower-back-erectors-right":"lowerback", "lower-back-ql-right":"lowerback",
+  "gluteus-medius-left":"glutes", "gluteus-maximus-left":"glutes",
+  "gluteus-medius-right":"glutes", "gluteus-maximus-right":"glutes",
+  "knee-back-left":"kneeback", "knee-back-right":"kneeback",
+  "calves-gastroc-medial-left":"calves", "calves-gastroc-lateral-left":"calves", "calves-soleus-left":"calves",
+  "calves-gastroc-medial-right":"calves", "calves-gastroc-lateral-right":"calves", "calves-soleus-right":"calves",
+  "foot-back-left":"footback", "foot-back-right":"footback",
+  "hamstrings-medial-left":"hamstrings", "hamstrings-lateral-left":"hamstrings",
+  "hamstrings-medial-right":"hamstrings", "hamstrings-lateral-right":"hamstrings"
+};
+
+const MUSCLE_CONTENT = {
+  headneck: {system:"msk",
+    location:"Muscles at the back of the skull and upper neck.",
+    funct:"Support and move the head, including extension (tilting the head back).",
+    path:"Strain from whiplash-type mechanisms (rapid deceleration) or direct blunt trauma.",
+    findings:"Neck pain/stiffness, tenderness, or limited range of motion after a significant mechanism of injury.",
+    interv:"If a significant mechanism of injury is present, apply spinal motion restriction per protocol rather than treating this as a simple muscle strain."},
+  traps: {system:"msk",
+    location:"A large, kite-shaped muscle spanning the upper back, neck, and shoulders.",
+    funct:"Elevates, rotates, and stabilizes the shoulder blade, and helps extend the neck.",
+    path:"A common site of muscular strain from lifting or sudden movement; also a frequent site of tension-related pain.",
+    findings:"Pain and tenderness across the shoulder/upper back, sometimes with a palpable tight band of muscle spasm.",
+    interv:"Position of comfort, ice for an acute strain, and transport if pain is severe or the mechanism suggests more than a simple strain."},
+  lats: {system:"msk",
+    location:"A broad, flat muscle covering much of the lower and mid back, from the upper arm down toward the pelvis/lower spine.",
+    funct:"Pulls the arm down and back (e.g., a pulling or climbing motion).",
+    path:"Can be strained by overhead lifting or pulling activities.",
+    findings:"Pain along the side of the back, worse with arm movement overhead.",
+    interv:"Position of comfort, ice for an acute strain, and transport if pain is severe."},
+  deltoid: {system:"msk",
+    location:"The back portion of the rounded shoulder muscle.",
+    funct:"Helps move the arm backward and rotate the shoulder.",
+    path:"Strain from overuse, or bruising/injury from a direct blow to the shoulder.",
+    findings:"Pain with arm movement, tenderness over the back of the shoulder.",
+    interv:"Sling and swathe for comfort if associated with a shoulder injury, and transport if a fracture/dislocation is also suspected."},
+  triceps: {system:"msk",
+    location:"The back of the upper arm, between the shoulder and elbow.",
+    funct:"Straightens (extends) the elbow.",
+    path:"Can be strained, bruised, or lacerated; rarely, a full tendon rupture from forceful contraction.",
+    findings:"Pain with elbow extension, swelling, or a palpable defect in a full rupture.",
+    interv:"Splint the arm in a position of comfort if a fracture is also suspected, and transport."},
+  handback: {system:"msk",
+    location:"The back of the hand.",
+    funct:"Houses the tendons that extend (straighten) the fingers and wrist.",
+    path:"Lacerations, crush injuries, and fractures of the hand bones are common.",
+    findings:"Deformity, swelling, or an inability to extend the fingers normally.",
+    interv:"Control bleeding, splint in a position of function, and check distal circulation/sensation before and after."},
+  forearmback: {system:"msk",
+    location:"The back of the forearm, between the elbow and wrist.",
+    funct:"Extend the wrist and fingers.",
+    path:"Fractures of the forearm bones (radius/ulna), lacerations, or compartment syndrome after a crush injury.",
+    findings:"Pain, swelling, deformity; in compartment syndrome, pain out of proportion to the injury and a tense, tight forearm.",
+    interv:"Splint a suspected fracture, check distal PMS before and after, and treat any open wound; report signs of possible compartment syndrome promptly."},
+  lowerback: {system:"msk",
+    location:"Deep muscles running alongside the spine in the lower back.",
+    funct:"Support and extend the spine, and help stabilize the trunk.",
+    path:"A very common source of non-traumatic lower back pain (muscle strain); can also be injured in significant back trauma.",
+    findings:"Localized lower back pain and muscle spasm; assess for any associated neurological deficit in the legs.",
+    interv:"For a traumatic mechanism, follow spinal motion restriction protocol; for a non-traumatic strain, position of comfort and transport."},
+  glutes: {system:"msk",
+    location:"The buttocks.",
+    funct:"Extend and stabilize the hip, powering movements like standing up and climbing stairs.",
+    path:"Can be contused or lacerated in a fall or direct trauma.",
+    findings:"Pain, swelling, or bruising over the buttock after trauma.",
+    interv:"Standard soft-tissue injury care; treat for shock if a large, deep injury suggests significant blood loss."},
+  kneeback: {system:"msk",
+    location:"The soft-tissue hollow directly behind the knee joint (the popliteal fossa).",
+    funct:"Houses the popliteal artery, vein, and nerve as they cross behind the knee.",
+    path:"A knee dislocation can stretch or tear the popliteal artery, threatening the entire lower leg's blood supply.",
+    findings:"Swelling/deformity at the knee with a diminished or absent distal pulse should raise urgent concern for vascular injury.",
+    interv:"Check distal pulses immediately after any significant knee injury; an absent pulse after knee trauma is a time-critical vascular emergency requiring rapid transport."},
+  calves: {system:"msk",
+    location:"The back of the lower leg, between the knee and ankle.",
+    funct:"Point the foot downward (plantar flexion), powering walking, running, and standing on tiptoe.",
+    path:"Common site of muscle strain (a \"calf strain\" or, more severely, a ruptured Achilles tendon); also where a deep vein thrombosis (DVT) can form.",
+    findings:"Sudden sharp pain with a strain/rupture; unilateral calf swelling, warmth, and tenderness can suggest a DVT.",
+    interv:"RICE-type care for a suspected strain; for suspected DVT, avoid massaging/manipulating the leg and transport for evaluation — a DVT can travel to the lungs (pulmonary embolism) if dislodged."},
+  footback: {system:"msk",
+    location:"The heel and back of the foot/ankle, including the Achilles tendon attachment.",
+    funct:"The Achilles tendon here transmits the calf muscles' pull to the heel, powering push-off during walking.",
+    path:"Achilles tendon rupture (sudden, often described as feeling \"kicked in the back of the leg\") or heel fractures from a fall/jump.",
+    findings:"Sudden pain and weakness pushing off the foot, or a palpable gap above the heel in a full Achilles rupture.",
+    interv:"Splint in the position found (often with the foot pointed down), avoid weight-bearing, and transport."},
+  hamstrings: {system:"msk",
+    location:"The back of the thigh, between the hip and knee.",
+    funct:"Bend the knee and extend the hip; heavily used in running and sprinting.",
+    path:"One of the most common muscle strain sites in athletes, ranging from a mild pull to a complete tear.",
+    findings:"Sudden sharp pain in the back of the thigh, sometimes with bruising or a palpable defect in a severe tear.",
+    interv:"RICE-type care (rest, ice, gentle support), and transport if pain is severe or the patient can't bear weight."}
+};
+
+const POSTERIOR_POINTS = [
+  {id:"q1", system:"msk", x:50, y:4, name:"Occipital bone",
    location:"The back and base of the skull.",
    funct:"Protects the back of the brain and the area where the spinal cord exits the skull.",
    path:"Fractures here can occur from a fall backward or a direct blow to the back of the head, and may involve the brainstem given the location.",
    findings:"Tenderness, deformity, or bruising at the back/base of the skull; assess mental status and pupils closely.",
    interv:"Maintain spinal motion restriction, monitor airway and mental status closely, and transport promptly."},
-  {id:31, view:"posterior", system:"msk", zone:"spine", x:135, y:78, label:"Cervical spine (C1–C7)",
+  {id:"q2", system:"msk", x:48, y:11, name:"Cervical spine (C1–C7)",
    location:"The neck portion of the vertebral column, 7 vertebrae between the skull and the upper back.",
    funct:"Supports the head and protects the cervical spinal cord running through it.",
    path:"The focus of spinal motion restriction after a significant mechanism of injury, given the risk of cord injury.",
    findings:"Neck pain, tenderness, or any neurological deficit (numbness, weakness) in the arms or legs.",
    interv:"Apply a cervical collar and full spinal motion restriction per current protocol; maintain in-line stabilization during airway management."},
-  {id:32, view:"posterior", system:"msk", zone:"chest", x:124, y:105, label:"Scapula",
+  {id:"q3", system:"msk", x:42, y:19, name:"Scapula",
    location:"The shoulder blade, on the upper back.",
    funct:"Anchors many shoulder and upper back muscles and forms part of the shoulder joint.",
    path:"Fractures here are uncommon and generally indicate a high-force mechanism of injury, raising suspicion for associated chest/lung injury.",
    findings:"Pain and tenderness over the upper back/shoulder blade area; consider associated rib or lung injury.",
    interv:"Treat as a marker of significant force — assess thoroughly for associated chest trauma, splint the arm for comfort, and transport."},
-  {id:33, view:"posterior", system:"resp", zone:"chest", x:172, y:168, label:"Posterior lung fields (bases)", inset:"lung",
+  {id:"q4", system:"resp", x:45, y:28, name:"Posterior lung fields (bases)", inset:"lung",
    location:"Fill most of the chest cavity, with the diaphragm forming the floor of the chest below them.",
    funct:"Together, perform the mechanical work of breathing and gas exchange; the bases are a key spot for detecting fluid buildup.",
    path:"Pulmonary edema, pneumonia, hemothorax, and pneumothorax can all be detected via posterior auscultation.",
    findings:"Crackles at the bases suggest fluid (pulmonary edema); diminished sounds on one side suggest pneumo/hemothorax.",
    interv:"Support oxygenation/ventilation as needed, position upright if tolerated for pulmonary edema, and transport promptly."},
-  {id:34, view:"posterior", system:"msk", zone:"spine", x:166, y:140, label:"Thoracic spine (T1–T12)",
+  {id:"q5", system:"msk", x:52, y:24, name:"Thoracic spine (T1–T12)",
    location:"The mid-back portion of the vertebral column, 12 vertebrae each paired with a rib.",
    funct:"Supports the rib cage and protects the thoracic spinal cord.",
    path:"Can be injured in falls or high-force trauma; associated rib fractures are common given the rib attachments.",
    findings:"Mid-back pain/tenderness, or any neurological deficit in the legs.",
    interv:"Spinal motion restriction per protocol; assess for associated chest wall injury."},
-  {id:35, view:"posterior", system:"neuro", zone:"spine", x:150, y:160, label:"Spinal cord", inset:"spinalcord",
+  {id:"q6", system:"neuro", x:57, y:24, name:"Spinal cord", inset:"spinalcord",
    location:"Runs through the protective canal formed by the vertebral column, from the base of the brain to the lower back.",
    funct:"The main communication pathway between the brain and the rest of the body.",
    path:"Traumatic spinal cord injury (partial or complete) from a significant mechanism of injury to the head, neck, or back.",
    findings:"Numbness, tingling, weakness, or paralysis below the level of injury; possibly bowel/bladder involvement.",
    interv:"Spinal motion restriction per current protocol, careful handling to avoid worsening injury, and prompt transport."},
-  {id:36, view:"posterior", system:"msk", zone:"abdomen", x:176, y:196, label:"Costovertebral angle (CVA)",
+  {id:"q7", system:"msk", x:59, y:37, name:"Costovertebral angle (CVA)",
    location:"The angle formed on the back where the lowest rib meets the spine, on either side.",
    funct:"An examination landmark overlying the kidneys.",
    path:"Tenderness here (CVA tenderness) is classically associated with a kidney infection (pyelonephritis) or kidney stone.",
    findings:"Pain with gentle percussion/pressure over this area, often with flank pain radiating to the groin.",
    interv:"Position of comfort and supportive care; generally a medical (non-traumatic) transport priority unless trauma is also involved."},
-  {id:37, view:"posterior", system:"msk", zone:"spine", x:134, y:220, label:"Lumbar spine (L1–L5)",
+  {id:"q8", system:"msk", x:52, y:39, name:"Lumbar spine (L1–L5)",
    location:"The lower back portion of the vertebral column, 5 vertebrae between the thoracic spine and sacrum.",
    funct:"Bears significant body weight and protects the lower spinal cord and nerve roots.",
    path:"A common site of both traumatic injury and everyday non-traumatic lower back pain.",
    findings:"Lower back pain, and — in trauma — any leg weakness, numbness, or loss of bowel/bladder control.",
    interv:"Spinal motion restriction per protocol for a traumatic mechanism; for non-traumatic back pain, focus on comfortable positioning and transport."},
-  {id:38, view:"posterior", system:"msk", zone:"pelvis", x:150, y:260, label:"Sacrum & coccyx",
+  {id:"q9", system:"msk", x:52, y:43, name:"Sacrum & coccyx",
    location:"The fused triangular bone at the base of the spine, ending in the small tailbone (coccyx).",
    funct:"Connects the spine to the pelvis and bears weight when sitting.",
    path:"Can be fractured or bruised in a fall onto the buttocks.",
    findings:"Pain and tenderness at the very base of the spine, worse with sitting.",
    interv:"Spinal motion restriction per protocol if the mechanism is significant; otherwise, position for comfort and transport."},
-  {id:39, view:"posterior", system:"cardio", zone:"legL", x:122, y:480, label:"Popliteal artery",
+  {id:"q10", system:"cardio", x:52, y:64, name:"Popliteal artery",
    location:"Behind the knee, in the popliteal fossa.",
    funct:"Continues blood supply from the femoral artery into the lower leg.",
    path:"Vulnerable to injury in knee dislocations, which can compromise distal circulation.",
    findings:"Checked when assessing circulation after a knee or lower-leg injury; harder to palpate than other pulse points.",
    interv:"Its absence after a knee injury is a time-sensitive finding warranting prompt transport for vascular evaluation."},
-  {id:40, view:"posterior", system:"cardio", zone:"legL", x:118, y:578, label:"Posterior tibial artery",
+  {id:"q11", system:"cardio", x:49, y:87, name:"Posterior tibial artery",
    location:"Just behind and below the medial ankle bone (medial malleolus).",
    funct:"One of two distal pulse points supplying the foot.",
    path:"Diminished/absent pulse can indicate peripheral vascular disease or distal limb injury.",
@@ -2768,11 +2982,6 @@ const POSTERIOR_LANDMARKS = [
    interv:"Document and compare bilaterally; recheck after splinting a lower-leg injury."}
 ];
 
-const POSTERIOR_ZONES = {
-  head:{x:100,y:5,w:100,h:95}, neck:{x:110,y:55,w:80,h:45}, chest:{x:95,y:85,w:110,h:120},
-  abdomen:{x:95,y:195,w:110,h:75}, pelvis:{x:95,y:210,w:110,h:95}, armL:{x:35,y:85,w:95,h:220},
-  legL:{x:90,y:270,w:70,h:340}, spine:{x:105,y:10,w:90,h:300}
-};
 
 const INSETS = {
   lung:{
@@ -2900,15 +3109,28 @@ function findOrganId(el, stopEl){
   return null;
 }
 
+function findMuscleId(el, stopEl){
+  while(el && el !== stopEl){
+    if(el.id && MUSCLE_GROUP_MAP[el.id]) return el.id;
+    el = el.parentElement;
+  }
+  return null;
+}
+
 function zoomToRect(svgId, groupId, hlId, viewW, viewH, el, padFrac){
   const svg = document.getElementById(svgId);
   const zg = document.getElementById(groupId);
   zg.style.transform = 'translate(0px,0px) scale(1)';
   const svgRect = svg.getBoundingClientRect();
+  // The viewBox's own min-x/min-y (e.g. the posterior illustration's viewBox starts
+  // at x=37, not 0) must be folded in — both when converting a screen position back
+  // into user-space coordinates, and when centering the zoom on the viewBox's actual
+  // center, or every posterior zoom/highlight lands offset by that origin.
+  const vb = svg.viewBox.baseVal;
   const scaleX = viewW / svgRect.width, scaleY = viewH / svgRect.height;
   const r = el.getBoundingClientRect();
-  let x = (r.left - svgRect.left) * scaleX;
-  let y = (r.top - svgRect.top) * scaleY;
+  let x = vb.x + (r.left - svgRect.left) * scaleX;
+  let y = vb.y + (r.top - svgRect.top) * scaleY;
   let w = Math.max(r.width * scaleX, 0.001);
   let h = Math.max(r.height * scaleY, 0.001);
   const pad = Math.max(w,h) * (padFrac !== undefined ? padFrac : 0.6) + viewW*0.02;
@@ -2916,8 +3138,8 @@ function zoomToRect(svgId, groupId, hlId, viewW, viewH, el, padFrac){
   let scale = Math.min(viewW / w, viewH / h);
   scale = Math.min(scale, 7);
   scale = Math.max(scale, 1);
-  const tx = viewW/2 - scale*(x + w/2);
-  const ty = viewH/2 - scale*(y + h/2);
+  const tx = vb.x + viewW/2 - scale*(x + w/2);
+  const ty = vb.y + viewH/2 - scale*(y + h/2);
   zg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
   const hl = document.getElementById(hlId);
   hl.setAttribute('x', x); hl.setAttribute('y', y);
@@ -2952,7 +3174,17 @@ function clearSelectionVisuals(){
   if(selected && selected.kind === 'organ'){
     const data = ORGAN_CONTENT[selected.key];
     const prevEl = document.getElementById(selected.key);
-    if(prevEl && data && !data.isSkin) tintElement(prevEl, 'var(--organ-tint)');
+    if(prevEl && data && !data.isSkin){
+      tintElement(prevEl, 'var(--organ-tint)');
+      prevEl.classList.remove('selected');
+    }
+  }
+  if(selected && selected.kind === 'muscle'){
+    const prevEl = document.getElementById(selected.key);
+    if(prevEl){
+      tintElement(prevEl, 'var(--organ-tint)');
+      prevEl.classList.remove('selected');
+    }
   }
 }
 
@@ -3009,7 +3241,7 @@ function selectOrgan(id){
   selected = {kind:'organ', key:id};
   const el = document.getElementById(id);
   if(el){
-    if(!data.isSkin) tintElement(el, 'var(--accent)');
+    if(!data.isSkin){ tintElement(el, 'var(--accent)'); el.classList.add('selected'); }
     zoomToRect('anteriorSvg','anteriorZoomGroup','anteriorHighlight',106.00675,195.36273, el, 0.6);
   }
   updateInfoPanel(data.system, data.name, data);
@@ -3030,24 +3262,41 @@ function selectPoint(id){
   renderList();
 }
 
-function selectPosteriorLandmark(id){
-  const l = POSTERIOR_LANDMARKS.find(x => x.id === id);
-  if(!l) return;
+function selectMuscle(id){
+  const groupKey = MUSCLE_GROUP_MAP[id];
+  const data = groupKey && MUSCLE_CONTENT[groupKey];
+  if(!data) return;
   clearSelectionVisuals();
-  selected = {kind:'posterior', key:id};
-  renderPosteriorDots();
-  const el = document.querySelector(`#posteriorPointLayer [data-id="${id}"] circle`);
-  zoomToRect('posteriorSvg','posteriorZoomGroup','posteriorHighlight',300,620, el, 0.6);
-  updateInfoPanel(l.system, l.label, l);
-  if(l.inset){ currentInsetKey = l.inset; openInset(l.inset); } else { clearInset(); }
+  selected = {kind:'muscle', key:id};
+  const el = document.getElementById(id);
+  if(el){
+    tintElement(el, 'var(--accent)');
+    el.classList.add('selected');
+    zoomToRect('posteriorSvg','posteriorZoomGroup','posteriorHighlight',35,93, el, 0.6);
+  }
+  updateInfoPanel(data.system, MUSCLE_DISPLAY_NAMES[id] || id, data);
+  clearInset();
   renderList();
 }
 
-function initAnteriorOrgans(){
-  const svgRect = document.getElementById('anteriorSvg').getBoundingClientRect();
+function selectPosteriorPoint(id){
+  const p = POSTERIOR_POINTS.find(x => x.id === id);
+  if(!p) return;
+  clearSelectionVisuals();
+  selected = {kind:'postpoint', key:id};
+  renderPosteriorPoints();
+  const el = document.querySelector(`#posteriorPointLayer [data-id="${id}"] circle`);
+  zoomToRect('posteriorSvg','posteriorZoomGroup','posteriorHighlight',35,93, el, 3.0);
+  updateInfoPanel(p.system, p.name, p);
+  if(p.inset){ currentInsetKey = p.inset; openInset(p.inset); } else { clearInset(); }
+  renderList();
+}
+
+function initShapeLayer(svgId, zoomGroupId, highlightId, pointLayerId, rule9Id, contentMap, displayNameOf){
+  const svgRect = document.getElementById(svgId).getBoundingClientRect();
   const withArea = [];
-  Object.keys(ORGAN_CONTENT).forEach(id => {
-    const data = ORGAN_CONTENT[id];
+  Object.keys(contentMap).forEach(id => {
+    const data = contentMap[id];
     const el = document.getElementById(id);
     if(!el) return;
     if(data.isSkin) return;
@@ -3055,32 +3304,41 @@ function initAnteriorOrgans(){
     tintElement(el, 'var(--organ-tint)');
     el.setAttribute('tabindex', '0');
     el.setAttribute('role', 'button');
-    el.setAttribute('aria-label', data.name);
+    el.setAttribute('aria-label', displayNameOf(id));
     const r = el.getBoundingClientRect();
-    // A thin, elongated shape (e.g. the spinal cord's vertical strip) can have a tiny
-    // bounding-box AREA despite spanning most of the body's height — its extreme aspect
-    // ratio is the real tell, not its absolute size. Treat anything either markedly
-    // elongated or spanning a large share of the body as "large" regardless of raw
-    // area, so it doesn't wrongly out-rank compact organs (liver, stomach, etc.) that
-    // share part of its footprint.
+    // A thin, elongated shape (e.g. the spinal cord's vertical strip, or the spine
+    // muscle outline here) can have a tiny bounding-box AREA despite spanning most of
+    // the body's height — its extreme aspect ratio is the real tell, not its absolute
+    // size. Treat anything either markedly elongated or spanning a large share of the
+    // body as "large" regardless of raw area, so it doesn't wrongly out-rank compact
+    // shapes (liver, stomach, a single muscle, etc.) that share part of its footprint.
     const longSide = Math.max(r.width, r.height), shortSide = Math.max(Math.min(r.width, r.height), 0.01);
     const isElongated = (longSide / shortSide > 4) || r.width > svgRect.width * 0.5 || r.height > svgRect.height * 0.5;
     const area = isElongated ? Infinity : r.width * r.height;
     withArea.push({el, area});
   });
-  // Repaint smaller/more specific shapes (e.g. heart chambers) on top of larger
-  // overlapping ones (e.g. the lung) so precise clicks reach the right structure.
-  // Re-parenting every organ into one shared, untransformed container (rather than
-  // just reordering within each element's original group) makes this ordering global
-  // — otherwise two organs in different original groups (e.g. liver vs. kidney) keep
-  // whatever relative order their enclosing groups happened to have.
-  const container = document.getElementById('anteriorZoomGroup');
+  // Repaint smaller/more specific shapes on top of larger overlapping ones so precise
+  // clicks reach the right structure. Re-parenting every shape into one shared,
+  // untransformed container (rather than just reordering within each element's
+  // original group) makes this ordering global — otherwise two shapes in different
+  // original groups keep whatever relative order their enclosing groups happened to have.
+  const container = document.getElementById(zoomGroupId);
   withArea.sort((a,b) => b.area - a.area);
   withArea.forEach(item => { container.appendChild(item.el); });
-  // Re-affirm these stay on top of the just-reordered organs.
-  container.appendChild(document.getElementById('anteriorHighlight'));
-  container.appendChild(document.getElementById('anteriorPointLayer'));
-  container.appendChild(document.getElementById('rule9LayerAnt'));
+  // Re-affirm these stay on top of the just-reordered shapes.
+  container.appendChild(document.getElementById(highlightId));
+  container.appendChild(document.getElementById(pointLayerId));
+  container.appendChild(document.getElementById(rule9Id));
+}
+
+function initAnteriorOrgans(){
+  initShapeLayer('anteriorSvg','anteriorZoomGroup','anteriorHighlight','anteriorPointLayer','rule9LayerAnt',
+    ORGAN_CONTENT, id => ORGAN_CONTENT[id].name);
+}
+
+function initPosteriorMuscles(){
+  initShapeLayer('posteriorSvg','posteriorZoomGroup','posteriorHighlight','posteriorPointLayer','rule9LayerPost',
+    MUSCLE_GROUP_MAP, id => MUSCLE_DISPLAY_NAMES[id] || id);
 }
 
 function renderAnteriorPoints(){
@@ -3094,13 +3352,13 @@ function renderAnteriorPoints(){
   }).join("");
 }
 
-function renderPosteriorDots(){
+function renderPosteriorPoints(){
   const layer = document.getElementById('posteriorPointLayer');
-  layer.innerHTML = POSTERIOR_LANDMARKS.map(l => {
-    const hidden = activeSystems.has(l.system) ? "" : "hidden";
-    const sel = (selected && selected.kind === 'posterior' && selected.key === l.id) ? "selected" : "";
-    return `<g class="landmark-dot-group ${hidden}" data-id="${l.id}" tabindex="0" role="button" aria-label="${l.label}">
-      <circle class="landmark-dot ${sel}" cx="${l.x}" cy="${l.y}" r="6"></circle>
+  layer.innerHTML = POSTERIOR_POINTS.map(p => {
+    const hidden = activeSystems.has(p.system) ? "" : "hidden";
+    const sel = (selected && selected.kind === 'postpoint' && selected.key === p.id) ? "selected" : "";
+    return `<g class="point-dot-group ${hidden}" data-id="${p.id}" tabindex="0" role="button" aria-label="${p.name}">
+      <circle class="point-dot ${sel}" cx="${p.x}" cy="${p.y}" r="0.6"></circle>
     </g>`;
   }).join("");
 }
@@ -3113,13 +3371,24 @@ function applySystemFilterToOrgans(){
   });
 }
 
+function applySystemFilterToMuscles(){
+  Object.keys(MUSCLE_GROUP_MAP).forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const system = MUSCLE_CONTENT[MUSCLE_GROUP_MAP[id]].system;
+    el.classList.toggle('sys-hidden', !activeSystems.has(system));
+  });
+}
+
 function getCurrentItems(){
   if(currentView === 'anterior'){
     const organs = Object.keys(ORGAN_CONTENT).map(id => ({key:id, kind:'organ', name:ORGAN_CONTENT[id].name, system:ORGAN_CONTENT[id].system}));
     const points = ANTERIOR_POINTS.map(p => ({key:p.id, kind:'point', name:p.name, system:p.system}));
     return organs.concat(points);
   }
-  return POSTERIOR_LANDMARKS.map(l => ({key:String(l.id), kind:'posterior', name:l.label, system:l.system}));
+  const muscles = Object.keys(MUSCLE_GROUP_MAP).map(id => ({key:id, kind:'muscle', name:MUSCLE_DISPLAY_NAMES[id] || id, system:MUSCLE_CONTENT[MUSCLE_GROUP_MAP[id]].system}));
+  const points = POSTERIOR_POINTS.map(p => ({key:p.id, kind:'postpoint', name:p.name, system:p.system}));
+  return muscles.concat(points);
 }
 
 function renderList(){
@@ -3150,11 +3419,11 @@ function renderRule9(){
 
   const postLayer = document.getElementById('rule9LayerPost');
   const postLabels = [
-    {x:150, y:45, t:"9%"}, {x:62, y:190, t:"9%"}, {x:238, y:190, t:"9%"},
-    {x:150, y:160, t:"18%"}, {x:119, y:450, t:"18%"}, {x:181, y:450, t:"18%"}
+    {x:52, y:7, t:"9%"}, {x:41, y:26, t:"9%"}, {x:63, y:26, t:"9%"},
+    {x:52, y:33, t:"18%"}, {x:46, y:65, t:"18%"}, {x:58, y:65, t:"18%"}
   ];
   postLayer.innerHTML = postLabels.map(l =>
-    `<rect x="${l.x-16}" y="${l.y-13}" width="32" height="18" rx="3"></rect><text x="${l.x}" y="${l.y}" font-size="12">${l.t}</text>`
+    `<rect x="${l.x-4.6}" y="${l.y-2.4}" width="9.2" height="4.6" rx="0.6"></rect><text x="${l.x}" y="${l.y+1.5}" font-size="2.6">${l.t}</text>`
   ).join('');
 }
 
@@ -3176,21 +3445,31 @@ document.getElementById('anteriorPointLayer').addEventListener('keydown', e => {
   const g = e.target.closest('.point-dot-group');
   if(g){ e.preventDefault(); selectPoint(g.dataset.id); }
 });
+document.getElementById('posteriorSvg').addEventListener('click', e => {
+  const id = findMuscleId(e.target, document.getElementById('posteriorSvg'));
+  if(id) selectMuscle(id);
+});
+document.getElementById('posteriorSvg').addEventListener('keydown', e => {
+  if(e.key !== 'Enter' && e.key !== ' ') return;
+  const id = findMuscleId(e.target, document.getElementById('posteriorSvg'));
+  if(id){ e.preventDefault(); selectMuscle(id); }
+});
 document.getElementById('posteriorPointLayer').addEventListener('click', e => {
-  const g = e.target.closest('.landmark-dot-group');
-  if(g) selectPosteriorLandmark(Number(g.dataset.id));
+  const g = e.target.closest('.point-dot-group');
+  if(g) selectPosteriorPoint(g.dataset.id);
 });
 document.getElementById('posteriorPointLayer').addEventListener('keydown', e => {
   if(e.key !== 'Enter' && e.key !== ' ') return;
-  const g = e.target.closest('.landmark-dot-group');
-  if(g){ e.preventDefault(); selectPosteriorLandmark(Number(g.dataset.id)); }
+  const g = e.target.closest('.point-dot-group');
+  if(g){ e.preventDefault(); selectPosteriorPoint(g.dataset.id); }
 });
 document.getElementById('landmarkList').addEventListener('click', e => {
   if(e.target.tagName !== 'BUTTON') return;
   const kind = e.target.dataset.kind, key = e.target.dataset.key;
   if(kind === 'organ') selectOrgan(key);
   else if(kind === 'point') selectPoint(key);
-  else if(kind === 'posterior') selectPosteriorLandmark(Number(key));
+  else if(kind === 'muscle') selectMuscle(key);
+  else if(kind === 'postpoint') selectPosteriorPoint(key);
 });
 document.getElementById('insetDiagram').addEventListener('click', e => {
   const box = e.target.closest('.inset-box');
@@ -3205,7 +3484,7 @@ document.querySelectorAll('.view-btn[data-view]').forEach(btn => btn.addEventLis
   document.getElementById('posteriorSvg').classList.toggle('view-hidden', currentView !== 'posterior');
   document.getElementById('viewCaption').textContent = currentView === 'anterior'
     ? 'ANTERIOR (FRONT) VIEW — REAL ILLUSTRATION'
-    : 'POSTERIOR (BACK) VIEW — SCHEMATIC PLACEHOLDER';
+    : 'POSTERIOR (BACK) VIEW — REAL ILLUSTRATION';
   selected = null;
   clearInset();
   resetZoom('both');
@@ -3219,14 +3498,15 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   clearInset();
   document.getElementById('infoPanel').innerHTML = PLACEHOLDER_HTML;
   renderAnteriorPoints();
-  renderPosteriorDots();
+  renderPosteriorPoints();
   renderList();
 });
 document.querySelectorAll('.sys-cb').forEach(cb => cb.addEventListener('change', () => {
   activeSystems = new Set([...document.querySelectorAll('.sys-cb:checked')].map(c => c.value));
   applySystemFilterToOrgans();
+  applySystemFilterToMuscles();
   renderAnteriorPoints();
-  renderPosteriorDots();
+  renderPosteriorPoints();
   renderList();
 }));
 document.getElementById('rule9Cb').addEventListener('change', e => {
@@ -3235,8 +3515,9 @@ document.getElementById('rule9Cb').addEventListener('change', e => {
 });
 
 initAnteriorOrgans();
+initPosteriorMuscles();
 renderAnteriorPoints();
-renderPosteriorDots();
+renderPosteriorPoints();
 renderList();
 renderTerms();
 renderRule9();
