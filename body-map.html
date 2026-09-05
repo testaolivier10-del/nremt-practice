@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Patient Body Map — EMT Prep</title>
+<meta name="description" content="An interactive, labeled body diagram of the anatomical landmarks, pulse points, and surface structures an EMT needs to know.">
+<style>
+  :root{
+    --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
+    --line:#DCE0DE; --ink:#1A1F1D; --muted:#5C645F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.6;}
+  .wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
+  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+  .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 20px;}
+  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
+  .site-nav a{color:var(--accent);text-decoration:none;}
+  .site-nav a:hover{text-decoration:underline;}
+  .warning{
+    background:#FBF0E9;border:1px solid #E8C4A8;border-radius:5px;padding:14px 16px;
+    font-size:13.5px;color:#7A4A2A;margin-bottom:28px;
+  }
+  h2{font-size:19px;font-weight:600;margin:36px 0 12px;}
+
+  .controls{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+  .view-toggle{display:flex;gap:8px;}
+  .view-btn{
+    font-family:inherit;font-size:13.5px;padding:8px 14px;border:1px solid var(--line);
+    background:var(--white);color:var(--ink);border-radius:5px;cursor:pointer;
+  }
+  .view-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
+  .cat-filters{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:var(--muted);max-width:360px;}
+  .cat-filters label{display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;}
+
+  .view-caption{
+    font-family:'SFMono-Regular',monospace;font-size:12px;color:var(--muted);
+    letter-spacing:0.05em;text-align:center;margin-bottom:8px;
+  }
+  .diagram-card{
+    background:var(--white);border:1px solid var(--line);border-radius:6px;
+    padding:18px;margin-bottom:16px;display:flex;justify-content:center;
+  }
+  #bodySvg{width:100%;max-width:300px;height:auto;}
+  .body-fill{fill:var(--line);stroke:var(--navy);stroke-width:2;}
+  .limb{fill:none;stroke:var(--navy);stroke-linecap:round;stroke-linejoin:round;}
+  .landmark-dot{
+    fill:var(--accent);stroke:var(--white);stroke-width:1.5;cursor:pointer;
+    transform-box:fill-box;transform-origin:center;transition:transform .12s ease;
+  }
+  .landmark-dot-group:hover .landmark-dot{transform:scale(1.4);}
+  .landmark-dot-group:focus{outline:none;}
+  .landmark-dot-group:focus .landmark-dot{transform:scale(1.4);stroke:var(--navy);}
+  .landmark-dot.selected{fill:var(--navy);transform:scale(1.5);}
+  .landmark-dot-group.hidden{display:none;}
+
+  .info-panel{
+    background:var(--white);border:1px solid var(--line);border-radius:6px;
+    padding:16px 18px;margin-bottom:8px;min-height:70px;
+  }
+  .info-panel .info-placeholder{color:var(--muted);font-size:14px;margin:0;}
+  .info-panel .info-cat{
+    display:inline-block;font-family:'SFMono-Regular',monospace;font-size:11px;color:var(--accent);
+    letter-spacing:0.04em;margin-bottom:6px;text-transform:uppercase;
+  }
+  .info-panel .info-label{font-size:16px;font-weight:600;margin:0 0 4px;}
+  .info-panel .info-desc{font-size:14.5px;color:var(--ink);margin:0;}
+
+  .landmark-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .landmark-list button{
+    font-family:inherit;font-size:13px;padding:7px 12px;border:1px solid var(--line);
+    background:var(--white);color:var(--ink);border-radius:14px;cursor:pointer;
+  }
+  .landmark-list button.selected{background:var(--navy);color:var(--white);border-color:var(--navy);}
+  .landmark-list button.hidden{display:none;}
+
+  .terms-card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:16px 20px;margin-bottom:20px;}
+  .term-pair{display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .term-pair:last-child{border-bottom:none;}
+  .term-pair b{min-width:100px;flex-shrink:0;color:var(--navy);}
+  .term-pair span{color:var(--muted);}
+
+  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Interactive Patient Body Map</h1>
+  <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a></div>
+  <p class="lede">A labeled body diagram of the pulse points, bony landmarks, and surface anatomy that come up again and again in EMT assessment and treatment. Tap a point (or browse the list) to see what it is and why it matters.</p>
+
+  <div class="warning">
+    <b>This is a simplified, schematic diagram — not an anatomically precise or to-scale illustration.</b> Landmark positions are approximate, meant to aid memorization of names, general location, and clinical relevance. Verify exact anatomy against a dedicated anatomy reference or your course materials.
+  </div>
+
+  <div class="controls">
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="anterior" type="button">Anterior (Front)</button>
+      <button class="view-btn" data-view="posterior" type="button">Posterior (Back)</button>
+    </div>
+    <div class="cat-filters">
+      <label><input type="checkbox" class="cat-cb" value="pulse" checked> Pulse points</label>
+      <label><input type="checkbox" class="cat-cb" value="bony" checked> Surface &amp; bony landmarks</label>
+      <label><input type="checkbox" class="cat-cb" value="airway" checked> Airway &amp; neck vessels</label>
+      <label><input type="checkbox" class="cat-cb" value="chest" checked> Chest &amp; auscultation</label>
+      <label><input type="checkbox" class="cat-cb" value="abdomen" checked> Abdominal quadrants</label>
+    </div>
+  </div>
+
+  <div class="view-caption" id="viewCaption">ANTERIOR (FRONT) VIEW</div>
+  <div class="diagram-card">
+    <svg id="bodySvg" viewBox="0 0 300 620" xmlns="http://www.w3.org/2000/svg">
+      <polyline class="limb" stroke-width="24" points="138,285 128,385 122,485 116,585"/>
+      <polyline class="limb" stroke-width="24" points="162,285 172,385 178,485 184,585"/>
+      <ellipse class="body-fill" cx="112" cy="598" rx="14" ry="8"/>
+      <ellipse class="body-fill" cx="188" cy="598" rx="14" ry="8"/>
+      <polyline class="limb" stroke-width="20" points="120,95 78,150 62,220 56,290"/>
+      <polyline class="limb" stroke-width="20" points="180,95 222,150 238,220 244,290"/>
+      <circle class="body-fill" cx="56" cy="295" r="11"/>
+      <circle class="body-fill" cx="244" cy="295" r="11"/>
+      <path class="body-fill" d="M108,220 L192,220 L182,290 L118,290 Z"/>
+      <rect class="body-fill" x="108" y="84" width="84" height="146" rx="20"/>
+      <rect class="body-fill" x="135" y="68" width="30" height="20" rx="4"/>
+      <circle class="body-fill" cx="150" cy="42" r="30"/>
+      <g id="landmarkLayer"></g>
+    </svg>
+  </div>
+
+  <div class="info-panel" id="infoPanel">
+    <p class="info-placeholder">Tap or click a labeled point on the diagram (or a name below) to see what it is and why it matters for EMTs.</p>
+  </div>
+
+  <h2>Browse by name</h2>
+  <div class="landmark-list" id="landmarkList"></div>
+
+  <h2>Directional &amp; positional terms</h2>
+  <div class="terms-card" id="termsCard"></div>
+
+  <footer>
+    <p>This diagram is a simplified schematic for study purposes, not a substitute for an anatomy textbook or your course's own reference materials. Landmark positions are approximate and not drawn to anatomical scale.</p>
+  </footer>
+</div>
+
+<script>
+const CAT_LABELS = {
+  pulse:"Pulse point",
+  bony:"Surface / bony landmark",
+  airway:"Airway & neck vessel",
+  chest:"Chest & auscultation",
+  abdomen:"Abdominal quadrant"
+};
+
+const LANDMARKS = [
+  // ANTERIOR
+  {id:1, view:"anterior", cat:"bony", x:150, y:28, label:"Frontal bone",
+   desc:"The forehead region of the skull. Used as a general reference point when describing the location of facial or head injuries."},
+  {id:2, view:"anterior", cat:"bony", x:150, y:66, label:"Mandible",
+   desc:"The lower jawbone. Assessed for stability and pain after facial trauma, and repositioned during a jaw-thrust to open the airway of a patient with suspected spinal injury."},
+  {id:3, view:"anterior", cat:"airway", x:150, y:82, label:"Trachea",
+   desc:"The airway tube in the anterior neck. Its midline position should be checked — tracheal deviation to one side can be a late sign of a tension pneumothorax."},
+  {id:4, view:"anterior", cat:"pulse", x:132, y:88, label:"Carotid artery",
+   desc:"A major artery on either side of the neck. Palpated gently, one side at a time, to check for a pulse in an unresponsive adult or child."},
+  {id:5, view:"anterior", cat:"airway", x:168, y:88, label:"Jugular vein",
+   desc:"A vein visible along the side of the neck. Assessed for distension (JVD), which can be a sign of conditions like heart failure or tension pneumothorax."},
+  {id:6, view:"anterior", cat:"bony", x:122, y:98, label:"Clavicle",
+   desc:"The collarbone. A common fracture site, especially from a fall onto an outstretched arm or the point of the shoulder."},
+  {id:7, view:"anterior", cat:"bony", x:150, y:110, label:"Sternum (manubrium)",
+   desc:"The upper portion of the breastbone, where the collarbones attach. Part of the bony chest wall protecting the heart and great vessels."},
+  {id:8, view:"anterior", cat:"chest", x:180, y:120, label:"2nd intercostal space, midclavicular line",
+   desc:"A rib-space landmark located roughly along an imaginary line through the middle of the collarbone. Used to describe the location of certain chest findings and advanced interventions."},
+  {id:9, view:"anterior", cat:"chest", x:124, y:140, label:"Anterior lung fields",
+   desc:"General area for anterior lung sound auscultation, assessed for equal, clear breath sounds on both sides of the chest."},
+  {id:10, view:"anterior", cat:"chest", x:178, y:142, label:"Nipple line",
+   desc:"A commonly used visual reference line across the chest, referenced when describing AED pad placement and other chest landmarks."},
+  {id:11, view:"anterior", cat:"chest", x:170, y:162, label:"Point of maximal impulse (apex)",
+   desc:"The spot on the chest wall where the heartbeat is often felt or heard most strongly, roughly at the lower-left portion of the chest."},
+  {id:12, view:"anterior", cat:"bony", x:150, y:200, label:"Xiphoid process",
+   desc:"The small, pointed lower tip of the breastbone. Chest compressions should be centered on the chest, avoiding direct pressure on this fragile structure."},
+  {id:13, view:"anterior", cat:"bony", x:186, y:222, label:"Iliac crest",
+   desc:"The top ridge of the pelvic bone, felt at the waistline. A landmark used when assessing for pelvic instability and applying a pelvic binder."},
+  {id:14, view:"anterior", cat:"abdomen", x:122, y:232, label:"Right upper quadrant (RUQ)",
+   desc:"One of the four abdominal quadrants — the patient's right side, above the umbilicus. Contains the liver and gallbladder."},
+  {id:15, view:"anterior", cat:"abdomen", x:178, y:232, label:"Left upper quadrant (LUQ)",
+   desc:"One of the four abdominal quadrants — the patient's left side, above the umbilicus. Contains the stomach and spleen."},
+  {id:16, view:"anterior", cat:"bony", x:150, y:255, label:"Umbilicus",
+   desc:"The navel. Used as the central reference point that divides the abdomen into its four quadrants."},
+  {id:17, view:"anterior", cat:"abdomen", x:124, y:272, label:"Right lower quadrant (RLQ)",
+   desc:"One of the four abdominal quadrants — the patient's right side, below the umbilicus. Contains the appendix."},
+  {id:18, view:"anterior", cat:"abdomen", x:176, y:272, label:"Left lower quadrant (LLQ)",
+   desc:"One of the four abdominal quadrants — the patient's left side, below the umbilicus. Contains part of the large intestine."},
+  {id:19, view:"anterior", cat:"bony", x:150, y:286, label:"Pubic symphysis",
+   desc:"The joint at the front of the pelvis, at the midline. Tenderness here can be a sign of pelvic fracture."},
+  {id:20, view:"anterior", cat:"pulse", x:134, y:296, label:"Femoral artery",
+   desc:"A major artery in the crease of the groin. A strong, easily-checked pulse point, and the site to compress when applying a proximal tourniquet for severe upper-leg bleeding."},
+  {id:21, view:"anterior", cat:"pulse", x:68, y:185, label:"Brachial artery",
+   desc:"An artery on the inside of the upper arm. The preferred pulse-check site in an infant, and the site used when taking a manual blood pressure."},
+  {id:22, view:"anterior", cat:"pulse", x:57, y:282, label:"Radial artery",
+   desc:"An artery at the wrist, on the thumb side. The standard pulse-check site in a responsive adult or child."},
+  {id:23, view:"anterior", cat:"bony", x:122, y:480, label:"Patella",
+   desc:"The kneecap. Assessed for stability and pain after direct trauma to the front of the knee."},
+  {id:24, view:"anterior", cat:"bony", x:117, y:578, label:"Medial malleolus",
+   desc:"The bony bump on the inner ankle, at the end of the shin bone. A common site of ankle fracture and sprain, and a landmark near the posterior tibial pulse."},
+  {id:25, view:"anterior", cat:"pulse", x:114, y:596, label:"Dorsalis pedis",
+   desc:"An artery on the top of the foot. Checked as a distal pulse when assessing circulation in a lower-leg injury."},
+
+  // POSTERIOR
+  {id:26, view:"posterior", cat:"bony", x:150, y:25, label:"Occipital bone",
+   desc:"The back and base of the skull. Assessed for tenderness or deformity after a fall backward or a blow to the back of the head."},
+  {id:27, view:"posterior", cat:"bony", x:150, y:80, label:"Cervical spine (C1–C7)",
+   desc:"The neck portion of the vertebral column. The focus of spinal motion restriction after a significant mechanism of injury."},
+  {id:28, view:"posterior", cat:"bony", x:124, y:105, label:"Scapula",
+   desc:"The shoulder blade. Fractures here are uncommon and generally indicate a high-force mechanism of injury."},
+  {id:29, view:"posterior", cat:"chest", x:172, y:168, label:"Posterior lung fields (bases)",
+   desc:"General area for posterior lung sound auscultation. The lower back is a key spot for detecting fluid, such as the crackles heard in pulmonary edema."},
+  {id:30, view:"posterior", cat:"bony", x:150, y:160, label:"Thoracic spine (T1–T12)",
+   desc:"The mid-back portion of the vertebral column. Each of its 12 vertebrae is paired with a rib."},
+  {id:31, view:"posterior", cat:"bony", x:176, y:196, label:"Costovertebral angle (CVA)",
+   desc:"The angle formed where the lowest rib meets the spine. Tenderness here (CVA tenderness) can suggest a kidney-related problem, such as an infection or kidney stone."},
+  {id:32, view:"posterior", cat:"bony", x:150, y:232, label:"Lumbar spine (L1–L5)",
+   desc:"The lower back portion of the vertebral column. A common site of both traumatic injury and everyday lower back pain."},
+  {id:33, view:"posterior", cat:"bony", x:150, y:268, label:"Sacrum & coccyx",
+   desc:"The fused vertebrae at the base of the spine, including the tailbone (coccyx). Can be injured in a fall onto the buttocks."},
+  {id:34, view:"posterior", cat:"pulse", x:122, y:480, label:"Popliteal artery",
+   desc:"An artery located behind the knee. A pulse point checked when assessing circulation after a knee or lower-leg injury."},
+  {id:35, view:"posterior", cat:"pulse", x:118, y:578, label:"Posterior tibial artery",
+   desc:"An artery located just behind the inner ankle bone. One of the two distal pulse points checked in a lower-leg injury, along with the dorsalis pedis."}
+];
+
+const TERM_PAIRS = [
+  ["Anterior", "Toward the front of the body."],
+  ["Posterior", "Toward the back of the body."],
+  ["Superior", "Toward the head; above."],
+  ["Inferior", "Away from the head; below."],
+  ["Medial", "Toward the midline of the body."],
+  ["Lateral", "Away from the midline of the body."],
+  ["Proximal", "Closer to the trunk or point of attachment."],
+  ["Distal", "Farther from the trunk or point of attachment."],
+  ["Supine", "Lying face-up."],
+  ["Prone", "Lying face-down."],
+  ["Midline", "An imaginary vertical line dividing the body into left and right halves."],
+  ["Right / Left", "Always refers to the patient's own right and left, not the observer's."]
+];
+
+let currentView = "anterior";
+let activeCats = new Set(["pulse","bony","airway","chest","abdomen"]);
+let selectedId = null;
+
+function renderDots(){
+  const layer = document.getElementById("landmarkLayer");
+  layer.innerHTML = LANDMARKS.filter(l => l.view === currentView).map(l => {
+    const hidden = activeCats.has(l.cat) ? "" : "hidden";
+    const selected = l.id === selectedId ? "selected" : "";
+    return `<g class="landmark-dot-group ${hidden}" data-id="${l.id}" tabindex="0" role="button" aria-label="${l.label}">
+      <circle class="landmark-dot ${selected}" cx="${l.x}" cy="${l.y}" r="6"></circle>
+    </g>`;
+  }).join("");
+}
+
+function renderList(){
+  const listEl = document.getElementById("landmarkList");
+  const items = LANDMARKS.filter(l => l.view === currentView).slice().sort((a,b) => a.label.localeCompare(b.label));
+  listEl.innerHTML = items.map(l => {
+    const hidden = activeCats.has(l.cat) ? "" : "hidden";
+    const selected = l.id === selectedId ? "selected" : "";
+    return `<button type="button" class="${hidden} ${selected}" data-id="${l.id}">${l.label}</button>`;
+  }).join("");
+}
+
+function renderTerms(){
+  document.getElementById("termsCard").innerHTML = TERM_PAIRS.map(([term, def]) =>
+    `<div class="term-pair"><b>${term}</b><span>${def}</span></div>`
+  ).join("");
+}
+
+function selectLandmark(id){
+  selectedId = id;
+  const l = LANDMARKS.find(x => x.id === id);
+  renderDots();
+  renderList();
+  document.getElementById("infoPanel").innerHTML = `
+    <div class="info-cat">${CAT_LABELS[l.cat]}</div>
+    <p class="info-label">${l.label}</p>
+    <p class="info-desc">${l.desc}</p>
+  `;
+}
+
+document.getElementById("landmarkLayer").addEventListener("click", e => {
+  const g = e.target.closest(".landmark-dot-group");
+  if(g) selectLandmark(Number(g.dataset.id));
+});
+document.getElementById("landmarkLayer").addEventListener("keydown", e => {
+  if(e.key === "Enter" || e.key === " "){
+    const g = e.target.closest(".landmark-dot-group");
+    if(g){ e.preventDefault(); selectLandmark(Number(g.dataset.id)); }
+  }
+});
+document.getElementById("landmarkList").addEventListener("click", e => {
+  if(e.target.tagName === "BUTTON") selectLandmark(Number(e.target.dataset.id));
+});
+document.querySelectorAll(".view-btn").forEach(btn => btn.addEventListener("click", () => {
+  document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  currentView = btn.dataset.view;
+  selectedId = null;
+  document.getElementById("viewCaption").textContent =
+    currentView === "anterior" ? "ANTERIOR (FRONT) VIEW" : "POSTERIOR (BACK) VIEW";
+  document.getElementById("infoPanel").innerHTML =
+    '<p class="info-placeholder">Tap or click a labeled point on the diagram (or a name below) to see what it is and why it matters for EMTs.</p>';
+  renderDots();
+  renderList();
+}));
+document.querySelectorAll(".cat-cb").forEach(cb => cb.addEventListener("change", () => {
+  activeCats = new Set([...document.querySelectorAll(".cat-cb:checked")].map(c => c.value));
+  renderDots();
+  renderList();
+}));
+
+renderDots();
+renderList();
+renderTerms();
+</script>
+</body>
+</html>
