@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Interactive Patient Body Map — EMT Prep</title>
-<meta name="description" content="An interactive, labeled body diagram of the anatomical landmarks, pulse points, and surface structures an EMT needs to know.">
+<meta name="description" content="An interactive human anatomy learning module for EMT prep: labeled body diagram with zoom, plus heart, airway, lung, brain, spinal cord, and skin cutaways covering EMT-relevant structures, pathologies, assessment findings, and field interventions.">
 <style>
   :root{
     --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
@@ -13,9 +13,9 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.6;}
-  .wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
+  .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
   h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
-  .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 20px;}
+  .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 20px;}
   .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
   .site-nav a{color:var(--accent);text-decoration:none;}
   .site-nav a:hover{text-decoration:underline;}
@@ -25,15 +25,15 @@
   }
   h2{font-size:19px;font-weight:600;margin:36px 0 12px;}
 
-  .controls{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
-  .view-toggle{display:flex;gap:8px;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:14px;}
   .view-btn{
     font-family:inherit;font-size:13.5px;padding:8px 14px;border:1px solid var(--line);
     background:var(--white);color:var(--ink);border-radius:5px;cursor:pointer;
   }
   .view-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
-  .cat-filters{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:var(--muted);max-width:360px;}
-  .cat-filters label{display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;}
+  .view-btn.reset-btn{border-color:var(--accent);color:var(--accent);}
+  .sys-filters{display:flex;flex-wrap:wrap;gap:7px 12px;font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+  .sys-filters label{display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;}
 
   .view-caption{
     font-family:'SFMono-Regular',monospace;font-size:12px;color:var(--muted);
@@ -41,11 +41,14 @@
   }
   .diagram-card{
     background:var(--white);border:1px solid var(--line);border-radius:6px;
-    padding:18px;margin-bottom:16px;display:flex;justify-content:center;
+    padding:18px;margin-bottom:14px;display:flex;justify-content:center;overflow:hidden;
   }
-  #bodySvg{width:100%;max-width:300px;height:auto;}
+  #bodySvg{width:100%;max-width:300px;height:auto;overflow:visible;}
+  #zoomGroup{transition:transform .6s cubic-bezier(.4,0,.2,1);}
   .body-fill{fill:var(--line);stroke:var(--navy);stroke-width:2;}
   .limb{fill:none;stroke:var(--navy);stroke-linecap:round;stroke-linejoin:round;}
+  .highlight-rect{fill:var(--accent);opacity:0;pointer-events:none;transition:opacity .3s ease;}
+  .highlight-rect.active{opacity:.16;}
   .landmark-dot{
     fill:var(--accent);stroke:var(--white);stroke-width:1.5;cursor:pointer;
     transform-box:fill-box;transform-origin:center;transition:transform .12s ease;
@@ -56,6 +59,29 @@
   .landmark-dot.selected{fill:var(--navy);transform:scale(1.5);}
   .landmark-dot-group.hidden{display:none;}
 
+  .inset-card{
+    background:var(--white);border:1px solid var(--line);border-radius:6px;
+    padding:18px;margin-bottom:14px;display:none;
+  }
+  .inset-card.visible{display:block;}
+  .inset-card h3{margin:0 0 12px;font-size:16px;font-weight:600;color:var(--navy);}
+  .inset-row{display:flex;gap:10px;margin-bottom:8px;}
+  .inset-box{
+    flex:1;background:var(--paper);border:1.5px solid var(--navy);border-radius:5px;
+    padding:10px 12px;text-align:center;font-size:13.5px;cursor:pointer;
+  }
+  .inset-box.chamber{min-height:46px;display:flex;align-items:center;justify-content:center;}
+  .inset-box.selected{background:var(--navy);color:var(--white);}
+  .inset-arrow{text-align:center;color:var(--muted);font-size:16px;margin:2px 0;}
+  .layer-epidermis{background:rgba(18,32,51,0.06);}
+  .layer-dermis{background:rgba(18,32,51,0.14);}
+  .layer-subq{background:rgba(18,32,51,0.24);}
+
+  .rule9-layer{display:none;pointer-events:none;}
+  #zoomGroup.rule9-active .rule9-layer{display:block;}
+  .rule9-layer rect{fill:var(--white);fill-opacity:.8;stroke:var(--accent);stroke-width:1;}
+  .rule9-layer text{font-family:'SFMono-Regular',monospace;font-size:12px;font-weight:600;fill:var(--accent);text-anchor:middle;}
+
   .info-panel{
     background:var(--white);border:1px solid var(--line);border-radius:6px;
     padding:16px 18px;margin-bottom:8px;min-height:70px;
@@ -65,8 +91,9 @@
     display:inline-block;font-family:'SFMono-Regular',monospace;font-size:11px;color:var(--accent);
     letter-spacing:0.04em;margin-bottom:6px;text-transform:uppercase;
   }
-  .info-panel .info-label{font-size:16px;font-weight:600;margin:0 0 4px;}
-  .info-panel .info-desc{font-size:14.5px;color:var(--ink);margin:0;}
+  .info-panel .info-label{font-size:17px;font-weight:600;margin:0 0 8px;}
+  .info-field{font-size:14px;margin:0 0 7px;}
+  .info-field b{color:var(--navy);display:inline;}
 
   .landmark-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
   .landmark-list button{
@@ -75,6 +102,11 @@
   }
   .landmark-list button.selected{background:var(--navy);color:var(--white);border-color:var(--navy);}
   .landmark-list button.hidden{display:none;}
+
+  .rule9-card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:18px 20px;margin-bottom:20px;}
+  .rule9-card p{font-size:14px;margin:0 0 10px;}
+  .rule9-card p:last-child{margin-bottom:0;}
+  #rule9Toggle{margin-bottom:10px;}
 
   .terms-card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:16px 20px;margin-bottom:20px;}
   .term-pair{display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;}
@@ -89,144 +121,526 @@
 <div class="wrap">
   <h1>Interactive Patient Body Map</h1>
   <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a></div>
-  <p class="lede">A labeled body diagram of the pulse points, bony landmarks, and surface anatomy that come up again and again in EMT assessment and treatment. Tap a point (or browse the list) to see what it is and why it matters.</p>
+  <p class="lede">A labeled, zoomable body map covering the structures an EMT needs across every major system — airway/respiratory, cardiovascular, neurological, musculoskeletal, abdominal, and skin. Click any point to zoom in, and get that structure's location, function, common emergencies, assessment findings, and field interventions.</p>
 
   <div class="warning">
-    <b>This is a simplified, schematic diagram — not an anatomically precise or to-scale illustration.</b> Landmark positions are approximate, meant to aid memorization of names, general location, and clinical relevance. Verify exact anatomy against a dedicated anatomy reference or your course materials.
+    <b>These are simplified, schematic diagrams — not anatomically precise or to-scale illustrations.</b> The body outline, organ cutaways, and landmark positions are approximate, meant to aid memorization of names, general location, and clinical relevance. Verify exact anatomy against a dedicated anatomy reference or your course materials.
   </div>
 
   <div class="controls">
-    <div class="view-toggle">
-      <button class="view-btn active" data-view="anterior" type="button">Anterior (Front)</button>
-      <button class="view-btn" data-view="posterior" type="button">Posterior (Back)</button>
-    </div>
-    <div class="cat-filters">
-      <label><input type="checkbox" class="cat-cb" value="pulse" checked> Pulse points</label>
-      <label><input type="checkbox" class="cat-cb" value="bony" checked> Surface &amp; bony landmarks</label>
-      <label><input type="checkbox" class="cat-cb" value="airway" checked> Airway &amp; neck vessels</label>
-      <label><input type="checkbox" class="cat-cb" value="chest" checked> Chest &amp; auscultation</label>
-      <label><input type="checkbox" class="cat-cb" value="abdomen" checked> Abdominal quadrants</label>
-    </div>
+    <button class="view-btn active" data-view="anterior" type="button">Anterior (Front)</button>
+    <button class="view-btn" data-view="posterior" type="button">Posterior (Back)</button>
+    <button class="view-btn reset-btn" id="resetBtn" type="button">Reset / Full Body</button>
+  </div>
+  <div class="sys-filters" id="sysFilters">
+    <label><input type="checkbox" class="sys-cb" value="resp" checked> Respiratory</label>
+    <label><input type="checkbox" class="sys-cb" value="cardio" checked> Cardiovascular</label>
+    <label><input type="checkbox" class="sys-cb" value="neuro" checked> Neurological</label>
+    <label><input type="checkbox" class="sys-cb" value="msk" checked> Musculoskeletal</label>
+    <label><input type="checkbox" class="sys-cb" value="abd" checked> Abdominal</label>
+    <label><input type="checkbox" class="sys-cb" value="skin" checked> Integumentary</label>
   </div>
 
   <div class="view-caption" id="viewCaption">ANTERIOR (FRONT) VIEW</div>
   <div class="diagram-card">
     <svg id="bodySvg" viewBox="0 0 300 620" xmlns="http://www.w3.org/2000/svg">
-      <polyline class="limb" stroke-width="24" points="138,285 128,385 122,485 116,585"/>
-      <polyline class="limb" stroke-width="24" points="162,285 172,385 178,485 184,585"/>
-      <ellipse class="body-fill" cx="112" cy="598" rx="14" ry="8"/>
-      <ellipse class="body-fill" cx="188" cy="598" rx="14" ry="8"/>
-      <polyline class="limb" stroke-width="20" points="120,95 78,150 62,220 56,290"/>
-      <polyline class="limb" stroke-width="20" points="180,95 222,150 238,220 244,290"/>
-      <circle class="body-fill" cx="56" cy="295" r="11"/>
-      <circle class="body-fill" cx="244" cy="295" r="11"/>
-      <path class="body-fill" d="M108,220 L192,220 L182,290 L118,290 Z"/>
-      <rect class="body-fill" x="108" y="84" width="84" height="146" rx="20"/>
-      <rect class="body-fill" x="135" y="68" width="30" height="20" rx="4"/>
-      <circle class="body-fill" cx="150" cy="42" r="30"/>
-      <g id="landmarkLayer"></g>
+      <g id="zoomGroup">
+        <polyline class="limb" stroke-width="24" points="138,285 128,385 122,485 116,585"/>
+        <polyline class="limb" stroke-width="24" points="162,285 172,385 178,485 184,585"/>
+        <ellipse class="body-fill" cx="112" cy="598" rx="14" ry="8"/>
+        <ellipse class="body-fill" cx="188" cy="598" rx="14" ry="8"/>
+        <polyline class="limb" stroke-width="20" points="120,95 78,150 62,220 56,290"/>
+        <polyline class="limb" stroke-width="20" points="180,95 222,150 238,220 244,290"/>
+        <circle class="body-fill" cx="56" cy="295" r="11"/>
+        <circle class="body-fill" cx="244" cy="295" r="11"/>
+        <path class="body-fill" d="M108,220 L192,220 L182,290 L118,290 Z"/>
+        <rect class="body-fill" x="108" y="84" width="84" height="146" rx="20"/>
+        <rect class="body-fill" x="135" y="68" width="30" height="20" rx="4"/>
+        <circle class="body-fill" cx="150" cy="42" r="30"/>
+        <rect id="highlightRect" class="highlight-rect" x="0" y="0" width="0" height="0" rx="14"/>
+        <g id="landmarkLayer"></g>
+        <g id="rule9Layer" class="rule9-layer"></g>
+      </g>
     </svg>
   </div>
 
+  <div class="inset-card" id="insetCard">
+    <h3 id="insetTitle"></h3>
+    <div id="insetDiagram"></div>
+  </div>
+
   <div class="info-panel" id="infoPanel">
-    <p class="info-placeholder">Tap or click a labeled point on the diagram (or a name below) to see what it is and why it matters for EMTs.</p>
+    <p class="info-placeholder">Tap or click a labeled point on the diagram (or a name below) to zoom in and see what it is, why it matters, and how to handle it in the field.</p>
   </div>
 
   <h2>Browse by name</h2>
   <div class="landmark-list" id="landmarkList"></div>
 
+  <h2>Burn surface area — Rule of Nines</h2>
+  <div class="rule9-card">
+    <label id="rule9Toggle"><input type="checkbox" id="rule9Cb"> Show Rule of Nines overlay on the diagram above</label>
+    <p>The Rule of Nines is a quick field method for estimating total body surface area (TBSA) affected by a burn in an adult, dividing the body into regions that are each roughly 9% (or a multiple of 9%): head &amp; neck 9%, each arm 9%, the entire front torso 18%, the entire back torso 18%, each leg 18%, and the groin 1%.</p>
+    <p>It's a rough estimate to guide severity communication and transport decisions — not a substitute for burn center evaluation, and pediatric proportions differ (a child's head accounts for a larger share of TBSA).</p>
+  </div>
+
   <h2>Directional &amp; positional terms</h2>
   <div class="terms-card" id="termsCard"></div>
 
   <footer>
-    <p>This diagram is a simplified schematic for study purposes, not a substitute for an anatomy textbook or your course's own reference materials. Landmark positions are approximate and not drawn to anatomical scale.</p>
+    <p>This module is a simplified schematic for study purposes, not a substitute for an anatomy or physiology textbook, or your course's own protocols and reference materials. Field interventions described here are general EMT-B-level guidance — always follow your local protocols and medical direction, which take precedence over anything shown here.</p>
   </footer>
 </div>
 
 <script>
-const CAT_LABELS = {
-  pulse:"Pulse point",
-  bony:"Surface / bony landmark",
-  airway:"Airway & neck vessel",
-  chest:"Chest & auscultation",
-  abdomen:"Abdominal quadrant"
+const SYSTEM_LABELS = {
+  resp:"Respiratory / Airway", cardio:"Cardiovascular", neuro:"Neurological",
+  msk:"Musculoskeletal & Landmarks", abd:"Abdominal Quadrant", skin:"Integumentary"
+};
+
+const ZONES = {
+  head:{x:100,y:5,w:100,h:95}, neck:{x:110,y:55,w:80,h:45}, chest:{x:95,y:85,w:110,h:120},
+  abdomen:{x:95,y:195,w:110,h:75}, pelvis:{x:95,y:210,w:110,h:95}, armL:{x:35,y:85,w:95,h:220},
+  legL:{x:90,y:270,w:70,h:340}, spine:{x:105,y:10,w:90,h:300}
 };
 
 const LANDMARKS = [
-  // ANTERIOR
-  {id:1, view:"anterior", cat:"bony", x:150, y:28, label:"Frontal bone",
-   desc:"The forehead region of the skull. Used as a general reference point when describing the location of facial or head injuries."},
-  {id:2, view:"anterior", cat:"bony", x:150, y:66, label:"Mandible",
-   desc:"The lower jawbone. Assessed for stability and pain after facial trauma, and repositioned during a jaw-thrust to open the airway of a patient with suspected spinal injury."},
-  {id:3, view:"anterior", cat:"airway", x:150, y:82, label:"Trachea",
-   desc:"The airway tube in the anterior neck. Its midline position should be checked — tracheal deviation to one side can be a late sign of a tension pneumothorax."},
-  {id:4, view:"anterior", cat:"pulse", x:132, y:88, label:"Carotid artery",
-   desc:"A major artery on either side of the neck. Palpated gently, one side at a time, to check for a pulse in an unresponsive adult or child."},
-  {id:5, view:"anterior", cat:"airway", x:168, y:88, label:"Jugular vein",
-   desc:"A vein visible along the side of the neck. Assessed for distension (JVD), which can be a sign of conditions like heart failure or tension pneumothorax."},
-  {id:6, view:"anterior", cat:"bony", x:122, y:98, label:"Clavicle",
-   desc:"The collarbone. A common fracture site, especially from a fall onto an outstretched arm or the point of the shoulder."},
-  {id:7, view:"anterior", cat:"bony", x:150, y:110, label:"Sternum (manubrium)",
-   desc:"The upper portion of the breastbone, where the collarbones attach. Part of the bony chest wall protecting the heart and great vessels."},
-  {id:8, view:"anterior", cat:"chest", x:180, y:120, label:"2nd intercostal space, midclavicular line",
-   desc:"A rib-space landmark located roughly along an imaginary line through the middle of the collarbone. Used to describe the location of certain chest findings and advanced interventions."},
-  {id:9, view:"anterior", cat:"chest", x:124, y:140, label:"Anterior lung fields",
-   desc:"General area for anterior lung sound auscultation, assessed for equal, clear breath sounds on both sides of the chest."},
-  {id:10, view:"anterior", cat:"chest", x:178, y:142, label:"Nipple line",
-   desc:"A commonly used visual reference line across the chest, referenced when describing AED pad placement and other chest landmarks."},
-  {id:11, view:"anterior", cat:"chest", x:170, y:162, label:"Point of maximal impulse (apex)",
-   desc:"The spot on the chest wall where the heartbeat is often felt or heard most strongly, roughly at the lower-left portion of the chest."},
-  {id:12, view:"anterior", cat:"bony", x:150, y:200, label:"Xiphoid process",
-   desc:"The small, pointed lower tip of the breastbone. Chest compressions should be centered on the chest, avoiding direct pressure on this fragile structure."},
-  {id:13, view:"anterior", cat:"bony", x:186, y:222, label:"Iliac crest",
-   desc:"The top ridge of the pelvic bone, felt at the waistline. A landmark used when assessing for pelvic instability and applying a pelvic binder."},
-  {id:14, view:"anterior", cat:"abdomen", x:122, y:232, label:"Right upper quadrant (RUQ)",
-   desc:"One of the four abdominal quadrants — the patient's right side, above the umbilicus. Contains the liver and gallbladder."},
-  {id:15, view:"anterior", cat:"abdomen", x:178, y:232, label:"Left upper quadrant (LUQ)",
-   desc:"One of the four abdominal quadrants — the patient's left side, above the umbilicus. Contains the stomach and spleen."},
-  {id:16, view:"anterior", cat:"bony", x:150, y:255, label:"Umbilicus",
-   desc:"The navel. Used as the central reference point that divides the abdomen into its four quadrants."},
-  {id:17, view:"anterior", cat:"abdomen", x:124, y:272, label:"Right lower quadrant (RLQ)",
-   desc:"One of the four abdominal quadrants — the patient's right side, below the umbilicus. Contains the appendix."},
-  {id:18, view:"anterior", cat:"abdomen", x:176, y:272, label:"Left lower quadrant (LLQ)",
-   desc:"One of the four abdominal quadrants — the patient's left side, below the umbilicus. Contains part of the large intestine."},
-  {id:19, view:"anterior", cat:"bony", x:150, y:286, label:"Pubic symphysis",
-   desc:"The joint at the front of the pelvis, at the midline. Tenderness here can be a sign of pelvic fracture."},
-  {id:20, view:"anterior", cat:"pulse", x:134, y:296, label:"Femoral artery",
-   desc:"A major artery in the crease of the groin. A strong, easily-checked pulse point, and the site to compress when applying a proximal tourniquet for severe upper-leg bleeding."},
-  {id:21, view:"anterior", cat:"pulse", x:68, y:185, label:"Brachial artery",
-   desc:"An artery on the inside of the upper arm. The preferred pulse-check site in an infant, and the site used when taking a manual blood pressure."},
-  {id:22, view:"anterior", cat:"pulse", x:57, y:282, label:"Radial artery",
-   desc:"An artery at the wrist, on the thumb side. The standard pulse-check site in a responsive adult or child."},
-  {id:23, view:"anterior", cat:"bony", x:122, y:480, label:"Patella",
-   desc:"The kneecap. Assessed for stability and pain after direct trauma to the front of the knee."},
-  {id:24, view:"anterior", cat:"bony", x:117, y:578, label:"Medial malleolus",
-   desc:"The bony bump on the inner ankle, at the end of the shin bone. A common site of ankle fracture and sprain, and a landmark near the posterior tibial pulse."},
-  {id:25, view:"anterior", cat:"pulse", x:114, y:596, label:"Dorsalis pedis",
-   desc:"An artery on the top of the foot. Checked as a distal pulse when assessing circulation in a lower-leg injury."},
+  {id:1, view:"anterior", system:"msk", zone:"head", x:140, y:28, label:"Frontal bone",
+   location:"The forehead region of the skull.",
+   funct:"Protects the frontal lobes of the brain and forms the upper eye sockets.",
+   path:"Fractures here can occur from direct frontal impact and may be associated with underlying brain injury.",
+   findings:"Deformity, swelling, or bruising over the forehead; assess mental status closely given proximity to the brain.",
+   interv:"Manage as a potential head injury: monitor airway and mental status, control any external bleeding, and transport promptly."},
+  {id:2, view:"anterior", system:"msk", zone:"head", x:150, y:66, label:"Mandible",
+   location:"The lower jawbone.",
+   funct:"Forms the lower jaw and anchors the lower teeth; its position is manipulated during a jaw-thrust maneuver.",
+   path:"A common facial fracture site, especially from a direct blow or fall onto the chin.",
+   findings:"Malocclusion (teeth not lining up normally), pain with jaw movement, or visible deformity/swelling along the jawline.",
+   interv:"Monitor the airway closely (bilateral mandible fractures can compromise it), and use a jaw-thrust rather than head-tilt if spinal injury is also suspected."},
+  {id:3, view:"anterior", system:"neuro", zone:"head", x:160, y:40, label:"Brain", inset:"brain",
+   location:"Housed within the skull, above the brainstem and spinal cord.",
+   funct:"Controls virtually all voluntary and involuntary body functions, from movement and speech to breathing and heart rate regulation.",
+   path:"Stroke, traumatic brain injury, seizure, and increased intracranial pressure are the major EMS-relevant brain emergencies.",
+   findings:"Altered mental status, unequal pupils, one-sided weakness, or an abnormal GCS score.",
+   interv:"Protect the airway, monitor for deterioration, avoid hypoxia/hypotension (both worsen brain injury), and transport promptly to an appropriate facility."},
+  {id:4, view:"anterior", system:"resp", zone:"neck", x:150, y:80, label:"Upper airway", inset:"airway",
+   location:"The passageway from the nose/mouth down through the throat to the top of the trachea.",
+   funct:"Directs air (and food, at the pharynx) toward the lungs while filtering and conditioning it.",
+   path:"Obstruction from swelling (anaphylaxis, epiglottitis), foreign body, blood, or vomit; also injury from direct neck trauma.",
+   findings:"Stridor, drooling, a muffled voice, or visible foreign material/trauma.",
+   interv:"Clear/suction the airway, use basic airway adjuncts as appropriate, give oxygen, and transport promptly — a compromised upper airway is a true emergency."},
+  {id:5, view:"anterior", system:"cardio", zone:"neck", x:132, y:88, label:"Carotid artery",
+   location:"Either side of the neck, lateral to the trachea, beneath the jaw angle.",
+   funct:"Carries oxygenated blood from the heart to the brain and face; the strongest centrally-located pulse in the body.",
+   path:"Carotid artery disease/stenosis; it's also the pulse point checked for cardiac arrest.",
+   findings:"Absent bilateral carotid pulse (with unresponsiveness and abnormal/absent breathing) confirms cardiac arrest; check gently, one side at a time.",
+   interv:"If absent, begin CPR immediately per BLS protocol; never compress both sides at once or use excessive pressure."},
+  {id:6, view:"anterior", system:"cardio", zone:"neck", x:168, y:88, label:"Jugular vein",
+   location:"Along the side of the neck, running roughly parallel to the carotid artery.",
+   funct:"Drains venous blood from the head back toward the heart.",
+   path:"Distension (JVD) is associated with conditions that raise right-heart pressure, such as heart failure or tension pneumothorax.",
+   findings:"Assess with the patient at roughly a 45-degree incline; flat neck veins with hypotension may instead suggest hypovolemia.",
+   interv:"JVD combined with respiratory distress and unequal breath sounds should raise suspicion for tension pneumothorax — treat per protocol and transport promptly."},
+  {id:7, view:"anterior", system:"msk", zone:"chest", x:122, y:98, label:"Clavicle",
+   location:"The collarbone, running horizontally between the sternum and shoulder.",
+   funct:"Connects the arm to the trunk skeleton and helps hold the shoulder in position.",
+   path:"One of the most common fracture sites, especially from a fall onto an outstretched arm or the point of the shoulder.",
+   findings:"Visible deformity, swelling, or the patient holding the arm close to the body to guard the injury.",
+   interv:"Support the arm in a position of comfort with a sling and swathe; check distal PMS before and after."},
+  {id:8, view:"anterior", system:"msk", zone:"chest", x:150, y:108, label:"Sternum (manubrium)",
+   location:"The upper portion of the breastbone, where the collarbones attach.",
+   funct:"Part of the bony chest wall, protecting the heart and great vessels that lie just behind it.",
+   path:"Can fracture from direct blunt chest trauma (e.g., a steering wheel impact), which raises concern for underlying cardiac or great-vessel injury.",
+   findings:"Point tenderness or deformity over the upper chest, especially after a high-force mechanism.",
+   interv:"Monitor closely for signs of underlying cardiac/pulmonary injury (irregular pulse, respiratory distress); treat as a high-priority trauma patient."},
+  {id:9, view:"anterior", system:"msk", zone:"chest", x:185, y:118, label:"2nd intercostal space, midclavicular line",
+   location:"A rib-space landmark located roughly along an imaginary line through the middle of the collarbone.",
+   funct:"A commonly referenced anatomical landmark for describing chest findings and certain advanced procedures.",
+   path:"Referenced when describing the location of a suspected tension pneumothorax for decompression, generally a paramedic-level (or above) procedure per local protocol.",
+   findings:"Used as a reference point in documentation rather than a finding itself.",
+   interv:"As an EMT, recognize and report signs of tension pneumothorax (severe distress, unequal breath sounds, JVD, tracheal deviation) and transport rapidly for advanced intervention."},
+  {id:10, view:"anterior", system:"cardio", zone:"chest", x:165, y:132, label:"Heart", inset:"heart",
+   location:"Center-left of the chest, behind the sternum, tilted slightly left.",
+   funct:"Pumps blood through two circuits — to the lungs and to the body.",
+   path:"Heart attack (MI), heart failure, cardiac arrest, and arrhythmias.",
+   findings:"Chest pain, irregular or absent pulse, or signs of poor perfusion.",
+   interv:"Oxygen if hypoxic, CPR/AED if in cardiac arrest, assist with prescribed cardiac medications per protocol, and rapid transport."},
+  {id:11, view:"anterior", system:"resp", zone:"chest", x:124, y:140, label:"Lungs & diaphragm", inset:"lung",
+   location:"Fill most of the chest cavity, with the diaphragm forming the floor of the chest below them.",
+   funct:"Together, perform the mechanical work of breathing and gas exchange.",
+   path:"Pneumothorax, hemothorax, pneumonia, pulmonary edema, asthma/COPD exacerbation, and diaphragmatic rupture.",
+   findings:"Diminished/unequal breath sounds, abnormal work of breathing, or paradoxical chest/abdominal movement.",
+   interv:"Support oxygenation/ventilation as needed, manage specific findings per protocol (e.g., seal an open chest wound), and transport promptly."},
+  {id:12, view:"anterior", system:"msk", zone:"chest", x:180, y:148, label:"Nipple line",
+   location:"A commonly used visual reference line across the chest.",
+   funct:"A quick visual landmark for describing chest findings and procedures.",
+   path:"Referenced when describing AED pad placement and the general location of penetrating chest wounds.",
+   findings:"Used as a reference point in documentation rather than a finding itself.",
+   interv:"Use as a guide for standard AED pad placement (one pad upper-right chest, one pad lower-left side/ribs, per the pad diagram)."},
+  {id:13, view:"anterior", system:"msk", zone:"chest", x:150, y:198, label:"Xiphoid process",
+   location:"The small, pointed lower tip of the breastbone.",
+   funct:"The lowest point of the sternum, marking the center of the chest for compression hand placement.",
+   path:"Can fracture or detach with forceful or misplaced chest compressions if pressure is applied directly to it.",
+   findings:"Point tenderness at the very bottom of the sternum.",
+   interv:"During CPR, center compressions on the chest, avoiding direct pressure on this fragile structure."},
+  {id:14, view:"anterior", system:"skin", zone:"armL", x:66, y:232, label:"Skin (forearm)", inset:"skin",
+   location:"The body's largest organ, covering the entire external surface — sampled here at the forearm.",
+   funct:"Protects against infection and fluid loss, regulates temperature, and provides sensation.",
+   path:"Burns (thermal, chemical, electrical), lacerations, abrasions, and pressure injuries.",
+   findings:"Depth, size (% body surface area), and location of a burn or wound all affect severity and priority.",
+   interv:"Stop the burning process, cool (don't ice) thermal burns, cover with a dry sterile dressing, and treat for shock/transport per burn severity."},
+  {id:15, view:"anterior", system:"cardio", zone:"armL", x:68, y:183, label:"Brachial artery",
+   location:"Inside of the upper arm, between the biceps and triceps, above the elbow crease.",
+   funct:"Main blood supply to the forearm and hand; used as the reference point for auscultating blood pressure.",
+   path:"Can be injured in upper-arm fractures or lacerations, causing distal ischemia.",
+   findings:"Preferred pulse-check site in an infant (in place of carotid); Korotkoff sounds are heard here during a manual BP.",
+   interv:"Check before/after splinting a humerus fracture; direct pressure controls bleeding from this vessel."},
+  {id:16, view:"anterior", system:"cardio", zone:"armL", x:57, y:280, label:"Radial artery",
+   location:"Wrist, on the thumb side, just proximal to the base of the thumb.",
+   funct:"Supplies the hand; used to gauge adequacy of central perfusion (a palpable radial pulse is a rough field indicator of an adequate systolic BP).",
+   path:"Distal pulse loss from a wrist/forearm fracture or from a proximal tourniquet.",
+   findings:"Standard pulse-check site in a responsive adult or child; assess rate, rhythm, and strength.",
+   interv:"Recheck after any splinting of the arm; if absent with a deformed forearm, follow local protocol on realignment."},
+  {id:17, view:"anterior", system:"abd", zone:"abdomen", x:120, y:214, label:"Right upper quadrant (RUQ)",
+   location:"The patient's right side of the abdomen, above the umbilicus.",
+   funct:"Contains the liver and gallbladder.",
+   path:"Gallbladder inflammation (cholecystitis), gallstones, or liver conditions/trauma.",
+   findings:"Pain or tenderness in this region, sometimes radiating to the right shoulder blade (referred gallbladder pain).",
+   interv:"Position of comfort, treat for shock if trauma-related internal bleeding is suspected, and transport — EMTs don't treat the underlying organ pathology in the field."},
+  {id:18, view:"anterior", system:"abd", zone:"abdomen", x:180, y:214, label:"Left upper quadrant (LUQ)",
+   location:"The patient's left side of the abdomen, above the umbilicus.",
+   funct:"Contains the stomach and spleen.",
+   path:"The spleen is the abdominal organ most commonly injured in blunt trauma, and a source of significant internal bleeding when it ruptures.",
+   findings:"Pain or tenderness in this region after blunt trauma (e.g., a steering wheel or bicycle handlebar injury) should raise concern for splenic injury.",
+   interv:"Treat for shock, minimize unnecessary movement, and prioritize rapid transport for suspected splenic injury — this is a load-and-go presentation."},
+  {id:19, view:"anterior", system:"msk", zone:"abdomen", x:150, y:236, label:"Umbilicus",
+   location:"The navel, at the midline of the abdomen.",
+   funct:"A fixed, central reference point used to divide the abdomen into its four quadrants.",
+   path:"Bruising around the umbilicus (Cullen's sign) can be a delayed sign of internal abdominal bleeding.",
+   findings:"Used as a landmark for describing the location of pain, wounds, or distension.",
+   interv:"Document findings relative to this landmark (e.g., \"pain in the right lower quadrant\") for clear hand-off communication."},
+  {id:20, view:"anterior", system:"abd", zone:"abdomen", x:122, y:258, label:"Right lower quadrant (RLQ)",
+   location:"The patient's right side of the abdomen, below the umbilicus.",
+   funct:"Contains the appendix and part of the large intestine.",
+   path:"Appendicitis is the classic condition associated with this region.",
+   findings:"Pain that often starts near the umbilicus and migrates to this quadrant, with localized tenderness.",
+   interv:"Position of comfort, avoid palpating repeatedly/aggressively, withhold food/water, and transport."},
+  {id:21, view:"anterior", system:"abd", zone:"abdomen", x:178, y:258, label:"Left lower quadrant (LLQ)",
+   location:"The patient's left side of the abdomen, below the umbilicus.",
+   funct:"Contains part of the large intestine (sigmoid colon).",
+   path:"Diverticulitis is a common condition associated with this region.",
+   findings:"Pain or tenderness localized to this quadrant, sometimes with fever or altered bowel habits reported.",
+   interv:"Position of comfort, supportive care, and transport."},
+  {id:22, view:"anterior", system:"msk", zone:"pelvis", x:150, y:276, label:"Pelvis (pelvic ring)",
+   location:"The ring of bone connecting the spine to the legs, including the iliac crests (hip bones) at the waistline and the pubic symphysis at the midline front.",
+   funct:"Bears the body's weight and protects major pelvic blood vessels and organs (bladder, rectum, reproductive organs).",
+   path:"An unstable pelvic fracture is life-threatening due to the risk of massive internal hemorrhage from the vessels running through this highly vascular area.",
+   findings:"Pain, instability, or deformity on gentle assessment; avoid rocking or repeatedly springing the pelvis, which can worsen bleeding.",
+   interv:"Apply a pelvic binder per protocol, minimize movement, treat for shock, and prioritize rapid transport."},
+  {id:23, view:"anterior", system:"cardio", zone:"pelvis", x:134, y:296, label:"Femoral artery",
+   location:"Groin crease, midway between the hip bone and pubic bone.",
+   funct:"Main blood supply to the leg; a large, easily-palpated central pulse.",
+   path:"Site of major hemorrhage in proximal leg/groin trauma; also a common IV access/catheterization site in-hospital.",
+   findings:"Strong pulse normally; diminished or absent pulse suggests proximal arterial injury or severe shock.",
+   interv:"Compression point for a proximal tourniquet placed high on the thigh for severe upper-leg bleeding that a standard tourniquet can't control."},
+  {id:24, view:"anterior", system:"msk", zone:"armL", x:72, y:160, label:"Humerus",
+   location:"The single long bone of the upper arm, between the shoulder and elbow.",
+   funct:"The longest bone in the arm, providing attachment points for the major arm and shoulder muscles.",
+   path:"Fractures can occur mid-shaft (direct trauma) or near either end (falls); can injure the nearby brachial artery or radial nerve.",
+   findings:"Deformity, swelling, pain, and possibly an altered distal pulse or sensation if the nearby artery/nerve is involved.",
+   interv:"Splint in the position found (or per protocol) with a rigid or sling-and-swathe splint, checking distal PMS before and after."},
+  {id:25, view:"anterior", system:"msk", zone:"legL", x:122, y:480, label:"Patella",
+   location:"The kneecap, at the front of the knee joint.",
+   funct:"Protects the knee joint and improves the mechanical leverage of the thigh muscles during leg extension.",
+   path:"Can fracture or dislocate from a direct blow to the front of the knee.",
+   findings:"Pain, swelling, or visible deformity at the front of the knee; a dislocated patella may look obviously out of place.",
+   interv:"Splint the knee in the position found (or per protocol) and check distal PMS before and after."},
+  {id:26, view:"anterior", system:"msk", zone:"legL", x:110, y:400, label:"Femur",
+   location:"The single long bone of the thigh, between the hip and knee — the longest and strongest bone in the body.",
+   funct:"Bears the majority of the body's weight during standing and walking.",
+   path:"A femur fracture can cause significant internal blood loss (up to 1-1.5 liters) into the thigh, even without an open wound.",
+   findings:"Severe pain, deformity, swelling, and possible signs of shock from associated blood loss.",
+   interv:"A traction splint is generally indicated for an isolated, closed mid-shaft femur fracture; check distal PMS before and after, and treat for shock."},
+  {id:27, view:"anterior", system:"msk", zone:"legL", x:112, y:535, label:"Tibia / fibula",
+   location:"The two long bones of the lower leg, between the knee and ankle — the tibia (shin bone) bears most of the weight.",
+   funct:"Support the body's weight below the knee and anchor the lower leg muscles.",
+   path:"Common fracture site in falls, direct blows, or twisting injuries to the lower leg; can be open or closed.",
+   findings:"Deformity, swelling, pain, and possible bone protrusion in an open fracture.",
+   interv:"Splint to immobilize the joint above and below the injury, check distal PMS before and after, and control any bleeding from an open fracture."},
+  {id:28, view:"anterior", system:"msk", zone:"legL", x:117, y:578, label:"Medial malleolus",
+   location:"The bony bump on the inner ankle, at the end of the shin bone (tibia).",
+   funct:"Forms part of the ankle joint and helps stabilize it.",
+   path:"A common site of ankle fracture and sprain, especially from a twisting injury.",
+   findings:"Pain, swelling, and tenderness over the inner ankle; may be accompanied by deformity in a significant fracture.",
+   interv:"Splint the ankle in the position found, and check the posterior tibial and dorsalis pedis pulses before and after."},
+  {id:29, view:"anterior", system:"cardio", zone:"legL", x:114, y:596, label:"Dorsalis pedis",
+   location:"Top of the foot, between the first and second metatarsal bones.",
+   funct:"One of the two standard distal pulse points in the foot.",
+   path:"Can be congenitally absent in a small percentage of people, so use the posterior tibial as the alternate check.",
+   findings:"Checked as a distal pulse when assessing circulation in a lower-leg injury.",
+   interv:"Reassess distal pulses, motor function, and sensation before and after splinting any lower-leg injury."},
 
-  // POSTERIOR
-  {id:26, view:"posterior", cat:"bony", x:150, y:25, label:"Occipital bone",
-   desc:"The back and base of the skull. Assessed for tenderness or deformity after a fall backward or a blow to the back of the head."},
-  {id:27, view:"posterior", cat:"bony", x:150, y:80, label:"Cervical spine (C1–C7)",
-   desc:"The neck portion of the vertebral column. The focus of spinal motion restriction after a significant mechanism of injury."},
-  {id:28, view:"posterior", cat:"bony", x:124, y:105, label:"Scapula",
-   desc:"The shoulder blade. Fractures here are uncommon and generally indicate a high-force mechanism of injury."},
-  {id:29, view:"posterior", cat:"chest", x:172, y:168, label:"Posterior lung fields (bases)",
-   desc:"General area for posterior lung sound auscultation. The lower back is a key spot for detecting fluid, such as the crackles heard in pulmonary edema."},
-  {id:30, view:"posterior", cat:"bony", x:150, y:160, label:"Thoracic spine (T1–T12)",
-   desc:"The mid-back portion of the vertebral column. Each of its 12 vertebrae is paired with a rib."},
-  {id:31, view:"posterior", cat:"bony", x:176, y:196, label:"Costovertebral angle (CVA)",
-   desc:"The angle formed where the lowest rib meets the spine. Tenderness here (CVA tenderness) can suggest a kidney-related problem, such as an infection or kidney stone."},
-  {id:32, view:"posterior", cat:"bony", x:150, y:232, label:"Lumbar spine (L1–L5)",
-   desc:"The lower back portion of the vertebral column. A common site of both traumatic injury and everyday lower back pain."},
-  {id:33, view:"posterior", cat:"bony", x:150, y:268, label:"Sacrum & coccyx",
-   desc:"The fused vertebrae at the base of the spine, including the tailbone (coccyx). Can be injured in a fall onto the buttocks."},
-  {id:34, view:"posterior", cat:"pulse", x:122, y:480, label:"Popliteal artery",
-   desc:"An artery located behind the knee. A pulse point checked when assessing circulation after a knee or lower-leg injury."},
-  {id:35, view:"posterior", cat:"pulse", x:118, y:578, label:"Posterior tibial artery",
-   desc:"An artery located just behind the inner ankle bone. One of the two distal pulse points checked in a lower-leg injury, along with the dorsalis pedis."}
+  {id:30, view:"posterior", system:"msk", zone:"head", x:150, y:25, label:"Occipital bone",
+   location:"The back and base of the skull.",
+   funct:"Protects the back of the brain and the area where the spinal cord exits the skull.",
+   path:"Fractures here can occur from a fall backward or a direct blow to the back of the head, and may involve the brainstem given the location.",
+   findings:"Tenderness, deformity, or bruising at the back/base of the skull; assess mental status and pupils closely.",
+   interv:"Maintain spinal motion restriction, monitor airway and mental status closely, and transport promptly."},
+  {id:31, view:"posterior", system:"msk", zone:"spine", x:135, y:78, label:"Cervical spine (C1–C7)",
+   location:"The neck portion of the vertebral column, 7 vertebrae between the skull and the upper back.",
+   funct:"Supports the head and protects the cervical spinal cord running through it.",
+   path:"The focus of spinal motion restriction after a significant mechanism of injury, given the risk of cord injury.",
+   findings:"Neck pain, tenderness, or any neurological deficit (numbness, weakness) in the arms or legs.",
+   interv:"Apply a cervical collar and full spinal motion restriction per current protocol; maintain in-line stabilization during airway management."},
+  {id:32, view:"posterior", system:"msk", zone:"chest", x:124, y:105, label:"Scapula",
+   location:"The shoulder blade, on the upper back.",
+   funct:"Anchors many shoulder and upper back muscles and forms part of the shoulder joint.",
+   path:"Fractures here are uncommon and generally indicate a high-force mechanism of injury, raising suspicion for associated chest/lung injury.",
+   findings:"Pain and tenderness over the upper back/shoulder blade area; consider associated rib or lung injury.",
+   interv:"Treat as a marker of significant force — assess thoroughly for associated chest trauma, splint the arm for comfort, and transport."},
+  {id:33, view:"posterior", system:"resp", zone:"chest", x:172, y:168, label:"Posterior lung fields (bases)", inset:"lung",
+   location:"Fill most of the chest cavity, with the diaphragm forming the floor of the chest below them.",
+   funct:"Together, perform the mechanical work of breathing and gas exchange; the bases are a key spot for detecting fluid buildup.",
+   path:"Pulmonary edema, pneumonia, hemothorax, and pneumothorax can all be detected via posterior auscultation.",
+   findings:"Crackles at the bases suggest fluid (pulmonary edema); diminished sounds on one side suggest pneumo/hemothorax.",
+   interv:"Support oxygenation/ventilation as needed, position upright if tolerated for pulmonary edema, and transport promptly."},
+  {id:34, view:"posterior", system:"msk", zone:"spine", x:166, y:140, label:"Thoracic spine (T1–T12)",
+   location:"The mid-back portion of the vertebral column, 12 vertebrae each paired with a rib.",
+   funct:"Supports the rib cage and protects the thoracic spinal cord.",
+   path:"Can be injured in falls or high-force trauma; associated rib fractures are common given the rib attachments.",
+   findings:"Mid-back pain/tenderness, or any neurological deficit in the legs.",
+   interv:"Spinal motion restriction per protocol; assess for associated chest wall injury."},
+  {id:35, view:"posterior", system:"neuro", zone:"spine", x:150, y:160, label:"Spinal cord", inset:"spinalcord",
+   location:"Runs through the protective canal formed by the vertebral column, from the base of the brain to the lower back.",
+   funct:"The main communication pathway between the brain and the rest of the body.",
+   path:"Traumatic spinal cord injury (partial or complete) from a significant mechanism of injury to the head, neck, or back.",
+   findings:"Numbness, tingling, weakness, or paralysis below the level of injury; possibly bowel/bladder involvement.",
+   interv:"Spinal motion restriction per current protocol, careful handling to avoid worsening injury, and prompt transport."},
+  {id:36, view:"posterior", system:"msk", zone:"abdomen", x:176, y:196, label:"Costovertebral angle (CVA)",
+   location:"The angle formed on the back where the lowest rib meets the spine, on either side.",
+   funct:"An examination landmark overlying the kidneys.",
+   path:"Tenderness here (CVA tenderness) is classically associated with a kidney infection (pyelonephritis) or kidney stone.",
+   findings:"Pain with gentle percussion/pressure over this area, often with flank pain radiating to the groin.",
+   interv:"Position of comfort and supportive care; generally a medical (non-traumatic) transport priority unless trauma is also involved."},
+  {id:37, view:"posterior", system:"msk", zone:"spine", x:134, y:220, label:"Lumbar spine (L1–L5)",
+   location:"The lower back portion of the vertebral column, 5 vertebrae between the thoracic spine and sacrum.",
+   funct:"Bears significant body weight and protects the lower spinal cord and nerve roots.",
+   path:"A common site of both traumatic injury and everyday non-traumatic lower back pain.",
+   findings:"Lower back pain, and — in trauma — any leg weakness, numbness, or loss of bowel/bladder control.",
+   interv:"Spinal motion restriction per protocol for a traumatic mechanism; for non-traumatic back pain, focus on comfortable positioning and transport."},
+  {id:38, view:"posterior", system:"msk", zone:"pelvis", x:150, y:260, label:"Sacrum & coccyx",
+   location:"The fused triangular bone at the base of the spine, ending in the small tailbone (coccyx).",
+   funct:"Connects the spine to the pelvis and bears weight when sitting.",
+   path:"Can be fractured or bruised in a fall onto the buttocks.",
+   findings:"Pain and tenderness at the very base of the spine, worse with sitting.",
+   interv:"Spinal motion restriction per protocol if the mechanism is significant; otherwise, position for comfort and transport."},
+  {id:39, view:"posterior", system:"cardio", zone:"legL", x:122, y:480, label:"Popliteal artery",
+   location:"Behind the knee, in the popliteal fossa.",
+   funct:"Continues blood supply from the femoral artery into the lower leg.",
+   path:"Vulnerable to injury in knee dislocations, which can compromise distal circulation.",
+   findings:"Checked when assessing circulation after a knee or lower-leg injury; harder to palpate than other pulse points.",
+   interv:"Its absence after a knee injury is a time-sensitive finding warranting prompt transport for vascular evaluation."},
+  {id:40, view:"posterior", system:"cardio", zone:"legL", x:118, y:578, label:"Posterior tibial artery",
+   location:"Just behind and below the medial ankle bone (medial malleolus).",
+   funct:"One of two distal pulse points supplying the foot.",
+   path:"Diminished/absent pulse can indicate peripheral vascular disease or distal limb injury.",
+   findings:"Checked alongside the dorsalis pedis as one of the two standard distal lower-leg pulse points.",
+   interv:"Document and compare bilaterally; recheck after splinting a lower-leg injury."}
 ];
+
+const INSETS = {
+  heart:{
+    title:"Heart — Chambers & Great Vessels",
+    items:[
+      {id:"pa", system:"cardio", label:"Pulmonary artery",
+       location:"Vessel exiting the right ventricle, carrying blood to the lungs.",
+       funct:"The only artery in the body that carries deoxygenated blood — delivers it to the lungs for gas exchange.",
+       path:"A blood clot lodging here (pulmonary embolism) is life-threatening, often arising from a DVT that traveled from a leg vein.",
+       findings:"Sudden-onset shortness of breath, pleuritic chest pain, tachycardia, and possibly a recent history of immobility, surgery, or long travel.",
+       interv:"High-concentration oxygen if hypoxic, position of comfort, and rapid transport — definitive treatment is hospital-based."},
+      {id:"svc", system:"cardio", label:"Superior vena cava (SVC)",
+       location:"Large vein entering the top of the right atrium, draining blood from the head, neck, and arms.",
+       funct:"Returns venous blood from the upper body to the heart.",
+       path:"SVC syndrome (external compression, e.g., from a tumor) can cause facial/upper-body swelling — rare in typical EMS calls.",
+       findings:"Not directly palpable; related findings include facial swelling or distended neck/upper-body veins.",
+       interv:"Supportive care and transport; no field-level intervention targets the SVC directly."},
+      {id:"aorta", system:"cardio", label:"Aorta",
+       location:"The large artery arising from the left ventricle, arching through the chest and running down through the abdomen.",
+       funct:"The main trunk artery distributing oxygenated blood to the entire body.",
+       path:"Aortic dissection or abdominal aortic aneurysm (AAA) rupture — both life-threatening.",
+       findings:"Sudden, severe tearing chest/back pain (dissection) or severe abdominal/back pain with a pulsating mass (AAA); unequal blood pressures between arms can suggest dissection.",
+       interv:"Treat for shock, avoid raising blood pressure further where possible, and prioritize rapid, gentle transport — a load-and-go emergency EMTs can't definitively treat in the field."},
+      {id:"ra", system:"cardio", label:"Right atrium",
+       location:"Upper-right chamber of the heart.",
+       funct:"Receives deoxygenated blood returning from the body via the vena cavae.",
+       path:"Right heart strain can occur with a large pulmonary embolism or long-standing pulmonary disease.",
+       findings:"Not directly assessed in the field; inferred from systemic signs like jugular venous distension.",
+       interv:"EMT care is supportive (oxygen, positioning, rapid transport) — no direct field intervention targets this chamber."},
+      {id:"la", system:"cardio", label:"Left atrium",
+       location:"Upper-left chamber of the heart.",
+       funct:"Receives freshly oxygenated blood from the lungs via the pulmonary veins.",
+       path:"Atrial fibrillation commonly originates from abnormal electrical activity here, increasing stroke risk from clot formation.",
+       findings:"An irregularly irregular pulse on palpation can suggest atrial fibrillation.",
+       interv:"Note an irregular pulse in your report; manage any resulting symptoms (e.g., signs of embolic stroke or poor perfusion) per protocol."},
+      {id:"rv", system:"cardio", label:"Right ventricle",
+       location:"Lower-right chamber of the heart.",
+       funct:"Pumps deoxygenated blood into the pulmonary artery toward the lungs.",
+       path:"Right ventricular failure/strain from pulmonary embolism, chronic lung disease, or right-sided MI.",
+       findings:"Suggested by peripheral edema, JVD, and hypotension in the right clinical context.",
+       interv:"Supportive care per protocol (oxygen as indicated, monitor closely, rapid transport); definitive treatment is hospital-based."},
+      {id:"lv", system:"cardio", label:"Left ventricle",
+       location:"Lower-left chamber of the heart; the thickest and strongest chamber.",
+       funct:"Pumps oxygenated blood out through the aorta to the entire body.",
+       path:"The most common site of damage in a myocardial infarction; failure here causes pulmonary edema (left heart failure).",
+       findings:"Suggested by chest pain (ACS) or by shortness of breath, crackles, and orthopnea (left heart failure).",
+       interv:"For suspected ACS: oxygen if hypoxic, assist with prescribed nitroglycerin/aspirin per protocol, rapid transport. For pulmonary edema: position upright, oxygen, prompt transport."},
+      {id:"ivc", system:"cardio", label:"Inferior vena cava (IVC)",
+       location:"Large vein entering the bottom of the right atrium, draining blood from the legs and abdomen.",
+       funct:"Returns venous blood from the lower body to the heart.",
+       path:"Can be compressed by a late-pregnancy uterus when a patient lies flat, reducing blood return to the heart (supine hypotensive syndrome).",
+       findings:"A pregnant patient becoming lightheaded or hypotensive while lying supine.",
+       interv:"Position a late-pregnancy patient tilted onto her left side, or manually displace the uterus leftward, to relieve IVC compression."}
+    ]
+  },
+  airway:{
+    title:"Upper Airway — Structures in Sequence",
+    items:[
+      {id:"nasopharynx", system:"resp", label:"Nasopharynx",
+       location:"The uppermost part of the throat, directly behind the nasal cavity.",
+       funct:"Warms, humidifies, and filters air entering through the nose before it continues down the airway.",
+       path:"Can be obstructed by swelling, blood, or foreign material after facial trauma.",
+       findings:"Nasal flaring in a child, or visible blood/drainage, can point to upper airway involvement.",
+       interv:"Suction gently if secretions/blood are present; a nasopharyngeal airway can be inserted here in a patient who won't tolerate an oral airway (avoid with suspected significant facial/skull fracture)."},
+      {id:"epiglottis", system:"resp", label:"Epiglottis",
+       location:"A flap of cartilage at the base of the tongue, just above the larynx.",
+       funct:"Folds down over the larynx during swallowing to prevent food/liquid from entering the airway.",
+       path:"Epiglottitis — dangerous swelling of this structure, more common in children and a true airway emergency.",
+       findings:"Drooling, stridor, a muffled voice, and a patient instinctively sitting up and leaning forward (tripod-like sniffing position).",
+       interv:"Keep the patient calm and in their position of comfort, avoid examining the mouth/throat directly, give oxygen as tolerated, and transport promptly without agitating the patient."},
+      {id:"larynx", system:"resp", label:"Larynx",
+       location:"The \"voice box,\" located in the anterior neck between the pharynx and trachea.",
+       funct:"Houses the vocal cords and is a common site of airway narrowing or spasm.",
+       path:"Laryngospasm, laryngeal edema (e.g., from anaphylaxis or an inhalation burn), or direct blunt/penetrating trauma to the neck.",
+       findings:"Hoarseness, stridor, or a change in voice; direct trauma may show bruising or deformity over the anterior neck.",
+       interv:"High-concentration oxygen, close airway monitoring, and rapid transport; treat suspected anaphylaxis per protocol (e.g., epinephrine auto-injector assist)."},
+      {id:"trachea", system:"resp", label:"Trachea",
+       location:"The airway tube in the anterior neck, continuing down into the chest to the mainstem bronchi.",
+       funct:"Conducts air between the larynx and the lungs; reinforced with cartilage rings to stay open.",
+       path:"Can be deviated from its normal midline position by a tension pneumothorax (a late, unreliable sign) or injured directly by penetrating neck trauma.",
+       findings:"Midline position should be checked; tracheal deviation, subcutaneous emphysema (crackling under the skin), or visible neck wounds are significant findings.",
+       interv:"Maintain a patent airway, give oxygen, and transport promptly; a suspected tension pneumothorax requires rapid transport for advanced decompression, beyond typical EMT-B scope."},
+      {id:"bronchi", system:"resp", label:"Mainstem bronchi",
+       location:"The two large branches where the trachea splits, one entering each lung.",
+       funct:"Direct airflow into the right and left lungs; the right mainstem bronchus is shorter and more vertical.",
+       path:"A common site for an aspirated foreign body to lodge, especially on the right side.",
+       findings:"Diminished or absent breath sounds on one side, with normal sounds on the other, can suggest bronchial obstruction.",
+       interv:"For a suspected foreign body causing partial obstruction, encourage coughing; for complete obstruction, follow choking management protocols."}
+    ]
+  },
+  lung:{
+    title:"Lungs & Diaphragm",
+    items:[
+      {id:"rlung", system:"resp", label:"Right lung",
+       location:"Fills the right side of the chest cavity; divided into three lobes.",
+       funct:"The larger of the two lungs, performing gas exchange for roughly half the body's oxygen needs.",
+       path:"Pneumothorax, hemothorax, pneumonia, or contusion can each affect this lung independently of the left.",
+       findings:"Unequal chest rise or diminished/absent breath sounds on this side compared to the left.",
+       interv:"Manage per the specific finding (e.g., seal an open chest wound); high-concentration oxygen and prompt transport for any significant unilateral lung finding."},
+      {id:"llung", system:"resp", label:"Left lung",
+       location:"Fills the left side of the chest cavity; divided into two lobes to make room for the heart.",
+       funct:"Performs gas exchange for roughly half the body's oxygen needs.",
+       path:"Same range of conditions as the right lung — pneumothorax, hemothorax, pneumonia, contusion.",
+       findings:"Unequal chest rise or diminished/absent breath sounds on this side compared to the right.",
+       interv:"Manage per the specific finding; high-concentration oxygen and prompt transport for any significant unilateral lung finding."},
+      {id:"alveoli", system:"resp", label:"Alveoli",
+       location:"Microscopic air sacs clustered at the very end of the smallest airway branches, throughout both lungs.",
+       funct:"The actual site of gas exchange — oxygen moves into the blood and carbon dioxide moves out, across a very thin membrane.",
+       path:"Fluid filling the alveoli occurs in pulmonary edema and pneumonia; they can rupture in severe asthma/COPD or barotrauma, contributing to a pneumothorax.",
+       findings:"Crackles/rales on auscultation suggest fluid-filled alveoli; low SpO2 despite adequate breathing effort points to a gas-exchange problem at this level.",
+       interv:"High-concentration oxygen as indicated, position upright if tolerated for pulmonary edema, and prompt transport — the underlying cause is treated in the hospital."},
+      {id:"diaphragm", system:"resp", label:"Diaphragm",
+       location:"A dome-shaped muscle separating the chest cavity from the abdominal cavity.",
+       funct:"The primary muscle of breathing — contracting flattens it, expanding the chest and drawing air in.",
+       path:"Can rupture in severe blunt abdominal/chest trauma (allowing abdominal organs to herniate into the chest), or its motion can be impaired by abdominal distension or severe pain.",
+       findings:"Paradoxical (see-saw) abdominal and chest movement, or bowel sounds heard in the chest, can suggest diaphragmatic injury.",
+       interv:"Support ventilation as needed, position of comfort, and prompt transport — surgical repair of a ruptured diaphragm is a hospital-level intervention."}
+    ]
+  },
+  brain:{
+    title:"Brain — Major Regions",
+    items:[
+      {id:"cerebrum", system:"neuro", label:"Cerebrum",
+       location:"The large, wrinkled outer portion of the brain, filling most of the skull.",
+       funct:"Responsible for voluntary movement, sensation, speech, and higher thinking; divided into left and right hemispheres.",
+       path:"The most common site affected by stroke and traumatic brain injury; a bleed or clot here often produces one-sided (contralateral) weakness.",
+       findings:"Facial droop, arm drift, and speech difficulty (as tested by the Cincinnati Prehospital Stroke Scale) point to a cerebral event; also assessed via GCS.",
+       interv:"For suspected stroke: note the last-known-well time and transport promptly to an appropriate stroke-capable facility. For suspected TBI: maintain airway, monitor for deterioration, and transport promptly."},
+      {id:"cerebellum", system:"neuro", label:"Cerebellum",
+       location:"A smaller, distinctly wrinkled structure tucked beneath the back of the cerebrum.",
+       funct:"Coordinates balance, fine motor control, and smooth, accurate movement.",
+       path:"Injury or stroke here classically causes ataxia (poor coordination/balance) rather than weakness.",
+       findings:"Unsteady gait, poor coordination, or difficulty with smooth, targeted movements.",
+       interv:"Manage as a general suspected stroke/TBI: monitor airway and mental status closely, prevent falls/further injury, and transport promptly."},
+      {id:"brainstem", system:"neuro", label:"Brainstem",
+       location:"The stalk-like lower portion of the brain connecting the cerebrum to the spinal cord.",
+       funct:"Controls essential automatic functions — breathing drive, heart rate regulation, and level of consciousness.",
+       path:"Injury or a bleed/stroke here is especially dangerous, since it can directly disrupt breathing and circulation.",
+       findings:"Irregular breathing patterns, altered consciousness, or abnormal pupil responses can suggest brainstem involvement, especially after significant head trauma.",
+       interv:"Aggressive airway support (this is where breathing can fail first), continuous monitoring, and rapid transport — a high-acuity, load-and-go presentation."}
+    ]
+  },
+  spinalcord:{
+    title:"Spinal Cord — Segments",
+    items:[
+      {id:"cervical", system:"neuro", label:"Cervical spinal cord",
+       location:"The portion of the spinal cord running through the neck (cervical) vertebrae.",
+       funct:"Carries all nerve signals between the brain and the rest of the body below the neck, including those controlling breathing.",
+       path:"A high cervical spinal cord injury can paralyze the muscles of breathing, in addition to causing widespread paralysis below the injury.",
+       findings:"Loss of sensation/movement in the arms and legs, or numbness/tingling after a significant mechanism of injury to the head or neck.",
+       interv:"Full spinal motion restriction per protocol, careful airway management without unnecessary neck movement, and prompt transport."},
+      {id:"thoracic", system:"neuro", label:"Thoracic spinal cord",
+       location:"The portion of the spinal cord running through the mid-back (thoracic) vertebrae.",
+       funct:"Carries nerve signals to and from the chest and upper abdomen; breathing muscles below this level (intercostals) can be affected.",
+       path:"Injury here typically spares arm function but can cause paralysis of the legs and trunk below the level of injury.",
+       findings:"Loss of sensation/movement in the legs, with arm function intact, after a significant mechanism of injury to the back.",
+       interv:"Spinal motion restriction per protocol, monitor for signs of spinal shock (e.g., unexpectedly low heart rate with hypotension), and transport promptly."},
+      {id:"lumbar", system:"neuro", label:"Lumbar spinal cord",
+       location:"The portion of the spinal cord running through the lower back (lumbar) vertebrae.",
+       funct:"Carries nerve signals primarily to and from the legs.",
+       path:"Injury here mainly affects leg strength, sensation, and bowel/bladder control.",
+       findings:"Leg weakness or numbness, or loss of bowel/bladder control, following a significant lower-back mechanism of injury.",
+       interv:"Spinal motion restriction per protocol; document any bowel/bladder involvement, which is clinically significant to receiving providers."},
+      {id:"sacral", system:"neuro", label:"Sacral spinal cord",
+       location:"The lowest functional portion of the spinal cord, near the sacrum, where it transitions into a bundle of nerve roots.",
+       funct:"Carries nerve signals for bowel, bladder, and sexual function, along with some leg/foot sensation.",
+       path:"Injury here can cause bowel/bladder dysfunction and saddle-area (groin/buttocks) numbness.",
+       findings:"Numbness in the groin/inner thighs (\"saddle anesthesia\") or new bowel/bladder incontinence after a significant mechanism of injury.",
+       interv:"Spinal motion restriction per protocol; report saddle anesthesia or incontinence clearly at hospital hand-off, as it's a red-flag finding."}
+    ]
+  },
+  skin:{
+    title:"Skin — Layers",
+    items:[
+      {id:"epidermis", system:"skin", label:"Epidermis",
+       location:"The thin, outermost layer of skin.",
+       funct:"Forms a waterproof barrier and the body's first line of defense against infection and fluid loss.",
+       path:"A superficial (first-degree) burn affects only this layer.",
+       findings:"Redness and pain without blistering, similar to a mild sunburn.",
+       interv:"Cool the area, cover loosely, and provide comfort care — these burns generally don't require hospital treatment unless extensive."},
+      {id:"dermis", system:"skin", label:"Dermis",
+       location:"The thicker layer of skin beneath the epidermis, containing blood vessels, nerve endings, and hair follicles.",
+       funct:"Provides strength, elasticity, sensation, and helps regulate body temperature.",
+       path:"A partial-thickness (second-degree) burn extends into this layer.",
+       findings:"Redness, significant pain, and blister formation.",
+       interv:"Cool with room-temperature water (avoid ice), cover with a dry, sterile dressing, and treat pain/monitor for larger burns needing hospital care."},
+      {id:"subq", system:"skin", label:"Subcutaneous tissue (hypodermis)",
+       location:"The deepest layer, made up mostly of fat, beneath the dermis.",
+       funct:"Insulates the body, cushions underlying structures, and stores energy.",
+       path:"A full-thickness (third-degree) burn extends through the dermis into this layer (and sometimes deeper).",
+       findings:"Skin may appear white, leathery, or charred, often with reduced pain at the burn site itself due to nerve ending destruction (though surrounding areas can be very painful).",
+       interv:"Cover with a dry, sterile dressing, treat for shock, and transport promptly — these burns require hospital/burn center care."}
+    ]
+  }
+};
 
 const TERM_PAIRS = [
   ["Anterior", "Toward the front of the body."],
@@ -244,13 +658,91 @@ const TERM_PAIRS = [
 ];
 
 let currentView = "anterior";
-let activeCats = new Set(["pulse","bony","airway","chest","abdomen"]);
+let activeSystems = new Set(["resp","cardio","neuro","msk","abd","skin"]);
 let selectedId = null;
+let currentInsetKey = null;
+let selectedSubId = null;
+
+function zoomTo(zoneKey){
+  const r = ZONES[zoneKey];
+  if(!r) return;
+  const viewW = 300, viewH = 620;
+  let scale = Math.min(viewW / r.w, viewH / r.h) * 0.85;
+  scale = Math.min(scale, 3.2);
+  const tx = viewW / 2 - scale * (r.x + r.w / 2);
+  const ty = viewH / 2 - scale * (r.y + r.h / 2);
+  document.getElementById("zoomGroup").style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+  const hl = document.getElementById("highlightRect");
+  hl.setAttribute("x", r.x);
+  hl.setAttribute("y", r.y);
+  hl.setAttribute("width", r.w);
+  hl.setAttribute("height", r.h);
+  hl.classList.add("active");
+}
+
+function resetZoom(){
+  document.getElementById("zoomGroup").style.transform = "translate(0,0) scale(1)";
+  document.getElementById("highlightRect").classList.remove("active");
+}
+
+function itemBox(insetKey, id, extraClass){
+  const item = INSETS[insetKey].items.find(i => i.id === id);
+  const sel = (currentInsetKey === insetKey && selectedSubId === id) ? "selected" : "";
+  return `<div class="inset-box ${extraClass || ""} ${sel}" data-inset="${insetKey}" data-sub="${id}">${item.label}</div>`;
+}
+
+function renderInsetDiagram(key){
+  if(key === "heart"){
+    return `
+      <div class="inset-row">${itemBox("heart","pa")}${itemBox("heart","svc")}${itemBox("heart","aorta")}</div>
+      <div class="inset-row">${itemBox("heart","ra","chamber")}${itemBox("heart","la","chamber")}</div>
+      <div class="inset-row">${itemBox("heart","rv","chamber")}${itemBox("heart","lv","chamber")}</div>
+      <div class="inset-row">${itemBox("heart","ivc")}</div>
+    `;
+  }
+  if(key === "airway"){
+    const order = ["nasopharynx","epiglottis","larynx","trachea","bronchi"];
+    return order.map((id,i) => itemBox("airway",id) + (i < order.length-1 ? '<div class="inset-arrow">&darr;</div>' : "")).join("");
+  }
+  if(key === "lung"){
+    return `
+      <div class="inset-row">${itemBox("lung","rlung")}${itemBox("lung","llung")}</div>
+      <div class="inset-arrow">&darr;</div>
+      ${itemBox("lung","alveoli")}
+      <div class="inset-arrow">&darr;</div>
+      ${itemBox("lung","diaphragm")}
+    `;
+  }
+  if(key === "brain"){
+    const order = ["cerebrum","cerebellum","brainstem"];
+    return order.map((id,i) => itemBox("brain",id) + (i < order.length-1 ? '<div class="inset-arrow">&darr;</div>' : "")).join("");
+  }
+  if(key === "spinalcord"){
+    const order = ["cervical","thoracic","lumbar","sacral"];
+    return order.map((id,i) => itemBox("spinalcord",id) + (i < order.length-1 ? '<div class="inset-arrow">&darr;</div>' : "")).join("");
+  }
+  if(key === "skin"){
+    return ["epidermis","dermis","subq"].map(id => itemBox("skin", id, "layer-"+id)).join("");
+  }
+  return "";
+}
+
+function updateInfoPanel(system, label, data){
+  document.getElementById("infoPanel").innerHTML = `
+    <div class="info-cat">${SYSTEM_LABELS[system] || system}</div>
+    <p class="info-label">${label}</p>
+    <div class="info-field"><b>Location:</b> ${data.location}</div>
+    <div class="info-field"><b>Function:</b> ${data.funct}</div>
+    <div class="info-field"><b>Common pathologies:</b> ${data.path}</div>
+    <div class="info-field"><b>Assessment findings:</b> ${data.findings}</div>
+    <div class="info-field"><b>Field interventions:</b> ${data.interv}</div>
+  `;
+}
 
 function renderDots(){
   const layer = document.getElementById("landmarkLayer");
   layer.innerHTML = LANDMARKS.filter(l => l.view === currentView).map(l => {
-    const hidden = activeCats.has(l.cat) ? "" : "hidden";
+    const hidden = activeSystems.has(l.system) ? "" : "hidden";
     const selected = l.id === selectedId ? "selected" : "";
     return `<g class="landmark-dot-group ${hidden}" data-id="${l.id}" tabindex="0" role="button" aria-label="${l.label}">
       <circle class="landmark-dot ${selected}" cx="${l.x}" cy="${l.y}" r="6"></circle>
@@ -262,10 +754,26 @@ function renderList(){
   const listEl = document.getElementById("landmarkList");
   const items = LANDMARKS.filter(l => l.view === currentView).slice().sort((a,b) => a.label.localeCompare(b.label));
   listEl.innerHTML = items.map(l => {
-    const hidden = activeCats.has(l.cat) ? "" : "hidden";
+    const hidden = activeSystems.has(l.system) ? "" : "hidden";
     const selected = l.id === selectedId ? "selected" : "";
     return `<button type="button" class="${hidden} ${selected}" data-id="${l.id}">${l.label}</button>`;
   }).join("");
+}
+
+function renderRule9(){
+  const layer = document.getElementById("rule9Layer");
+  const labels = [
+    {x:150, y:45, t:"9%"},
+    {x:62, y:190, t:"9%"},
+    {x:238, y:190, t:"9%"},
+    {x:150, y:160, t:"18%"},
+    {x:119, y:450, t:"18%"},
+    {x:181, y:450, t:"18%"}
+  ];
+  layer.innerHTML = labels.map(l => `
+    <rect x="${l.x-16}" y="${l.y-13}" width="32" height="18" rx="3"></rect>
+    <text x="${l.x}" y="${l.y}">${l.t}</text>
+  `).join("");
 }
 
 function renderTerms(){
@@ -274,16 +782,36 @@ function renderTerms(){
   ).join("");
 }
 
+function clearInset(){
+  currentInsetKey = null;
+  selectedSubId = null;
+  document.getElementById("insetCard").classList.remove("visible");
+}
+
 function selectLandmark(id){
-  selectedId = id;
   const l = LANDMARKS.find(x => x.id === id);
+  selectedId = id;
+  selectedSubId = null;
+  zoomTo(l.zone);
   renderDots();
   renderList();
-  document.getElementById("infoPanel").innerHTML = `
-    <div class="info-cat">${CAT_LABELS[l.cat]}</div>
-    <p class="info-label">${l.label}</p>
-    <p class="info-desc">${l.desc}</p>
-  `;
+  if(l.inset){
+    currentInsetKey = l.inset;
+    document.getElementById("insetTitle").textContent = INSETS[l.inset].title;
+    document.getElementById("insetDiagram").innerHTML = renderInsetDiagram(l.inset);
+    document.getElementById("insetCard").classList.add("visible");
+  } else {
+    clearInset();
+  }
+  updateInfoPanel(l.system, l.label, l);
+}
+
+function selectSubItem(insetKey, subId){
+  currentInsetKey = insetKey;
+  selectedSubId = subId;
+  document.getElementById("insetDiagram").innerHTML = renderInsetDiagram(insetKey);
+  const item = INSETS[insetKey].items.find(i => i.id === subId);
+  updateInfoPanel(item.system, item.label, item);
 }
 
 document.getElementById("landmarkLayer").addEventListener("click", e => {
@@ -299,27 +827,47 @@ document.getElementById("landmarkLayer").addEventListener("keydown", e => {
 document.getElementById("landmarkList").addEventListener("click", e => {
   if(e.target.tagName === "BUTTON") selectLandmark(Number(e.target.dataset.id));
 });
-document.querySelectorAll(".view-btn").forEach(btn => btn.addEventListener("click", () => {
-  document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+document.getElementById("insetDiagram").addEventListener("click", e => {
+  const box = e.target.closest(".inset-box");
+  if(box) selectSubItem(box.dataset.inset, box.dataset.sub);
+});
+document.querySelectorAll(".view-btn[data-view]").forEach(btn => btn.addEventListener("click", () => {
+  document.querySelectorAll(".view-btn[data-view]").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   currentView = btn.dataset.view;
   selectedId = null;
   document.getElementById("viewCaption").textContent =
     currentView === "anterior" ? "ANTERIOR (FRONT) VIEW" : "POSTERIOR (BACK) VIEW";
   document.getElementById("infoPanel").innerHTML =
-    '<p class="info-placeholder">Tap or click a labeled point on the diagram (or a name below) to see what it is and why it matters for EMTs.</p>';
+    '<p class="info-placeholder">Tap or click a labeled point on the diagram (or a name below) to zoom in and see what it is, why it matters, and how to handle it in the field.</p>';
+  resetZoom();
+  clearInset();
+  renderDots();
+  renderList();
+  renderRule9();
+}));
+document.getElementById("resetBtn").addEventListener("click", () => {
+  selectedId = null;
+  resetZoom();
+  clearInset();
+  renderDots();
+  renderList();
+  document.getElementById("infoPanel").innerHTML =
+    '<p class="info-placeholder">Tap or click a labeled point on the diagram (or a name below) to zoom in and see what it is, why it matters, and how to handle it in the field.</p>';
+});
+document.querySelectorAll(".sys-cb").forEach(cb => cb.addEventListener("change", () => {
+  activeSystems = new Set([...document.querySelectorAll(".sys-cb:checked")].map(c => c.value));
   renderDots();
   renderList();
 }));
-document.querySelectorAll(".cat-cb").forEach(cb => cb.addEventListener("change", () => {
-  activeCats = new Set([...document.querySelectorAll(".cat-cb:checked")].map(c => c.value));
-  renderDots();
-  renderList();
-}));
+document.getElementById("rule9Cb").addEventListener("change", e => {
+  document.getElementById("landmarkLayer").parentElement.classList.toggle("rule9-active", e.target.checked);
+});
 
 renderDots();
 renderList();
 renderTerms();
+renderRule9();
 </script>
 </body>
 </html>
