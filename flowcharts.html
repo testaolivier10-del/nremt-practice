@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Protocol Flow Diagrams — EMT Prep</title>
-<meta name="description" content="Visual flow diagrams for core EMT protocols: BLS/CPR sequence, shock recognition, and START triage.">
+<meta name="description" content="Visual flow diagrams for core EMT protocols: BLS/CPR, primary assessment, airway obstruction, anaphylaxis, stroke, spinal motion restriction, shock recognition, and START triage.">
 <style>
   :root{
     --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
@@ -46,6 +46,191 @@
 
   <div class="warning">
     <b>These show general, widely-taught sequences — not a scored skill sheet.</b> Specific protocols can vary by local medical direction. Verify anything protocol-specific against your own course materials.
+  </div>
+
+  <h2>Primary Assessment Sequence</h2>
+  <div class="diagram-card">
+    <div class="flow-box action">Scene size-up: BSI, scene safety, MOI/NOI, number of patients</div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box">Form general impression (age, sex, distress level, obvious life threats)</div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Airway patent?</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">No</div>
+        <div class="flow-box action">Open airway (manual maneuver, suction, adjunct as needed)</div>
+      </div>
+      <div>
+        <div class="branch-label">Yes</div>
+        <div class="flow-box">Proceed to breathing</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Breathing adequate? (rate, depth, effort)</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">No</div>
+        <div class="flow-box action">Assist ventilations, high-flow oxygen</div>
+      </div>
+      <div>
+        <div class="branch-label">Yes</div>
+        <div class="flow-box">Proceed to circulation</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Circulation: pulse, major bleeding, skin signs</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">Major bleeding present</div>
+        <div class="flow-box action">Control bleeding immediately</div>
+      </div>
+      <div>
+        <div class="branch-label">No major bleeding</div>
+        <div class="flow-box">Proceed to priority decision</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Significant MOI, unstable finding, or altered mental status?</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">Yes</div>
+        <div class="flow-box action">Rapid trauma exam or detailed exam, high transport priority</div>
+      </div>
+      <div>
+        <div class="branch-label">No</div>
+        <div class="flow-box">Focused exam on chief complaint, history, vitals</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box">Ongoing reassessment (more frequent if unstable)</div>
+  </div>
+
+  <h2>Adult Foreign Body Airway Obstruction</h2>
+  <div class="diagram-card">
+    <div class="flow-box decision">Signs of choking — can the patient cough or speak?</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">Mild / partial obstruction</div>
+        <div class="flow-box">Encourage forceful coughing, monitor closely, do not intervene further unless it worsens</div>
+      </div>
+      <div>
+        <div class="branch-label">Severe / complete obstruction</div>
+        <div class="flow-box action">Deliver abdominal thrusts repeatedly (chest thrusts if pregnant or significantly obese)</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Result of thrusts?</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">Object expelled</div>
+        <div class="flow-box">Reassess airway and breathing, monitor</div>
+      </div>
+      <div>
+        <div class="branch-label">Patient becomes unresponsive</div>
+        <div class="flow-box action">Lower to ground, begin CPR — check mouth for a visible object before each set of breaths</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Anaphylaxis Recognition &amp; Management</h2>
+  <div class="diagram-card">
+    <div class="flow-box decision">Signs of an allergic reaction after exposure — severity?</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">Mild / localized</div>
+        <div class="flow-box">Rash or itching only, no airway/breathing/circulation involvement — supportive care, monitor for progression</div>
+      </div>
+      <div>
+        <div class="branch-label">Severe / anaphylaxis</div>
+        <div class="flow-box">Stridor, wheezing, widespread hives, or hypotension — systemic involvement</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box action">Assist with the patient's prescribed epinephrine auto-injector (or administer per local protocol), lateral thigh</div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box action">High-flow oxygen, position for comfort/perfusion, reassess</div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Improving?</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">No</div>
+        <div class="flow-box action">Repeat epinephrine per protocol/timing if authorized, continue support</div>
+      </div>
+      <div>
+        <div class="branch-label">Yes</div>
+        <div class="flow-box">Continue monitoring — reaction can still recur</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box action">Immediate, high-priority transport</div>
+  </div>
+
+  <h2>Stroke Assessment &amp; Transport Decision</h2>
+  <div class="diagram-card">
+    <div class="flow-box decision">Sudden neurological symptoms — perform a stroke screen (FAST / Cincinnati)</div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Screen positive? (facial droop, arm drift, or speech abnormality)</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">No, but suspicion remains</div>
+        <div class="flow-box">Still transport and monitor — symptoms can evolve</div>
+      </div>
+      <div>
+        <div class="branch-label">Yes</div>
+        <div class="flow-box">Note the time last known well, check blood glucose</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Blood glucose result?</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">Low</div>
+        <div class="flow-box action">Treat hypoglycemia per protocol, reassess — it can mimic a stroke</div>
+      </div>
+      <div>
+        <div class="branch-label">Normal</div>
+        <div class="flow-box action">Treat as a stroke — high-priority transport to a stroke-capable facility, avoid on-scene delay</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Spinal Motion Restriction Decision</h2>
+  <div class="diagram-card">
+    <div class="flow-box decision">Trauma with a mechanism that could involve the spine</div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box decision">Is the patient reliable? (alert, not intoxicated, no distracting injury)</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">No</div>
+        <div class="flow-box action">Spinal motion restriction indicated</div>
+      </div>
+      <div>
+        <div class="branch-label">Yes</div>
+        <div class="flow-box decision">Midline spinal tenderness or deformity?</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">Present</div>
+        <div class="flow-box action">Spinal motion restriction indicated</div>
+      </div>
+      <div>
+        <div class="branch-label">Absent</div>
+        <div class="flow-box decision">Numbness, tingling, or weakness in the extremities?</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-branch">
+      <div>
+        <div class="branch-label">Present</div>
+        <div class="flow-box action">Spinal motion restriction indicated</div>
+      </div>
+      <div>
+        <div class="branch-label">Absent</div>
+        <div class="flow-box">Spinal motion restriction generally not required — continue monitoring</div>
+      </div>
+    </div>
   </div>
 
   <h2>Adult BLS / CPR Sequence (no advanced airway)</h2>
