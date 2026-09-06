@@ -45,7 +45,15 @@
   }
   .play-btn:hover{background:#1c3350;}
   .play-btn:disabled{opacity:0.55;cursor:default;}
+  .play-btn.playing{background:var(--accent);}
+  .play-btn.playing:hover{background:#a8431f;}
   .play-btn .icon{font-size:12px;}
+  .link-out-btn{
+    display:inline-flex;align-items:center;gap:6px;background:var(--white);color:var(--navy);
+    border:1px solid var(--line);border-radius:20px;padding:8px 16px;font-size:13px;font-family:inherit;
+    text-decoration:none;transition:border-color .15s,color .15s;
+  }
+  .link-out-btn:hover{border-color:var(--accent);color:var(--accent);}
   .sound-card.unavailable{opacity:0.5;}
   .sound-card.unavailable .play-btn{background:var(--line);color:var(--muted);}
   .audio-error{font-size:12px;color:var(--bad);margin-top:8px;display:none;}
@@ -64,10 +72,11 @@
   .big-play-btn{
     width:88px;height:88px;border-radius:50%;border:none;background:var(--accent);color:var(--white);
     font-size:30px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
-    box-shadow:0 4px 14px rgba(193,80,46,0.35);transition:transform .12s;margin-bottom:10px;
+    box-shadow:0 4px 14px rgba(193,80,46,0.35);transition:transform .12s,background .15s;margin-bottom:10px;
   }
   .big-play-btn:hover{transform:scale(1.05);}
   .big-play-btn:disabled{opacity:0.5;cursor:default;transform:none;}
+  .big-play-btn.playing{background:var(--navy);}
   .quiz-hint{font-size:13px;color:var(--muted);margin-bottom:22px;}
   .quiz-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;}
   @media (max-width:480px){.quiz-choices{grid-template-columns:1fr;}}
@@ -115,12 +124,12 @@
   <p class="lede">Text can tell you a wheeze is "high-pitched and musical" and a crackle is "discrete and popping" — but that distinction only really locks in once you've actually heard both. Listen to real recorded breath sounds below, then test your ear in quiz mode.</p>
 
   <div class="notice">
-    <strong>A note on these recordings:</strong> the clips below are real auscultation recordings sourced from Wikimedia Commons (each individually credited and licensed CC BY-SA), not synthesized audio. Coverage is currently limited to the sound types where a properly licensed recording could be verified — more will be added over time.
+    <strong>A note on these recordings:</strong> the wheeze, crackles, and stridor clips are real auscultation recordings sourced from Wikimedia Commons (each individually credited and licensed CC BY-SA). Rhonchi and normal breath sounds aren't hosted here yet — instead, each links out to the Hawaii COPD Coalition's own lung sounds page so you can hear them directly from the source. Coverage is currently limited to the sound types where a properly licensed or directly-linked recording is available — more will be added over time.
   </div>
 
   <section id="listenSection">
     <h2>Listen &amp; Compare</h2>
-    <p class="section-sub">Click any card to hear the actual sound. Play them back to back — that's the fastest way to train your ear.</p>
+    <p class="section-sub">Click any card to hear the actual sound. Click again to stop it. Play them back to back — that's the fastest way to train your ear.</p>
     <div class="sound-grid" id="soundGrid"></div>
   </section>
 
@@ -131,7 +140,7 @@
   </section>
 
   <footer>
-    <p>Audio credits: recordings sourced from Wikimedia Commons contributors under CC BY-SA 3.0 — individual credits are shown next to each clip above. This trainer is a supplementary study aid; it is not a substitute for hands-on stethoscope practice with an instructor.</p>
+    <p>Audio credits: the wheeze, crackles, and stridor recordings are sourced from Wikimedia Commons contributors under CC BY-SA 3.0 — individual credits are shown next to each clip above. Rhonchi and normal breath sound recordings can be heard at the <a href="https://hawaiicopd.org/lung-sounds/" target="_blank" rel="noopener">Hawaii COPD Coalition's lung sounds page</a>. This trainer is a supplementary study aid; it is not a substitute for hands-on stethoscope practice with an instructor.</p>
   </footer>
 </div>
 
@@ -139,9 +148,11 @@
 
 <script>
 // Only sound categories with an actually-verified, appropriately-licensed source
-// recording are marked available:true. Categories without one still appear as
-// quiz answer choices (so the multiple choice makes sense) but are never the
-// correct answer and have no playable card in the Listen & Compare section.
+// recording hosted here are marked available:true and get an inline play button.
+// Categories with a linkOut instead point to where the sound can be heard directly
+// from its source rather than being rehosted here. Either way, all categories still
+// appear as quiz answer choices so the multiple choice makes sense, but only
+// available:true ones are ever the correct answer or playable inline.
 const SOUNDS = [
   {
     id: "wheeze",
@@ -174,6 +185,8 @@ const SOUNDS = [
     id: "rhonchi",
     label: "Rhonchi",
     available: false,
+    linkOut: "https://hawaiicopd.org/lung-sounds/",
+    linkLabel: "Listen at Hawaii COPD Coalition",
     description: "Low-pitched, continuous — often described as snoring or rattling. Heard in the larger airways.",
     clinical: "Caused by secretions or mucus in the larger bronchi. Common in pneumonia, chronic bronchitis, or when a patient just needs to cough. Unlike crackles, rhonchi can sometimes clear (or change character) after a productive cough."
   },
@@ -181,6 +194,8 @@ const SOUNDS = [
     id: "normal",
     label: "Normal Breath Sounds",
     available: false,
+    linkOut: "https://hawaiicopd.org/lung-sounds/",
+    linkLabel: "Listen at Hawaii COPD Coalition",
     description: "Soft, low-pitched, breezy — audible through most of both lung fields, quieter and shorter on expiration than inspiration.",
     clinical: "The baseline every abnormal sound is judged against. Knowing what normal actually sounds like is what makes an abnormal finding jump out in the first place."
   }
@@ -196,8 +211,10 @@ function renderListenSection(){
       ${s.available
         ? `<button type="button" class="play-btn" data-play="${s.id}"><span class="icon">&#9658;</span> Play clip</button>
            <div class="audio-error" id="err-${s.id}">Couldn't load this clip — check your connection and try again.</div>
-           <div class="credit-line">Recording via <a href="${s.creditUrl}" target="_blank" rel="noopener">Wikimedia Commons</a>, CC BY-SA 3.0</div>`
-        : `<button type="button" class="play-btn" disabled><span class="icon">&#9658;</span> Clip coming soon</button>`
+           ${s.creditUrl ? `<div class="credit-line">Recording via <a href="${s.creditUrl}" target="_blank" rel="noopener">Wikimedia Commons</a>, CC BY-SA 3.0</div>` : ''}`
+        : s.linkOut
+          ? `<a class="link-out-btn" href="${s.linkOut}" target="_blank" rel="noopener">${s.linkLabel} &#8599;</a>`
+          : `<button type="button" class="play-btn" disabled><span class="icon">&#9658;</span> Clip coming soon</button>`
       }
     </div>
   `).join('');
@@ -212,13 +229,40 @@ function renderListenSection(){
 }
 
 const player = document.getElementById('player');
+
 function playClip(sound, onError){
+  // Clicking the clip that's currently playing stops it instead of restarting it.
+  if (player.dataset.soundId === sound.id && !player.paused && !player.ended) {
+    player.pause();
+    return;
+  }
   const errEls = document.querySelectorAll('.audio-error');
   errEls.forEach(e => e.style.display = 'none');
+  player.dataset.soundId = sound.id;
   player.src = sound.audioUrl;
   player.play().catch(() => { if (onError) onError(); });
   player.onerror = () => { if (onError) onError(); };
 }
+
+function updatePlayButtons(){
+  document.querySelectorAll('.play-btn[data-play]').forEach(btn => {
+    const isPlaying = player.dataset.soundId === btn.dataset.play && !player.paused && !player.ended;
+    btn.classList.toggle('playing', isPlaying);
+    btn.innerHTML = isPlaying
+      ? '<span class="icon">&#9724;</span> Stop'
+      : '<span class="icon">&#9658;</span> Play clip';
+  });
+  const quizBtn = document.getElementById('quizPlayBtn');
+  if (quizBtn && quizState && quizState.current < quizState.rounds.length) {
+    const round = quizState.rounds[quizState.current];
+    const isPlaying = player.dataset.soundId === round.id && !player.paused && !player.ended;
+    quizBtn.innerHTML = isPlaying ? '&#9724;' : '&#9658;';
+    quizBtn.classList.toggle('playing', isPlaying);
+  }
+}
+player.addEventListener('play', updatePlayButtons);
+player.addEventListener('pause', updatePlayButtons);
+player.addEventListener('ended', updatePlayButtons);
 
 // --- Quiz mode ---
 const QUIZ_ROUNDS = 8;
@@ -262,7 +306,7 @@ function renderQuizRound(){
   box.innerHTML = `
     <div class="quiz-progress">Round ${quizState.current + 1} of ${quizState.rounds.length}<span class="quiz-score">Score: ${quizState.score}/${quizState.current}</span></div>
     <button type="button" class="big-play-btn" id="quizPlayBtn">&#9658;</button>
-    <div class="quiz-hint">Click to play the clip, then pick what you hear</div>
+    <div class="quiz-hint">Click to play the clip (click again to stop), then pick what you hear</div>
     <div class="quiz-choices" id="quizChoices">
       ${SOUNDS.map(s => `<button type="button" class="choice-btn" data-choice="${s.id}">${s.label}</button>`).join('')}
     </div>
