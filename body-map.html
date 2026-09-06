@@ -314,7 +314,7 @@ function materialFor(content){
 function loadModel(){
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  loader.load('assets/body3d.glb?v=c6f44e5', (gltf) => {
+  loader.load('assets/body3d.glb?v=hires1', (gltf) => {
     modelRoot = gltf.scene;
     modelRoot.traverse(obj => {
       if (!obj.isMesh) return;
@@ -324,11 +324,15 @@ function loadModel(){
       if (!groupKey) return;
       const content = GROUP_CONTENT[groupKey];
       if (!content) return;
+      if (!obj.geometry.attributes.normal) obj.geometry.computeVertexNormals();
       obj.material = materialFor(content);
       obj.userData.groupKey = groupKey;
+      obj.userData.kind = content.kind;
       obj.userData.baseColor = obj.material.color.getHex();
       obj.userData.baseEmissive = obj.material.emissive.getHex();
       obj.userData.baseEmissiveIntensity = obj.material.emissiveIntensity;
+      obj.userData.baseOpacity = obj.material.opacity;
+      obj.userData.baseTransparent = obj.material.transparent;
       obj.userData.isSkin = content.kind === 'skin';
       (meshByGroup[groupKey] = meshByGroup[groupKey] || []).push(obj);
       allPickable.push(obj);
@@ -439,12 +443,41 @@ function highlightGroup(groupKey){
   }
 }
 
+// Organs, vessels, and skin are the things that most often sit in front of
+// whatever you actually clicked, hiding it — so once something is selected,
+// fade every OTHER organ/vessel/skin mesh down to a ghost. Bones stay fully
+// solid throughout, since they rarely fully block a selection and keeping
+// them opaque preserves a stable frame of reference to orient by.
+const FADE_KINDS = new Set(['organ', 'vessel', 'skin']);
+const FADE_OPACITY = 0.1;
+
+function updateOcclusionFade(){
+  for (const m of allPickable) {
+    if (!FADE_KINDS.has(m.userData.kind)) continue;
+    const isSelected = selectedGroupKey && m.userData.groupKey === selectedGroupKey;
+    if (isSelected) {
+      m.material.transparent = m.userData.baseTransparent;
+      m.material.opacity = 1;
+      m.material.depthWrite = !m.userData.baseTransparent;
+    } else if (selectedGroupKey) {
+      m.material.transparent = true;
+      m.material.opacity = FADE_OPACITY;
+      m.material.depthWrite = false;
+    } else {
+      m.material.transparent = m.userData.baseTransparent;
+      m.material.opacity = m.userData.baseOpacity;
+      m.material.depthWrite = !m.userData.baseTransparent;
+    }
+  }
+}
+
 function selectGroup(groupKey){
   if (selectedGroupKey && meshByGroup[selectedGroupKey]) {
     for (const m of meshByGroup[selectedGroupKey]) resetMeshColor(m);
   }
   selectedGroupKey = groupKey;
   highlightGroup(groupKey);
+  updateOcclusionFade();
   const content = CONTENT_BY_KEY[groupKey];
   if (content) updateInfoPanel(content);
   flyToGroup(groupKey);
@@ -456,6 +489,7 @@ function clearSelection(){
     for (const m of meshByGroup[selectedGroupKey]) resetMeshColor(m);
   }
   selectedGroupKey = null;
+  updateOcclusionFade();
   document.getElementById('infoPanel').innerHTML = PLACEHOLDER_HTML;
   renderList();
 }
