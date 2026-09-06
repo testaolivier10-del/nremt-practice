@@ -175,9 +175,24 @@ const SCENARIOS = [
       },
       s1_tourniquet_good: {
         vitals: "HR 108 · BP 112/74 · RR 18",
-        text: "The tourniquet stops the bleeding completely. You note the time of application, treat him for shock, and prepare for rapid transport. His color is already looking better.",
+        text: "The tourniquet stops the bleeding completely. You note the time of application and his color is already looking better. A second bystander mentions he also hit his head on the curb before you arrived, but he seems alert and is answering questions clearly.",
         choices: [
-          { text: "Transport now, reassessing vitals en route", next: "s1_end_good" }
+          { text: "Quickly assess his mental status and pupils before moving him, then treat for shock and package for transport", next: "s1_secondary_good" },
+          { text: "Skip the head check since the leg is clearly the priority and load him now", next: "s1_secondary_skipped", consequence: "You get him loaded quickly, but a minute into transport he suddenly seems slower to answer than before — a head injury you never assessed for is now catching you off guard." }
+        ]
+      },
+      s1_secondary_skipped: {
+        vitals: "HR 112 · BP 108/70 · RR 18",
+        text: "You go back and check him now — pupils equal and reactive, oriented to person and place but slightly slow on time. Not clearly worse, but you can't be sure it isn't, since you have no baseline to compare to.",
+        choices: [
+          { text: "Document what you find now, monitor closely, and continue to the hospital", next: "s1_end_ok" }
+        ]
+      },
+      s1_secondary_good: {
+        vitals: "HR 106 · BP 114/74 · RR 16",
+        text: "Pupils equal and reactive, alert and oriented, no other injuries found. You have a clean baseline documented before he ever leaves the scene, in case anything changes en route.",
+        choices: [
+          { text: "Transport now, reassessing vitals and mental status en route", next: "s1_end_good" }
         ]
       },
       s1_tourniquet_late: {
@@ -187,8 +202,8 @@ const SCENARIOS = [
           { text: "Treat aggressively for shock, transport immediately, and request ALS intercept if available", next: "s1_end_ok" }
         ]
       },
-      s1_end_good: { ending: "good", text: "Bleeding controlled fast, shock never truly set in. This is close to a textbook run — the sequence (direct pressure → escalate to a tourniquet the moment pressure isn't keeping up → treat shock → transport) is exactly what kept him stable the whole way to the hospital." },
-      s1_end_ok: { ending: "neutral", text: "He survives, but the delay before the tourniquet went on meant he needed blood products and a longer ICU stay than he otherwise would have. Severe arterial bleeding needs a tourniquet the moment direct pressure stops keeping up — not several more minutes of hoping it will." },
+      s1_end_good: { ending: "good", text: "Bleeding controlled fast, shock never truly set in, and a proper head-to-toe caught nothing missed before transport. This is close to a textbook run — the sequence (direct pressure → escalate to a tourniquet the moment pressure isn't keeping up → secondary assessment → treat shock → transport) is exactly what kept him stable the whole way to the hospital." },
+      s1_end_ok: { ending: "neutral", text: "He survives, but either the delay before the tourniquet or the skipped baseline assessment meant a rougher trip than it needed to be — extra blood products, a longer ICU stay, or a late catch on a head injury with no baseline to compare against. Severe arterial bleeding needs a tourniquet the moment direct pressure stops keeping up, and a patient with a reported head strike needs a baseline exam before he's loaded, not after something changes." },
       s1_end_bad: { ending: "bad", text: "By the time you finally escalate to a tourniquet, he's unresponsive and critically hypotensive. He's still alive when you reach the hospital, but only barely. Uncontrolled severe bleeding is one of the most preventable causes of death in trauma — preventable specifically by not waiting." }
     }
   },
@@ -239,16 +254,31 @@ const SCENARIOS = [
       },
       s2_meds_good: {
         vitals: "HR 90 · BP 128/82 · Pain 5/10",
-        text: "Aspirin given, BP checked and adequate, nitro assisted per protocol. Her pain eases. You get a 12-lead if trained and equipped, and prepare for transport.",
+        text: "Aspirin given, BP checked and adequate, nitro assisted per protocol. Her pain eases somewhat but she is still uncomfortable. You have a 12-lead monitor in the rig.",
+        choices: [
+          { text: "Acquire a 12-lead ECG before moving her and transmit it ahead to the receiving hospital", next: "s2_ecg_good" },
+          { text: "Skip the 12-lead since her pain is already improving and just transport", next: "s2_ecg_skipped", consequence: "You load her without a 12-lead. At the hospital the crew has to acquire one cold, with no pre-arrival notification — a STEMI alert that could have started the moment you left the scene instead starts only once she's already in the door." }
+        ]
+      },
+      s2_ecg_good: {
+        vitals: "HR 88 · BP 126/80 · Pain 4/10",
+        text: "The 12-lead shows changes concerning for a possible STEMI. You transmit it to the receiving hospital, which activates their cath lab team before she even arrives.",
         choices: [
           { text: "Transport promptly, avoiding unnecessary lights-and-siren stress, reassessing en route", next: "s2_end_good" }
+        ]
+      },
+      s2_ecg_skipped: {
+        vitals: "HR 92 · BP 124/80 · Pain 5/10",
+        text: "You transport without the early 12-lead. She arrives stable, but precious minutes are lost before the cath lab team is even activated.",
+        choices: [
+          { text: "Transport promptly", next: "s2_end_ok" }
         ]
       },
       s2_meds_outoforder: {
         vitals: "HR 102 · BP 96/64 · Pain 7/10, lightheaded",
         text: "You catch the mistake and hold further nitro since her pressure has dropped. She's shaken by the dizziness but stabilizes somewhat.",
         choices: [
-          { text: "Treat supportively and transport promptly", next: "s2_end_ok" },
+          { text: "Treat supportively, get a 12-lead once her pressure allows, and transport promptly", next: "s2_end_ok" },
           { text: "Give another dose of nitro to try to fully resolve the pain despite her dizziness", next: "s2_end_bad" }
         ]
       },
@@ -256,11 +286,11 @@ const SCENARIOS = [
         vitals: "HR 96 · BP 122/80 · Pain 6/10",
         text: "Medications given correctly this time, though she's more distressed overall than she needed to be given the earlier walk.",
         choices: [
-          { text: "Transport promptly", next: "s2_end_ok" }
+          { text: "Get a 12-lead and transport promptly", next: "s2_end_ok" }
         ]
       },
-      s2_end_good: { ending: "good", text: "Every step matched protocol: appropriate oxygen, aspirin, nitro only after confirming her pressure could tolerate it, and a smooth, low-stress transport. This is the version of this call that goes right." },
-      s2_end_ok: { ending: "neutral", text: "She makes it to the hospital and stabilizes, but a couple of avoidable missteps — added exertion, a medication given before confirming it was safe — made the call rougher than it needed to be. None of it was catastrophic, but each one was worth not repeating." },
+      s2_end_good: { ending: "good", text: "Every step matched protocol: appropriate oxygen, aspirin, nitro only after confirming her pressure could tolerate it, an early transmitted 12-lead, and a smooth, low-stress transport. This is the version of this call that goes right — the cath lab is ready before she even arrives." },
+      s2_end_ok: { ending: "neutral", text: "She makes it to the hospital and stabilizes, but a couple of avoidable missteps — added exertion, a medication given before confirming it was safe, or a skipped early 12-lead — made the call rougher or slower than it needed to be. None of it was catastrophic, but each one was worth not repeating." },
       s2_end_bad: { ending: "bad", text: "Another dose drops her blood pressure further — she becomes frankly hypotensive and near-syncopal before you reach the hospital. Nitroglycerin's blood-pressure threshold isn't arbitrary: repeat dosing when a patient is already showing a BP drop can turn a treatable chest pain call into a hemodynamic emergency." }
     }
   },
@@ -307,9 +337,17 @@ const SCENARIOS = [
       s3_full_obstruction_good: {
         text: "You alternate back blows and chest thrusts. After the third cycle, a grape pops free and she takes a huge, gasping breath, then starts crying loudly.",
         choices: [
-          { text: "Reassess her breathing and transport for evaluation", next: "s3_end_good" }
+          { text: "Recheck her airway and breathing before deciding on transport", next: "s3_recheck_good" }
         ]
       },
+      s3_recheck_good: {
+        text: "Her cry is strong and her color returns to normal within a minute. Her father is understandably shaken and asks if she really needs to go to the hospital now that she seems fine.",
+        choices: [
+          { text: "Explain that any child who had a complete obstruction should still be evaluated, and transport for evaluation", next: "s3_end_good" },
+          { text: "Agree she looks fine now and let the father keep her home without transport", next: "s3_end_ok_no_transport", consequence: "She does seem fine in the moment, but a piece of the grape could still be lodged lower in the airway, or she may have aspirated during the episode — either can cause problems hours later with no transport and no one watching for it." }
+        ]
+      },
+      s3_end_ok_no_transport: { ending: "neutral", text: "She likely will be fine, but skipping transport after a true complete airway obstruction removes the safety net of a hospital evaluation. Even a child who looks completely recovered after choking should be seen — a retained fragment or aspiration event doesn't always announce itself right away." },
       s3_full_obstruction_delayed: {
         text: "You continue cycles of back blows and chest thrusts. She still hasn't cleared the object, and she suddenly goes limp and stops responding.",
         choices: [
@@ -317,7 +355,7 @@ const SCENARIOS = [
           { text: "Keep doing back blows and chest thrusts the same way as before, since that's what you'd already started", next: "s3_end_bad" }
         ]
       },
-      s3_end_good: { ending: "good", text: "Textbook sequence: let an effective cough do its job, recognize the exact moment it becomes a complete obstruction, and act immediately once it does. She never went more than a few seconds without some air movement." },
+      s3_end_good: { ending: "good", text: "Textbook sequence: let an effective cough do its job, recognize the exact moment it becomes a complete obstruction, act immediately once it does, recheck her afterward, and still transport for evaluation despite how well she looked. She never went more than a few seconds without some air movement, and nothing about the episode goes unassessed." },
       s3_end_ok: { ending: "neutral", text: "You catch the transition to unresponsiveness and switch approach correctly — the object finally clears and she starts breathing again. It took longer than the best-case run because of an earlier misstep, but recognizing when the approach needs to change is exactly the skill this scenario is testing." },
       s3_end_bad: { ending: "bad", text: "Once a choking child becomes unresponsive, the approach has to change — CPR-style compressions with a look in the mouth before each rescue breath attempt, not continued back blows and thrusts on a limp child. Missing that transition costs critical time she doesn't have." }
     }
@@ -379,9 +417,23 @@ const SCENARIOS = [
       },
       s4_oralglucose_good: {
         vitals: "Glucose 92 mg/dL",
-        text: "Within a few minutes, his confusion clears noticeably. He's now alert, oriented, and a little embarrassed about the scene.",
+        text: "Within a few minutes, his confusion clears noticeably. He's now alert, oriented, and a little embarrassed about the scene. He tells you he feels completely fine now and wants to just sign a refusal and skip the hospital.",
         choices: [
-          { text: "Recheck glucose, monitor, and transport for evaluation", next: "s4_end_good" }
+          { text: "Recheck his glucose again in a few minutes, explain the risk of it dropping again, and strongly recommend transport", next: "s4_refusal_handled_good" },
+          { text: "Accept the refusal immediately since he's alert and clearly back to normal", next: "s4_refusal_rushed", consequence: "You didn't recheck his glucose or walk him through what could happen if it drops again once the glucose gel wears off. A rushed refusal on a patient who was just altered, without a second glucose check or a clear risk conversation, is a real liability and a real risk to him." }
+        ]
+      },
+      s4_refusal_handled_good: {
+        vitals: "Glucose 96 mg/dL",
+        text: "His repeat glucose is stable. You explain clearly that hypoglycemia can recur, especially since he still hasn't eaten a real meal, and that transport is strongly recommended. He agrees to go to be evaluated and eat something under observation.",
+        choices: [
+          { text: "Transport for evaluation, monitoring glucose en route", next: "s4_end_good" }
+        ]
+      },
+      s4_refusal_rushed: {
+        text: "He signs the refusal and you clear the scene. You never confirmed a second glucose reading stayed up, and he still hasn't eaten anything solid.",
+        choices: [
+          { text: "Document the refusal and clear", next: "s4_end_ok" }
         ]
       },
       s4_oralglucose_okay: {
@@ -391,9 +443,314 @@ const SCENARIOS = [
           { text: "Recheck glucose, monitor closely, and transport", next: "s4_end_ok" }
         ]
       },
-      s4_end_good: { ending: "good", text: "You caught the real cause fast, confirmed he could safely swallow, treated it correctly, and watched him return to his normal self within minutes. \"Diabetic, confused, hasn't eaten\" is one of the most reliably fixable presentations you'll see in the field — this is exactly why it should jump out immediately." },
-      s4_end_ok: { ending: "neutral", text: "He recovers, but the path there was rougher than it had to be — either lost time from an early wrong assumption, or a real (if minor) airway risk taken along the way. The underlying rule still held: confirm a patient can safely protect their airway before anything goes by mouth, every time." },
+      s4_end_good: { ending: "good", text: "You caught the real cause fast, confirmed he could safely swallow, treated it correctly, rechecked before accepting anything from him, and made sure he understood the real risk of a rebound episode before agreeing to go in. \"Diabetic, confused, hasn't eaten\" is one of the most reliably fixable presentations you'll see in the field — this is exactly why it should jump out immediately, and why the job isn't done the moment he looks better." },
+      s4_end_ok: { ending: "neutral", text: "He recovers, but the path there was rougher than it had to be — either lost time from an early wrong assumption, a real (if minor) airway risk taken along the way, or a refusal accepted without confirming his glucose would actually hold. The underlying rule still held: confirm a patient can safely protect their airway before anything goes by mouth, and confirm a recovering hypoglycemic patient is actually stable before you let them decline care." },
       s4_end_bad: { ending: "bad", text: "A shortcut on a real safety check turned a fixable hypoglycemic emergency into an actual airway emergency. \"Can he safely swallow\" isn't a formality — skipping it isn't a shortcut, it's a real risk to the patient." }
+    }
+  },
+  {
+    id: "s5",
+    title: "Anaphylaxis at a Backyard Barbecue",
+    domain: "Allergic & Immunologic",
+    blurb: "A bee sting, a peanut allergy nobody double-checked, and a throat that's starting to feel tight.",
+    startNode: "s5_start",
+    nodes: {
+      s5_start: {
+        vitals: "HR 110 · BP 122/78 · SpO2 96%",
+        text: "A 16-year-old boy at a backyard party says he thinks he ate something with peanuts in it about ten minutes ago. He has hives spreading across his arms and chest and says his throat \"feels tight.\" He has a prescribed epinephrine auto-injector in his pocket but hasn't used it yet.",
+        choices: [
+          { text: "Assess his airway and breathing while asking about known allergies and prior reactions", next: "s5_assess_good" },
+          { text: "Have him lie down and wait to see if the hives get worse before doing anything", next: "s5_wait_bad", consequence: "Waiting to \"see if it gets worse\" on a patient already reporting throat tightness after a known allergen exposure burns time you don't have — this can progress to full airway swelling within minutes." },
+          { text: "Give him a dose of oral antihistamine from the party's first aid kit and monitor", next: "s5_antihistamine_bad", consequence: "An oral antihistamine does nothing for the airway swelling and cardiovascular effects of true anaphylaxis, and it does nothing quickly even for the hives — it's not a substitute for epinephrine when there are signs of a systemic allergic reaction." }
+        ]
+      },
+      s5_wait_bad: {
+        vitals: "HR 122 · BP 116/74 · SpO2 93%",
+        text: "A minute later his voice sounds noticeably more hoarse and he's starting to look anxious and short of breath.",
+        choices: [
+          { text: "Recognize anaphylaxis and administer his epinephrine auto-injector immediately", next: "s5_epi_late" }
+        ]
+      },
+      s5_antihistamine_bad: {
+        vitals: "HR 124 · BP 112/70 · SpO2 92%",
+        text: "The antihistamine hasn't helped at all — his throat tightness and hoarseness are getting worse.",
+        choices: [
+          { text: "Stop delaying and administer his epinephrine auto-injector now", next: "s5_epi_late" }
+        ]
+      },
+      s5_assess_good: {
+        vitals: "HR 112 · BP 120/76 · SpO2 95%",
+        text: "He confirms a known peanut allergy and says this feels like his past reactions, only worse. Hives, throat tightness, and a known allergen exposure — this meets criteria for anaphylaxis.",
+        choices: [
+          { text: "Administer his epinephrine auto-injector into the outer thigh right away", next: "s5_epi_good" },
+          { text: "Call medical control to ask permission before using his prescribed auto-injector", next: "s5_delay_call", consequence: "This is a life threat with a patient's own prescribed epinephrine right there — most protocols don't require an online call before assisting with a patient's own auto-injector, and the extra minutes spent on the phone let his airway symptoms progress." }
+        ]
+      },
+      s5_delay_call: {
+        vitals: "HR 120 · BP 112/72 · SpO2 92%",
+        text: "By the time you get through, his voice is noticeably more hoarse. You get authorization and finally administer the epinephrine.",
+        choices: [
+          { text: "Administer the epinephrine now and reassess closely", next: "s5_epi_late" }
+        ]
+      },
+      s5_epi_good: {
+        vitals: "HR 104 · BP 128/80 · SpO2 98%",
+        text: "Within a couple of minutes his breathing eases, the hoarseness resolves, and his hives start to fade. You continue high-flow oxygen and prepare for transport, watching closely for a rebound reaction.",
+        choices: [
+          { text: "Transport promptly, monitoring for a possible biphasic reaction en route", next: "s5_transport_good" }
+        ]
+      },
+      s5_epi_late: {
+        vitals: "HR 116 · BP 118/74 · SpO2 94%",
+        text: "The epinephrine helps, but improvement is slower and less complete than it likely would have been with an earlier dose. His hoarseness improves but doesn't fully resolve.",
+        choices: [
+          { text: "Reassess in a couple of minutes and prepare a second dose if he doesn't improve further", next: "s5_reassess_needed" }
+        ]
+      },
+      s5_reassess_needed: {
+        vitals: "HR 118 · BP 114/72 · SpO2 93%",
+        text: "He's still hoarse and anxious with only partial improvement.",
+        choices: [
+          { text: "Administer a second dose of epinephrine per protocol and transport emergently", next: "s5_transport_ok" },
+          { text: "Wait longer to see if the first dose fully kicks in before giving another", next: "s5_end_bad" }
+        ]
+      },
+      s5_transport_good: {
+        text: "He remains stable throughout transport, and the receiving hospital is ready to observe him for the biphasic reaction that can follow anaphylaxis hours later.",
+        choices: [
+          { text: "Hand off a full report, including the time of epinephrine administration", next: "s5_end_good" }
+        ]
+      },
+      s5_transport_ok: {
+        text: "The second dose finally resolves his airway symptoms. He's shaken but stable by the time you reach the hospital.",
+        choices: [
+          { text: "Hand off a full report and continue monitoring", next: "s5_end_ok" }
+        ]
+      },
+      s5_end_good: { ending: "good", text: "You recognized anaphylaxis immediately from the combination of a known allergen, hives, and airway symptoms, treated with epinephrine without unnecessary delay, and transported with an eye toward the biphasic reaction risk. This is the sequence that keeps a severe allergic reaction from ever becoming an airway emergency." },
+      s5_end_ok: { ending: "neutral", text: "He recovers, but a delay before the first dose of epinephrine — whether from waiting, trying an antihistamine first, or stopping to call for permission — meant his airway symptoms had more time to progress before treatment caught up, and a second dose was needed to finish the job. Epinephrine is the first-line treatment for anaphylaxis, not a last resort after other things are tried." },
+      s5_end_bad: { ending: "bad", text: "Waiting for the first dose to \"fully kick in\" instead of reassessing and re-dosing per protocol let his airway symptoms continue to worsen. Anaphylaxis can progress fast, and a partial response to epinephrine is a reason to reassess and re-treat, not a reason to wait longer." }
+    }
+  },
+  {
+    id: "s6",
+    title: "Sudden Cardiac Arrest at the Gym",
+    domain: "Cardiac Arrest & Resuscitation",
+    blurb: "A man collapses mid-workout. Compressions and an AED are the whole ballgame — if you don't waste the first minute.",
+    startNode: "s6_start",
+    nodes: {
+      s6_start: {
+        text: "You arrive to find a 52-year-old man collapsed on the gym floor. A bystander is standing over him, unsure what to do. He is unresponsive.",
+        choices: [
+          { text: "Check for responsiveness and breathing at the same time you check for a pulse, and call for the AED immediately", next: "s6_check_good" },
+          { text: "Spend a full minute checking his medical history with bystanders before touching him", next: "s6_delay_bad", consequence: "Every second without compressions or defibrillation in cardiac arrest lowers his odds of survival. History can be gathered later — it is never the first priority in an unresponsive, possibly pulseless patient." },
+          { text: "Immediately begin rescue breaths without checking for a pulse or breathing first", next: "s6_skip_check_bad", consequence: "Skipping the pulse and breathing check means you don't actually know yet whether this is a respiratory problem or a cardiac arrest — and you've delayed starting compressions, which is what he actually needs right now." }
+        ]
+      },
+      s6_delay_bad: {
+        text: "A bystander finally gets you a defibrillator while you're still asking questions. You realize you've lost valuable time and check him now — no pulse, no breathing.",
+        choices: [
+          { text: "Begin high-quality chest compressions immediately and apply the AED as soon as it arrives", next: "s6_cpr_late" }
+        ]
+      },
+      s6_skip_check_bad: {
+        text: "Your rescue breaths aren't producing visible chest rise, and you realize you never actually confirmed he has a pulse. You check now — no pulse, no breathing.",
+        choices: [
+          { text: "Stop rescue breaths and begin chest compressions immediately, and call for an AED", next: "s6_cpr_late" }
+        ]
+      },
+      s6_check_good: {
+        text: "He's unresponsive, not breathing normally, and you can't feel a pulse within ten seconds. A staff member is already bringing the gym's AED.",
+        choices: [
+          { text: "Begin high-quality chest compressions immediately while waiting for the AED", next: "s6_cpr_good" }
+        ]
+      },
+      s6_cpr_good: {
+        text: "You deliver compressions at an adequate rate and depth, allowing full chest recoil between compressions. The AED arrives within a minute.",
+        choices: [
+          { text: "Apply the AED pads immediately, minimizing interruptions to compressions, and follow its prompts", next: "s6_aed_good" },
+          { text: "Continue compressions for several more minutes before bothering with the AED", next: "s6_aed_delayed", consequence: "Early defibrillation for a shockable rhythm dramatically improves survival odds — delaying AED application once it's available and ready wastes one of the most time-sensitive interventions in the whole call." }
+        ]
+      },
+      s6_cpr_late: {
+        text: "You start compressions now, later than ideal. The AED becomes available shortly after.",
+        choices: [
+          { text: "Apply the AED immediately with minimal interruption to compressions", next: "s6_aed_good" }
+        ]
+      },
+      s6_aed_delayed: {
+        text: "You finally apply the AED. It analyzes and advises a shock.",
+        choices: [
+          { text: "Ensure everyone is clear and deliver the shock, then resume compressions immediately", next: "s6_shock_late" }
+        ]
+      },
+      s6_aed_good: {
+        text: "The AED analyzes the rhythm and advises a shock. Everyone is clear.",
+        choices: [
+          { text: "Deliver the shock, then immediately resume chest compressions without checking for a pulse first", next: "s6_shock_good" },
+          { text: "Check for a pulse right after the shock before resuming compressions", next: "s6_pulse_check_delay", consequence: "Checking for a pulse immediately after a shock delays the resumption of compressions — post-shock, the correct move is to resume CPR right away and let the AED reassess the rhythm at its next scheduled interval, not to pause for a manual pulse check." }
+        ]
+      },
+      s6_pulse_check_delay: {
+        text: "You lose several seconds feeling for a pulse you can't confidently find, delaying the resumption of compressions.",
+        choices: [
+          { text: "Resume compressions now and let the AED reanalyze at its next interval", next: "s6_shock_late" },
+          { text: "Keep trying to find a definite pulse before restarting compressions", next: "s6_end_bad", consequence: "Continuing to search for a pulse you can't confidently feel, instead of resuming compressions, leaves him without circulation support for far longer than protocol allows — when a pulse check is inconclusive within about ten seconds, the correct move is always to resume compressions, not keep searching." }
+        ]
+      },
+      s6_shock_good: {
+        text: "Compressions resume within seconds of the shock. Two minutes later, the AED reanalyzes and no further shock is advised — he starts to gasp, then breathe on his own, and begins moving his arms.",
+        choices: [
+          { text: "Reassess breathing and pulse, and prepare for immediate transport with continued monitoring", next: "s6_end_good" }
+        ]
+      },
+      s6_shock_late: {
+        text: "Compressions resume, but with the earlier delays factored in, it takes several more cycles before the AED shows a perfusing rhythm and he starts to breathe on his own.",
+        choices: [
+          { text: "Reassess breathing and pulse, and prepare for transport with continued monitoring", next: "s6_end_ok" }
+        ]
+      },
+      s6_end_good: { ending: "good", text: "Immediate recognition, compressions started within seconds, minimal hands-off time around defibrillation, and no unnecessary pause for a pulse check after the shock. This is the sequence — early CPR plus early defibrillation with minimal interruptions — that actually drives survival in witnessed cardiac arrest." },
+      s6_end_ok: { ending: "neutral", text: "He achieves return of spontaneous circulation, but earlier delays — in starting compressions, in applying the AED, or in pausing to check a pulse right after a shock — meant more total time without a perfusing rhythm than the best-case run. In cardiac arrest, minutes without compressions or defibrillation are minutes his brain and heart don't get, even if the eventual outcome looks similar on paper." },
+      s6_end_bad: { ending: "bad", text: "Extended delays before compressions and defibrillation meant far more total downtime than necessary. Every element of high-performance CPR — early recognition, early compressions, early defibrillation, minimal interruptions — exists because each one measurably changes survival odds." }
+    }
+  },
+  {
+    id: "s7",
+    title: "Wandering Elderly Patient with Slurred Speech",
+    domain: "Neurologic Emergencies",
+    blurb: "A stroke looks a lot like \"just confused\" right up until it doesn't.",
+    startNode: "s7_start",
+    nodes: {
+      s7_start: {
+        vitals: "HR 88 · BP 168/94 · SpO2 97%",
+        text: "A 74-year-old woman was found by a neighbor wandering her yard in her nightgown, speech slurred, right arm hanging at her side. Her family isn't home and no one can immediately say when she was last seen normal.",
+        choices: [
+          { text: "Perform a rapid stroke screen (face, arm, speech) and get an exact last-known-well time from any available source", next: "s7_fast_good" },
+          { text: "Assume she's just disoriented from age and focus on getting her comfortable before assessing further", next: "s7_assume_bad", consequence: "Slurred speech and one-sided arm weakness are classic stroke signs, not just \"disorientation.\" Dismissing them as normal aging costs precious time in a condition where time directly determines treatment options and outcome." },
+          { text: "Check her blood glucose first, since altered mental status could just be low blood sugar", next: "s7_glucose_first", consequence: "Checking glucose isn't wrong on its own, but doing it before a rapid stroke screen delays recognizing time-critical stroke signs that are visible immediately just by looking and listening to her." }
+        ]
+      },
+      s7_assume_bad: {
+        vitals: "HR 90 · BP 172/96 · SpO2 96%",
+        text: "By the time you actually look closely, you notice her right arm truly won't lift and her face droops slightly on the right side.",
+        choices: [
+          { text: "Perform the stroke screen now and try to establish a last-known-well time", next: "s7_fast_late" }
+        ]
+      },
+      s7_glucose_first: {
+        vitals: "Glucose 104 mg/dL · HR 88 · BP 170/94",
+        text: "Her glucose is normal. You've ruled out one cause but lost time before assessing for the more likely one.",
+        choices: [
+          { text: "Now perform a rapid stroke screen and try to establish a last-known-well time", next: "s7_fast_late" }
+        ]
+      },
+      s7_fast_good: {
+        vitals: "HR 88 · BP 168/94 · SpO2 97%",
+        text: "Facial droop on the right, right arm drifts down when raised, and speech is clearly slurred — positive stroke screen. The neighbor says she saw her gardening normally about 40 minutes ago, giving you a reasonably tight last-known-well time.",
+        choices: [
+          { text: "Notify the receiving hospital of a stroke alert with the last-known-well time, and transport promptly to an appropriate stroke center", next: "s7_transport_good" },
+          { text: "Spend extra time on scene trying to get a full medical history before moving her", next: "s7_scene_delay", consequence: "For a time-critical stroke, extended scene time to gather a full history that can be obtained en route or from family at the hospital works against her — \"time is brain,\" and every extra minute on scene is a minute treatment is delayed." }
+        ]
+      },
+      s7_fast_late: {
+        vitals: "HR 92 · BP 176/98 · SpO2 96%",
+        text: "You get a positive stroke screen and a rough last-known-well time, though with less certainty and more time already elapsed than the best-case scenario.",
+        choices: [
+          { text: "Notify the receiving hospital of a stroke alert and transport promptly", next: "s7_transport_ok" }
+        ]
+      },
+      s7_scene_delay: {
+        vitals: "HR 90 · BP 174/96 · SpO2 96%",
+        text: "You finally load her after several extra minutes spent on scene.",
+        choices: [
+          { text: "Notify the hospital now and transport", next: "s7_transport_ok" }
+        ]
+      },
+      s7_transport_good: {
+        text: "The stroke team is mobilized before she even arrives, with a clear last-known-well time already in hand. Every minute saved here is a minute closer to potential treatment eligibility.",
+        choices: [
+          { text: "Reassess her stroke signs en route and hand off a clear, complete report", next: "s7_end_good" }
+        ]
+      },
+      s7_transport_ok: {
+        text: "The hospital is notified, but with less lead time and a less precise last-known-well time than the best-case run.",
+        choices: [
+          { text: "Reassess en route and hand off a report", next: "s7_end_ok" }
+        ]
+      },
+      s7_end_good: { ending: "good", text: "Rapid recognition, an accurate last-known-well time, and immediate transport with early hospital notification all preserved the treatment window as much as possible. In stroke care, minutes saved before the hospital door can be the difference between treatment options being available or not — this is the sequence that protects that window." },
+      s7_end_ok: { ending: "neutral", text: "She reaches an appropriate facility, but delays — assuming her symptoms were something else, checking glucose before screening for stroke, or spending extra time on scene — narrowed her treatment window more than necessary. \"Time is brain\" isn't a slogan; every extra minute before recognition and transport is a minute that can move a patient out of eligibility for certain treatments." }
+    }
+  },
+  {
+    id: "s8",
+    title: "Opioid Overdose Behind a Convenience Store",
+    domain: "Toxicology & Overdose",
+    blurb: "Slow, shallow breathing behind a dumpster, and a naloxone dose that has more to it than just \"give it.\"",
+    startNode: "s8_start",
+    nodes: {
+      s8_start: {
+        vitals: "HR 58 · RR 4 · SpO2 82%",
+        text: "Bystanders flag you down to a 30-year-old man slumped behind a convenience store, needle nearby, breathing about four times a minute and barely responsive to a sternal rub. His lips have a bluish tint.",
+        choices: [
+          { text: "Open his airway and begin assisting ventilations with a bag-valve mask while preparing naloxone", next: "s8_bvm_good" },
+          { text: "Administer naloxone immediately and wait to see if he starts breathing better on his own", next: "s8_naloxone_only", consequence: "He is barely breathing right now — four breaths a minute with an SpO2 of 82% is not survivable for long. Naloxone takes a couple of minutes to take effect at best; a patient this hypoxic needs ventilatory support started immediately, not after a delay waiting on a drug to work." },
+          { text: "Just place him in the recovery position and monitor, since he's technically still breathing", next: "s8_recovery_bad", consequence: "Four breaths a minute with an oxygen saturation in the low 80s is severe respiratory depression, not adequate breathing that just needs positioning. Without ventilatory support this level of hypoventilation can progress to full respiratory arrest quickly." }
+        ]
+      },
+      s8_naloxone_only: {
+        vitals: "HR 60 · RR 3 · SpO2 76%",
+        text: "His breathing gets even slower while you wait, and his oxygen saturation continues to drop.",
+        choices: [
+          { text: "Stop waiting and begin bag-valve mask ventilations right away", next: "s8_bvm_late" }
+        ]
+      },
+      s8_recovery_bad: {
+        vitals: "HR 56 · RR 2 · SpO2 71%",
+        text: "His breathing slows further and becomes irregular. This is progressing toward respiratory arrest.",
+        choices: [
+          { text: "Open his airway and begin bag-valve mask ventilations immediately", next: "s8_bvm_late" }
+        ]
+      },
+      s8_bvm_good: {
+        vitals: "HR 62 · RR (assisted) · SpO2 90%",
+        text: "Assisted ventilations bring his oxygen saturation up quickly. With his airway and breathing supported, you now have time to give naloxone without it being the only thing standing between him and further hypoxia.",
+        choices: [
+          { text: "Administer naloxone via the route available to you while continuing to support ventilations", next: "s8_naloxone_good" },
+          { text: "Skip naloxone entirely now that his oxygen saturation looks better with bagging alone", next: "s8_no_naloxone", consequence: "Bagging supports his oxygenation for now, but it doesn't reverse the underlying opioid effect causing his respiratory depression — without naloxone, he'll likely need continuous ventilatory support all the way to the hospital instead of starting to breathe adequately on his own." }
+        ]
+      },
+      s8_bvm_late: {
+        vitals: "HR 64 · RR (assisted) · SpO2 88%",
+        text: "Ventilations bring his saturation back up, later than ideal, but recovering. You still need to address the underlying cause.",
+        choices: [
+          { text: "Administer naloxone while continuing to support ventilations", next: "s8_naloxone_late" }
+        ]
+      },
+      s8_naloxone_good: {
+        vitals: "HR 78 · RR 14 · SpO2 96%",
+        text: "Within a couple of minutes, his own respiratory drive returns and he starts breathing adequately on his own. He becomes more responsive, though groggy and disoriented.",
+        choices: [
+          { text: "Continue reassessing his airway and breathing closely, and prepare for transport, watching for the naloxone wearing off before the opioid does", next: "s8_end_good" }
+        ]
+      },
+      s8_no_naloxone: {
+        vitals: "HR 66 · RR (assisted) · SpO2 92%",
+        text: "You continue bagging him all the way to the point of realizing he isn't going to start breathing adequately on his own without reversing the opioid effect.",
+        choices: [
+          { text: "Give naloxone now and continue supporting ventilations until it takes effect", next: "s8_naloxone_late" }
+        ]
+      },
+      s8_naloxone_late: {
+        vitals: "HR 76 · RR 12 · SpO2 94%",
+        text: "His breathing improves and he becomes more responsive, though the overall episode of hypoxia lasted longer than the best-case run.",
+        choices: [
+          { text: "Reassess closely and prepare for transport, watching for re-sedation as the naloxone wears off", next: "s8_end_ok" }
+        ]
+      },
+      s8_end_good: { ending: "good", text: "Ventilatory support came first, buying time for the naloxone to work without oxygenation depending entirely on it — and once his own breathing returned, you kept watching for the naloxone wearing off before the longer-acting opioid does, since re-sedation on the way to the hospital is a real risk. This is the sequence that treats the actual emergency (he isn't breathing enough) rather than just the cause of it." },
+      s8_end_ok: { ending: "neutral", text: "He recovers, but a longer period of severe hypoxia than necessary — from waiting on naloxone alone, from treating recovery position as sufficient, or from delaying naloxone once bagging was already underway — meant more physiologic stress than the best-case run. Airway and breathing come before reversal agents; a patient who isn't breathing adequately needs ventilatory support started immediately, with naloxone as an addition to that, not a replacement for it." }
     }
   }
 ];
