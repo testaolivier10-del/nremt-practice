@@ -43,7 +43,47 @@
   .toc-sections a{font-size:13px;color:var(--muted);text-decoration:none;}
   .toc-sections a:hover{color:var(--accent);text-decoration:underline;}
 
-  .chapter{margin-bottom:48px;}
+  .chapter-rail{position:fixed;z-index:60;}
+  @media (min-width:1150px){
+    .chapter-rail{right:22px;top:50%;transform:translateY(-50%);}
+    .chapter-rail .rail-toggle{display:none;}
+    .chapter-rail .rail-list{
+      display:flex;flex-direction:column;align-items:center;gap:4px;
+      max-height:82vh;overflow-y:auto;padding:10px 6px;
+      background:var(--white);border:1px solid var(--line);border-radius:20px;
+      box-shadow:0 2px 12px rgba(18,32,51,0.10);
+    }
+  }
+  @media (max-width:1149.98px){
+    .chapter-rail{right:16px;bottom:16px;}
+    .chapter-rail .rail-toggle{
+      width:46px;height:46px;border-radius:50%;border:1px solid var(--line);
+      background:var(--white);color:var(--navy);font-family:'SFMono-Regular',monospace;
+      font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 3px 14px rgba(18,32,51,0.18);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .chapter-rail .rail-list{
+      display:none;position:absolute;bottom:54px;right:0;
+      flex-direction:column;align-items:center;gap:4px;
+      max-height:56vh;overflow-y:auto;padding:10px 6px;
+      background:var(--white);border:1px solid var(--line);border-radius:16px;
+      box-shadow:0 3px 18px rgba(18,32,51,0.22);
+    }
+    .chapter-rail.open .rail-list{display:flex;}
+  }
+  .rail-list::-webkit-scrollbar{width:4px;}
+  .rail-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px;}
+  .rail-btn{
+    width:26px;height:26px;flex-shrink:0;border-radius:50%;border:1px solid var(--line);
+    background:var(--paper);color:var(--muted);font-family:'SFMono-Regular',monospace;font-size:10px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s,color .15s;
+    padding:0;
+  }
+  .rail-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .rail-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+  .rail-btn.rail-top{font-size:13px;border-color:var(--navy);color:var(--navy);margin-bottom:4px;padding-bottom:2px;}
+
+  .chapter{margin-bottom:48px;scroll-margin-top:16px;}
   .chapter-head{
     font-family:'SFMono-Regular',monospace;font-size:12px;color:var(--accent);
     text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;
@@ -116,6 +156,13 @@
     <p>These notes are a supplementary study aid summarizing course concepts in plain language. They are not a substitute for your program's official textbook or instructor — always verify specifics (exact figures, current protocols, legal definitions in your state) against your own course materials.</p>
   </footer>
 </div>
+
+<nav class="chapter-rail" id="chapterRail" aria-label="Jump to chapter">
+  <button type="button" class="rail-toggle" id="railToggle" aria-label="Open chapter navigation">
+    <span id="railToggleLabel">TOP</span>
+  </button>
+  <div class="rail-list" id="railList"></div>
+</nav>
 
 <script>
 // Each chapter holds sections, each section holds topics (a heading + one or
@@ -3800,11 +3847,62 @@ function renderNotes(filterText){
   root.innerHTML = html;
   noResults.style.display = anyVisible ? 'none' : 'block';
   document.getElementById('tocBox').style.display = q ? 'none' : 'block';
+  document.getElementById('chapterRail').style.display = q ? 'none' : '';
+}
+
+function renderRail(){
+  const list = document.getElementById('railList');
+  const topBtn = `<button type="button" class="rail-btn rail-top" data-target="top" title="Back to top">&uarr;</button>`;
+  const chapterBtns = CHAPTERS.map(ch =>
+    `<button type="button" class="rail-btn" data-chapter="${ch.num}" title="Chapter ${ch.num}: ${ch.title}">${ch.num}</button>`
+  ).join('');
+  list.innerHTML = topBtn + chapterBtns;
+
+  const railEl = document.getElementById('chapterRail');
+  const toggle = document.getElementById('railToggle');
+  const toggleLabel = document.getElementById('railToggleLabel');
+
+  list.addEventListener('click', (e) => {
+    const btn = e.target.closest('.rail-btn');
+    if (!btn) return;
+    if (btn.dataset.target === 'top') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const target = document.getElementById('chapter-' + btn.dataset.chapter);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    railEl.classList.remove('open');
+  });
+
+  toggle.addEventListener('click', () => railEl.classList.toggle('open'));
+  document.addEventListener('click', (e) => {
+    if (railEl.classList.contains('open') && !railEl.contains(e.target)) railEl.classList.remove('open');
+  });
+
+  const setActive = (chapterNum) => {
+    list.querySelectorAll('.rail-btn').forEach(b => {
+      b.classList.toggle('active', chapterNum === null ? b.dataset.target === 'top' : b.dataset.chapter === String(chapterNum));
+    });
+    toggleLabel.textContent = chapterNum === null ? 'TOP' : ('CH ' + chapterNum);
+  };
+  setActive(null);
+
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries.filter(en => en.isIntersecting).map(en => en.target);
+    if (!visible.length) return;
+    visible.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+    const num = visible[0].id.replace('chapter-', '');
+    setActive(window.scrollY < 80 ? null : num);
+  }, { root: null, rootMargin: '0px 0px -75% 0px', threshold: 0 });
+
+  document.querySelectorAll('.chapter').forEach(c => observer.observe(c));
+  window.addEventListener('scroll', () => { if (window.scrollY < 80) setActive(null); }, { passive: true });
 }
 
 document.getElementById('searchBox').addEventListener('input', (e) => renderNotes(e.target.value));
 renderTOC();
 renderNotes('');
+renderRail();
 </script>
 </body>
 </html>
