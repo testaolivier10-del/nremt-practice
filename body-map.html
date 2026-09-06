@@ -472,6 +472,12 @@ function updateOcclusionFade(){
 }
 
 function selectGroup(groupKey){
+  // Clicking the already-selected part again toggles it off: zoom back out
+  // and clear the selection, instead of re-selecting a no-op.
+  if (groupKey === selectedGroupKey) {
+    resetView();
+    return;
+  }
   if (selectedGroupKey && meshByGroup[selectedGroupKey]) {
     for (const m of meshByGroup[selectedGroupKey]) resetMeshColor(m);
   }
