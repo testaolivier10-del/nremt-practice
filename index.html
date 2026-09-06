@@ -155,7 +155,8 @@
   .progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:12.5px;color:var(--muted);font-family:'SFMono-Regular',monospace;}
   .progress-track{height:4px;background:var(--line);border-radius:2px;margin-bottom:28px;overflow:hidden;}
   .progress-fill{height:100%;background:var(--accent);transition:width 0.2s;}
-  .q-domain{font-size:11.5px;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin-bottom:10px;}
+  .q-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;}
+  .q-domain{font-size:11.5px;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin-bottom:0;}
   .diff-badge{
     display:inline-block;font-family:'SFMono-Regular',monospace;font-size:10px;
     padding:2px 7px;border-radius:10px;margin-left:8px;text-transform:none;letter-spacing:0;
@@ -163,6 +164,12 @@
   .diff-badge.easy{background:#E4F3E9;color:var(--good);}
   .diff-badge.medium{background:#FBF0E9;color:var(--accent);}
   .diff-badge.hard{background:#F8E6E1;color:var(--bad);}
+  .flag-btn{
+    flex-shrink:0;padding:5px 12px;background:var(--white);border:1px solid var(--line);border-radius:20px;
+    font-family:inherit;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;
+  }
+  .flag-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .flag-btn.active{background:#FBF0E9;border-color:var(--accent);color:var(--accent);font-weight:600;}
   .q-prompt{font-size:19px;margin-bottom:24px;line-height:1.5;}
   .options{display:grid;gap:10px;margin-bottom:28px;}
   .option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--white);border:1px solid var(--line);border-radius:5px;cursor:pointer;font-size:15.5px;}
@@ -176,12 +183,16 @@
   .nav-row button:disabled{opacity:0.4;cursor:not-allowed;}
   .jump-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:20px;max-height:80px;overflow-y:auto;}
   .jump-btn{
-    width:26px;height:26px;font-size:10px;font-family:'SFMono-Regular',monospace;
+    position:relative;width:26px;height:26px;font-size:10px;font-family:'SFMono-Regular',monospace;
     border:1px solid var(--line);background:var(--white);border-radius:3px;cursor:pointer;
     color:var(--muted);display:flex;align-items:center;justify-content:center;
   }
   .jump-btn.current{border-color:var(--navy);color:var(--navy);font-weight:600;}
   .jump-btn.answered{background:#EEF1F6;}
+  .jump-btn.flagged::after{
+    content:'';position:absolute;top:-3px;right:-3px;width:7px;height:7px;border-radius:50%;
+    background:var(--accent);border:1px solid var(--white);
+  }
 
   .fc-card{
     background:var(--white);border:1px solid var(--line);border-radius:8px;
@@ -227,7 +238,14 @@
   .readiness-update .r-label.tier-low{background:rgba(176,64,42,0.28);color:#F2A08F;}
   .readiness-empty{margin:16px 0;padding:14px 16px;background:var(--white);border:1px dashed var(--line);border-radius:6px;font-size:13px;color:var(--muted);text-align:center;}
   .review-item{background:var(--white);border:1px solid var(--line);border-radius:5px;padding:18px 20px;margin-bottom:14px;}
-  .review-item .r-domain{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:8px;}
+  .review-item .r-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
+  .review-item .r-domain{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0;}
+  .review-item .r-flag-btn{
+    flex-shrink:0;padding:3px 10px;background:var(--white);border:1px solid var(--line);border-radius:20px;
+    font-family:inherit;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;
+  }
+  .review-item .r-flag-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .review-item .r-flag-btn.active{background:#FBF0E9;border-color:var(--accent);color:var(--accent);font-weight:600;}
   .review-item .r-q{font-size:16px;margin-bottom:12px;}
   .review-item .r-answer{font-size:14px;padding:8px 10px;border-radius:4px;margin-bottom:6px;}
   .r-answer.correct{background:#E4F3E9;color:var(--good);}
@@ -308,6 +326,10 @@
       <span>Review Missed Questions</span>
       <span class="count" id="missedCount">0</span>
     </button>
+    <button class="review-btn" id="flaggedReviewBtn">
+      <span>Review Flagged Questions</span>
+      <span class="count" id="flaggedCount">0</span>
+    </button>
 
     <div class="domain-quiz-box adaptive-box">
       <div class="domain-quiz-title">Adaptive Practice <span class="adaptive-tag">retargets live</span></div>
@@ -368,7 +390,10 @@
     </div>
     <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:1%"></div></div>
 
-    <div class="q-domain" id="qDomain"></div>
+    <div class="q-head-row">
+      <div class="q-domain" id="qDomain"></div>
+      <button type="button" class="flag-btn" id="flagBtn">🚩 Flag for review</button>
+    </div>
     <div class="q-prompt" id="qPrompt"></div>
     <div class="options" id="qOptions"></div>
 
@@ -2340,7 +2365,7 @@ const QUESTIONS = [
   }
 })();
 
-let mode = 'full'; // 'full', 'review', 'domain', or 'flashcard'
+let mode = 'full'; // 'full', 'review', 'flagged', 'domain', 'adaptive', or 'flashcard'
 let selectedDomain = null;
 let activeIndices = []; // maps position-in-quiz -> index into QUESTIONS
 let current = 0;
@@ -2932,6 +2957,24 @@ function saveMissed(list){
   localStorage.setItem(MISSED_KEY, JSON.stringify(list));
 }
 
+// Flagged questions are a manual bookmark, unlike the missed-question queue —
+// flagging/unflagging is purely a user decision and is never auto-added or
+// auto-cleared based on whether the question was answered correctly.
+const FLAGGED_KEY = 'nremt_exam100_flagged';
+function loadFlagged(){
+  const raw = localStorage.getItem(FLAGGED_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveFlagged(list){
+  localStorage.setItem(FLAGGED_KEY, JSON.stringify(list));
+}
+function toggleFlag(qIdx){
+  const flagged = new Set(loadFlagged());
+  if(flagged.has(qIdx)) flagged.delete(qIdx); else flagged.add(qIdx);
+  saveFlagged(Array.from(flagged));
+  return flagged.has(qIdx);
+}
+
 function refreshIntroState(){
   const best = localStorage.getItem(STORAGE_KEY);
   const line = document.getElementById('bestScoreLine');
@@ -2942,6 +2985,9 @@ function refreshIntroState(){
   const missed = loadMissed();
   document.getElementById('missedCount').textContent = missed.length;
   document.getElementById('reviewBtn').disabled = missed.length === 0;
+  const flagged = loadFlagged();
+  document.getElementById('flaggedCount').textContent = flagged.length;
+  document.getElementById('flaggedReviewBtn').disabled = flagged.length === 0;
   renderProgressChart();
   renderReadiness('readinessCard');
   renderStreakWidget();
@@ -2972,6 +3018,14 @@ document.getElementById('reviewBtn').addEventListener('click', () => {
   if(missed.length === 0) return;
   mode = 'review';
   activeIndices = missed.slice();
+  beginQuiz(false);
+});
+
+document.getElementById('flaggedReviewBtn').addEventListener('click', () => {
+  const flagged = loadFlagged();
+  if(flagged.length === 0) return;
+  mode = 'flagged';
+  activeIndices = flagged.slice();
   beginQuiz(false);
 });
 
@@ -3175,6 +3229,8 @@ function beginQuiz(withTimer){
     banner.style.display = 'block';
     if(mode === 'review'){
       banner.textContent = 'Missed-question review — untimed practice mode';
+    } else if(mode === 'flagged'){
+      banner.textContent = 'Flagged-question review — untimed practice mode';
     } else if(mode === 'adaptive'){
       banner.textContent = 'Adaptive Practice — untimed, retargets after every question';
     } else {
@@ -3233,6 +3289,11 @@ function renderQuestion(){
   document.getElementById('qDomain').innerHTML = `${q.domain}<span class="diff-badge ${q.diff}">${q.diff}</span>`;
   document.getElementById('qPrompt').textContent = q.q;
 
+  const isFlagged = loadFlagged().includes(activeIndices[current]);
+  const flagBtn = document.getElementById('flagBtn');
+  flagBtn.textContent = isFlagged ? '🚩 Flagged' : '🚩 Flag for review';
+  flagBtn.classList.toggle('active', isFlagged);
+
   const letters = ['A','B','C','D'];
   const optsEl = document.getElementById('qOptions');
   optsEl.innerHTML = '';
@@ -3254,15 +3315,22 @@ function renderQuestion(){
 
 function renderJumpRow(){
   const row = document.getElementById('jumpRow');
+  const flagged = new Set(loadFlagged());
   row.innerHTML = '';
   activeIndices.forEach((qIdx,i) => {
     const btn = document.createElement('button');
-    btn.className = 'jump-btn' + (i===current?' current':'') + (answers[i]!==null?' answered':'');
+    btn.className = 'jump-btn' + (i===current?' current':'') + (answers[i]!==null?' answered':'') + (flagged.has(qIdx)?' flagged':'');
     btn.textContent = i+1;
     btn.addEventListener('click', () => { current = i; renderQuestion(); renderJumpRow(); });
     row.appendChild(btn);
   });
 }
+
+document.getElementById('flagBtn').addEventListener('click', () => {
+  toggleFlag(activeIndices[current]);
+  renderQuestion();
+  renderJumpRow();
+});
 
 document.getElementById('prevBtn').addEventListener('click', () => {
   if(current > 0){ current--; renderQuestion(); renderJumpRow(); }
@@ -3366,6 +3434,12 @@ function showResults(){
   } else if(mode === 'review'){
     clearedNote.style.display = 'block';
     clearedNote.textContent = `${missedSet.size} question${missedSet.size===1?'':'s'} still in your review queue for next time.`;
+  } else if(mode === 'flagged'){
+    const stillFlagged = loadFlagged().length;
+    clearedNote.style.display = 'block';
+    clearedNote.textContent = stillFlagged === 0
+      ? "You've unflagged everything in this review session. Flag any question again from its answer screen whenever something's worth coming back to."
+      : `${stillFlagged} question${stillFlagged===1?'':'s'} still flagged for review. Flags don't clear on their own — unflag one with its 🚩 button once you're confident on it.`;
   } else {
     clearedNote.style.display = 'none';
   }
@@ -3394,7 +3468,7 @@ function showResults(){
     const q = QUESTIONS[qIdx];
     const userAns = answers[i];
     const isCorrect = userAns === q.correct;
-    return {q, userAns, isCorrect, letters};
+    return {q, qIdx, userAns, isCorrect, letters};
   });
   document.querySelectorAll('.filter-row button').forEach(b=>b.classList.remove('active'));
   document.querySelector('.filter-row button[data-filter="all"]').classList.add('active');
@@ -3407,9 +3481,13 @@ function renderReview(filter){
   if(filter === 'incorrect') items = allReviewData.filter(d => !d.isCorrect && d.userAns !== null);
   if(filter === 'unanswered') items = allReviewData.filter(d => d.userAns === null);
 
-  reviewEl.innerHTML = items.map(({q,userAns,isCorrect,letters}) => `
+  const flagged = new Set(loadFlagged());
+  reviewEl.innerHTML = items.map(({q,qIdx,userAns,isCorrect,letters}) => `
       <div class="review-item">
-        <div class="r-domain">${q.domain}<span class="diff-badge ${q.diff}">${q.diff}</span></div>
+        <div class="r-head">
+          <div class="r-domain">${q.domain}<span class="diff-badge ${q.diff}">${q.diff}</span></div>
+          <button type="button" class="r-flag-btn${flagged.has(qIdx) ? ' active' : ''}" data-qidx="${qIdx}">${flagged.has(qIdx) ? '🚩 Flagged' : '🚩 Flag'}</button>
+        </div>
         <div class="r-q">${q.q}</div>
         <div class="r-answer ${isCorrect ? 'correct' : 'incorrect'}">
           Your answer: ${userAns!==null ? letters[userAns]+') '+q.options[userAns] : 'Not answered'} ${isCorrect ? '✓' : '✗'}
@@ -3418,7 +3496,15 @@ function renderReview(filter){
         <div class="r-explain">${q.explain}</div>
       </div>
   `).join('');
+  currentReviewFilter = filter;
+  reviewEl.querySelectorAll('.r-flag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleFlag(parseInt(btn.dataset.qidx, 10));
+      renderReview(currentReviewFilter);
+    });
+  });
 }
+let currentReviewFilter = 'all';
 
 document.querySelectorAll('.filter-row button').forEach(btn => {
   btn.addEventListener('click', () => {
