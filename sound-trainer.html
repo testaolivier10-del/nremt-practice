@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7204592276443890" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auscultation Sound Trainer — EMT Prep</title>
+<meta name="description" content="Listen to real recorded lung sounds — wheezes, crackles, stridor — and train your ear to tell them apart. Click to play, guess which one it is, get instant feedback.">
+<style>
+  :root{
+    --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
+    --line:#DCE0DE; --ink:#1A1F1D; --muted:#5C645F; --good:#2E7D4F; --bad:#B23A3A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.65;}
+  .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
+  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+  .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 20px;}
+  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
+  .site-nav a{color:var(--accent);text-decoration:none;}
+  .site-nav a:hover{text-decoration:underline;}
+
+  .notice{
+    background:#FBEFE9;border:1px solid #E8C9B8;border-radius:6px;padding:14px 16px;
+    font-size:13.5px;color:#7A4A30;margin-bottom:28px;
+  }
+  .notice strong{color:#5E3822;}
+
+  section{margin-bottom:40px;}
+  h2{font-size:19px;font-weight:600;margin:0 0 6px;}
+  .section-sub{color:var(--muted);font-size:14px;margin:0 0 18px;}
+
+  .sound-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:520px){.sound-grid{grid-template-columns:1fr;}}
+  .sound-card{
+    background:var(--white);border:1px solid var(--line);border-radius:8px;padding:16px;
+  }
+  .sound-card h3{font-size:15.5px;font-weight:600;margin:0 0 6px;color:var(--navy);}
+  .sound-card p{font-size:13.5px;color:var(--muted);margin:0 0 12px;}
+  .play-btn{
+    display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:var(--white);
+    border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-family:inherit;
+    cursor:pointer;transition:background .15s;
+  }
+  .play-btn:hover{background:#1c3350;}
+  .play-btn:disabled{opacity:0.55;cursor:default;}
+  .play-btn .icon{font-size:12px;}
+  .sound-card.unavailable{opacity:0.5;}
+  .sound-card.unavailable .play-btn{background:var(--line);color:var(--muted);}
+  .audio-error{font-size:12px;color:var(--bad);margin-top:8px;display:none;}
+  .credit-line{font-size:10.5px;color:#9AA19C;margin-top:10px;}
+  .credit-line a{color:#9AA19C;}
+
+  .quiz-box{
+    background:var(--white);border:1px solid var(--line);border-radius:10px;padding:26px 24px;
+    text-align:center;
+  }
+  .quiz-progress{
+    font-family:'SFMono-Regular',monospace;font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px;
+  }
+  .quiz-score{float:right;}
+  .big-play-btn{
+    width:88px;height:88px;border-radius:50%;border:none;background:var(--accent);color:var(--white);
+    font-size:30px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 14px rgba(193,80,46,0.35);transition:transform .12s;margin-bottom:10px;
+  }
+  .big-play-btn:hover{transform:scale(1.05);}
+  .big-play-btn:disabled{opacity:0.5;cursor:default;transform:none;}
+  .quiz-hint{font-size:13px;color:var(--muted);margin-bottom:22px;}
+  .quiz-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;}
+  @media (max-width:480px){.quiz-choices{grid-template-columns:1fr;}}
+  .choice-btn{
+    background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:12px 10px;
+    font-family:inherit;font-size:14.5px;color:var(--ink);cursor:pointer;transition:all .12s;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:rgba(46,125,79,0.12);border-color:var(--good);color:var(--good);font-weight:600;}
+  .choice-btn.incorrect{background:rgba(178,58,58,0.1);border-color:var(--bad);color:var(--bad);}
+
+  .feedback{margin-top:22px;padding-top:20px;border-top:1px solid var(--line);text-align:left;display:none;}
+  .feedback.visible{display:block;}
+  .feedback-verdict{font-weight:600;font-size:15.5px;margin-bottom:8px;}
+  .feedback-verdict.correct{color:var(--good);}
+  .feedback-verdict.incorrect{color:var(--bad);}
+  .feedback p{font-size:14px;color:var(--ink);margin:0 0 16px;}
+  .next-btn{
+    background:var(--navy);color:var(--white);border:none;border-radius:6px;padding:11px 22px;
+    font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .next-btn:hover{background:#1c3350;}
+
+  .quiz-start{text-align:center;padding:30px 20px;}
+  .start-btn{
+    background:var(--accent);color:var(--white);border:none;border-radius:6px;padding:13px 26px;
+    font-family:inherit;font-size:15px;cursor:pointer;margin-top:14px;
+  }
+  .start-btn:hover{background:#a8431f;}
+
+  .results-box{text-align:center;padding:20px;}
+  .results-score{font-size:40px;font-weight:700;color:var(--navy);margin:6px 0;}
+  .results-breakdown{text-align:left;max-width:400px;margin:20px auto 0;font-size:13.5px;}
+  .results-breakdown .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);}
+  .results-breakdown .row:last-child{border-bottom:none;}
+
+  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:60ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Auscultation Sound Trainer</h1>
+  <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="scenario-sim.html">Scenarios</a></div>
+  <p class="lede">Text can tell you a wheeze is "high-pitched and musical" and a crackle is "discrete and popping" — but that distinction only really locks in once you've actually heard both. Listen to real recorded breath sounds below, then test your ear in quiz mode.</p>
+
+  <div class="notice">
+    <strong>A note on these recordings:</strong> the clips below are real auscultation recordings sourced from Wikimedia Commons (each individually credited and licensed CC BY-SA), not synthesized audio. Coverage is currently limited to the sound types where a properly licensed recording could be verified — more will be added over time.
+  </div>
+
+  <section id="listenSection">
+    <h2>Listen &amp; Compare</h2>
+    <p class="section-sub">Click any card to hear the actual sound. Play them back to back — that's the fastest way to train your ear.</p>
+    <div class="sound-grid" id="soundGrid"></div>
+  </section>
+
+  <section id="quizSection">
+    <h2>Quiz Mode</h2>
+    <p class="section-sub">A clip plays, you guess what it is, you find out immediately whether you were right — and why.</p>
+    <div class="quiz-box" id="quizBox"></div>
+  </section>
+
+  <footer>
+    <p>Audio credits: recordings sourced from Wikimedia Commons contributors under CC BY-SA 3.0 — individual credits are shown next to each clip above. This trainer is a supplementary study aid; it is not a substitute for hands-on stethoscope practice with an instructor.</p>
+  </footer>
+</div>
+
+<audio id="player" preload="none"></audio>
+
+<script>
+// Only sound categories with an actually-verified, appropriately-licensed source
+// recording are marked available:true. Categories without one still appear as
+// quiz answer choices (so the multiple choice makes sense) but are never the
+// correct answer and have no playable card in the Listen & Compare section.
+const SOUNDS = [
+  {
+    id: "wheeze",
+    label: "Wheeze",
+    available: true,
+    audioUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Wheeze2O.ogg",
+    creditUrl: "https://commons.wikimedia.org/wiki/File:Wheeze2O.ogg",
+    description: "High-pitched, continuous, musical whistling — usually loudest on expiration. Caused by air forced through narrowed small airways.",
+    clinical: "Classic in asthma and COPD exacerbations. A patient who stops wheezing during a severe attack isn't necessarily improving — it can mean they're moving too little air to generate the sound at all, a genuinely worse sign (\"silent chest\")."
+  },
+  {
+    id: "crackles",
+    label: "Crackles (Rales)",
+    available: true,
+    audioUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Crackles_pneumoniaO.ogg",
+    creditUrl: "https://commons.wikimedia.org/wiki/File:Crackles_pneumoniaO.ogg",
+    description: "Discrete, discontinuous clicking or popping — think of gently rubbing hair between your fingers next to your ear. Heard mainly on inspiration.",
+    clinical: "Caused by fluid in the alveoli, or small airways popping open. Classic in pulmonary edema (fine, wet-sounding) and pneumonia (coarser, more localized)."
+  },
+  {
+    id: "stridor",
+    label: "Stridor",
+    available: true,
+    audioUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Stridor_NP_OGG_2.ogg",
+    creditUrl: "https://commons.wikimedia.org/wiki/File:Stridor_NP_OGG_2.ogg",
+    description: "Harsh, high-pitched crowing sound, loudest on inspiration — and often audible without a stethoscope at all.",
+    clinical: "An upper-airway sound, not a lung sound — it means a partial obstruction somewhere above the vocal cords (croup, epiglottitis, a foreign body, or airway swelling). It's a red flag that gets escalated fast."
+  },
+  {
+    id: "rhonchi",
+    label: "Rhonchi",
+    available: false,
+    description: "Low-pitched, continuous — often described as snoring or rattling. Heard in the larger airways.",
+    clinical: "Caused by secretions or mucus in the larger bronchi. Common in pneumonia, chronic bronchitis, or when a patient just needs to cough. Unlike crackles, rhonchi can sometimes clear (or change character) after a productive cough."
+  },
+  {
+    id: "normal",
+    label: "Normal Breath Sounds",
+    available: false,
+    description: "Soft, low-pitched, breezy — audible through most of both lung fields, quieter and shorter on expiration than inspiration.",
+    clinical: "The baseline every abnormal sound is judged against. Knowing what normal actually sounds like is what makes an abnormal finding jump out in the first place."
+  }
+];
+
+function renderListenSection(){
+  const grid = document.getElementById('soundGrid');
+  grid.innerHTML = SOUNDS.map(s => `
+    <div class="sound-card${s.available ? '' : ' unavailable'}" data-id="${s.id}">
+      <h3>${s.label}</h3>
+      <p>${s.description}</p>
+      <p class="section-sub" style="margin-bottom:10px;">${s.clinical}</p>
+      ${s.available
+        ? `<button type="button" class="play-btn" data-play="${s.id}"><span class="icon">&#9658;</span> Play clip</button>
+           <div class="audio-error" id="err-${s.id}">Couldn't load this clip — check your connection and try again.</div>
+           <div class="credit-line">Recording via <a href="${s.creditUrl}" target="_blank" rel="noopener">Wikimedia Commons</a>, CC BY-SA 3.0</div>`
+        : `<button type="button" class="play-btn" disabled><span class="icon">&#9658;</span> Clip coming soon</button>`
+      }
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('[data-play]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.play;
+      const sound = SOUNDS.find(s => s.id === id);
+      playClip(sound, () => { document.getElementById('err-' + id).style.display = 'block'; });
+    });
+  });
+}
+
+const player = document.getElementById('player');
+function playClip(sound, onError){
+  const errEls = document.querySelectorAll('.audio-error');
+  errEls.forEach(e => e.style.display = 'none');
+  player.src = sound.audioUrl;
+  player.play().catch(() => { if (onError) onError(); });
+  player.onerror = () => { if (onError) onError(); };
+}
+
+// --- Quiz mode ---
+const QUIZ_ROUNDS = 8;
+let quizState = null;
+
+function startQuiz(){
+  const pool = SOUNDS.filter(s => s.available);
+  const rounds = [];
+  let lastId = null;
+  for (let i = 0; i < QUIZ_ROUNDS; i++) {
+    let pick;
+    do { pick = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && pick.id === lastId);
+    lastId = pick.id;
+    rounds.push(pick);
+  }
+  quizState = { rounds, current: 0, score: 0, answered: false, log: [] };
+  renderQuizRound();
+}
+
+function renderQuizRound(){
+  const box = document.getElementById('quizBox');
+  if (!quizState) {
+    box.innerHTML = `
+      <div class="quiz-start">
+        <p style="color:var(--muted);font-size:14px;margin:0 0 4px;">${SOUNDS.filter(s=>s.available).length} sound types in rotation, ${QUIZ_ROUNDS} rounds per attempt.</p>
+        <button type="button" class="start-btn" id="startQuizBtn">Start Quiz</button>
+      </div>
+    `;
+    document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+    return;
+  }
+
+  if (quizState.current >= quizState.rounds.length) {
+    renderResults();
+    return;
+  }
+
+  const round = quizState.rounds[quizState.current];
+  quizState.answered = false;
+
+  box.innerHTML = `
+    <div class="quiz-progress">Round ${quizState.current + 1} of ${quizState.rounds.length}<span class="quiz-score">Score: ${quizState.score}/${quizState.current}</span></div>
+    <button type="button" class="big-play-btn" id="quizPlayBtn">&#9658;</button>
+    <div class="quiz-hint">Click to play the clip, then pick what you hear</div>
+    <div class="quiz-choices" id="quizChoices">
+      ${SOUNDS.map(s => `<button type="button" class="choice-btn" data-choice="${s.id}">${s.label}</button>`).join('')}
+    </div>
+    <div class="feedback" id="quizFeedback"></div>
+  `;
+
+  document.getElementById('quizPlayBtn').addEventListener('click', () => playClip(round));
+  // auto-play on round start
+  playClip(round);
+
+  document.querySelectorAll('#quizChoices [data-choice]').forEach(btn => {
+    btn.addEventListener('click', () => submitAnswer(btn.dataset.choice, round));
+  });
+}
+
+function submitAnswer(chosenId, round){
+  if (quizState.answered) return;
+  quizState.answered = true;
+  const correct = chosenId === round.id;
+  if (correct) quizState.score++;
+  quizState.log.push({ round: round.label, correct });
+
+  document.querySelectorAll('#quizChoices [data-choice]').forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.choice === round.id) btn.classList.add('correct');
+    else if (btn.dataset.choice === chosenId) btn.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('quizFeedback');
+  fb.classList.add('visible');
+  fb.innerHTML = `
+    <div class="feedback-verdict ${correct ? 'correct' : 'incorrect'}">${correct ? 'Correct — that\'s ' + round.label + '.' : 'Not quite — that was ' + round.label + '.'}</div>
+    <p>${round.clinical}</p>
+    <button type="button" class="next-btn" id="nextRoundBtn">${quizState.current + 1 >= quizState.rounds.length ? 'See results' : 'Next clip'}</button>
+  `;
+  document.getElementById('nextRoundBtn').addEventListener('click', () => {
+    quizState.current++;
+    renderQuizRound();
+  });
+}
+
+function renderResults(){
+  const box = document.getElementById('quizBox');
+  const pct = Math.round((quizState.score / quizState.rounds.length) * 100);
+  box.innerHTML = `
+    <div class="results-box">
+      <div class="quiz-progress">Quiz complete</div>
+      <div class="results-score">${quizState.score}/${quizState.rounds.length}</div>
+      <p style="color:var(--muted);font-size:14px;">${pct}% correct</p>
+      <div class="results-breakdown">
+        ${quizState.log.map(l => `<div class="row"><span>${l.round}</span><span style="color:${l.correct ? 'var(--good)' : 'var(--bad)'}">${l.correct ? 'Correct' : 'Missed'}</span></div>`).join('')}
+      </div>
+      <button type="button" class="start-btn" id="retryQuizBtn" style="margin-top:22px;">Try Again</button>
+    </div>
+  `;
+  document.getElementById('retryQuizBtn').addEventListener('click', () => { quizState = null; startQuiz(); });
+}
+
+renderListenSection();
+renderQuizRound();
+</script>
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7204592276443890" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinical Scenario Simulator — EMT Prep</title>
+<meta name="description" content="Branching patient-care scenarios where every choice leads to a real consequence, not just right or wrong. Practice sequencing and judgment, not just recall.">
+<style>
+  :root{
+    --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
+    --line:#DCE0DE; --ink:#1A1F1D; --muted:#5C645F; --good:#2E7D4F; --bad:#B23A3A; --warn:#B8863A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.65;}
+  .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
+  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+  .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 28px;}
+  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
+  .site-nav a{color:var(--accent);text-decoration:none;}
+  .site-nav a:hover{text-decoration:underline;}
+
+  .picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:560px){.picker-grid{grid-template-columns:1fr;}}
+  .scenario-card{
+    background:var(--white);border:1px solid var(--line);border-radius:10px;padding:18px;
+    cursor:pointer;transition:border-color .15s,transform .1s;text-align:left;font-family:inherit;
+  }
+  .scenario-card:hover{border-color:var(--accent);transform:translateY(-1px);}
+  .scenario-domain{
+    font-family:'SFMono-Regular',monospace;font-size:10.5px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;
+  }
+  .scenario-card h3{font-size:16.5px;font-weight:600;margin:0 0 8px;color:var(--navy);}
+  .scenario-card p{font-size:13.5px;color:var(--muted);margin:0;}
+
+  .sim-box{
+    background:var(--white);border:1px solid var(--line);border-radius:10px;padding:26px 24px;
+    display:none;
+  }
+  .sim-box.active{display:block;}
+  .sim-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+  .sim-domain{
+    font-family:'SFMono-Regular',monospace;font-size:11px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:0.05em;
+  }
+  .back-link{font-size:12.5px;color:var(--muted);text-decoration:none;cursor:pointer;background:none;border:none;font-family:inherit;padding:0;}
+  .back-link:hover{color:var(--accent);}
+
+  .vitals-bar{
+    font-family:'SFMono-Regular',monospace;font-size:12px;color:var(--navy);
+    background:rgba(18,32,51,0.06);border-radius:5px;padding:8px 12px;margin-bottom:16px;display:inline-block;
+  }
+  .node-text{font-size:15.5px;margin:0 0 22px;}
+
+  .consequence-banner{
+    border-left:3px solid var(--warn);background:rgba(184,134,58,0.1);border-radius:4px;
+    padding:12px 14px;margin-bottom:20px;font-size:14px;
+  }
+  .consequence-banner strong{color:var(--warn);display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;font-family:'SFMono-Regular',monospace;}
+
+  .choice-list{display:flex;flex-direction:column;gap:9px;}
+  .choice-option{
+    text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:6px;
+    padding:13px 16px;font-family:inherit;font-size:14.5px;color:var(--ink);cursor:pointer;
+    transition:border-color .12s,background .12s;
+  }
+  .choice-option:hover{border-color:var(--accent);background:var(--white);}
+
+  .ending-badge{
+    display:inline-block;font-family:'SFMono-Regular',monospace;font-size:11px;text-transform:uppercase;
+    letter-spacing:0.05em;padding:4px 11px;border-radius:20px;margin-bottom:14px;
+  }
+  .ending-badge.good{background:rgba(46,125,79,0.14);color:var(--good);}
+  .ending-badge.neutral{background:rgba(184,134,58,0.14);color:var(--warn);}
+  .ending-badge.bad{background:rgba(178,58,58,0.12);color:var(--bad);}
+
+  .sim-actions{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--navy);color:var(--white);border:none;border-radius:6px;padding:11px 20px;
+    font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .btn-primary:hover{background:#1c3350;}
+  .btn-secondary{
+    background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:11px 20px;
+    font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+
+  .path-log{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);}
+  .path-log-title{
+    font-family:'SFMono-Regular',monospace;font-size:10.5px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;
+  }
+  .path-log ol{margin:0;padding-left:18px;font-size:12.5px;color:var(--muted);}
+  .path-log li{margin-bottom:4px;}
+
+  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:60ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Clinical Scenario Simulator</h1>
+  <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a></div>
+  <p class="lede">Multiple choice tests recall. This tests sequencing and judgment — closer to how the real exam's scenario logic actually works. Every choice here leads somewhere real, not just a right/wrong buzzer. Choose carefully; a delay or a skipped step shows up later in the scenario, exactly like it would on an actual call.</p>
+
+  <div id="pickerScreen">
+    <div class="picker-grid" id="pickerGrid"></div>
+  </div>
+
+  <div class="sim-box" id="simBox"></div>
+
+  <footer>
+    <p>These scenarios are simplified teaching cases meant to build a feel for sequencing and consequence, not exhaustive protocol simulations. Always follow your own program's protocols and medical direction.</p>
+  </footer>
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    id: "s1",
+    title: "Severe Leg Bleeding After a Motorcycle Crash",
+    domain: "Trauma — Bleeding & Shock",
+    blurb: "A spurting leg wound and a clock that doesn't stop for you.",
+    startNode: "s1_start",
+    nodes: {
+      s1_start: {
+        vitals: "HR 118 · BP 108/70 · RR 22",
+        text: "You arrive to find a 28-year-old man lying next to a motorcycle, alert and shouting in pain. His right thigh has an open wound with blood visibly spurting in time with his pulse. Bystanders are standing around, unsure what to do.",
+        choices: [
+          { text: "Apply firm direct pressure to the wound immediately", next: "s1_pressure_good" },
+          { text: "Ask him what happened and check for other injuries first", next: "s1_delayed", consequence: "You spend a moment gathering the story while the bleeding continues unchecked. By the time you look back down, a visibly larger pool of blood has formed and he looks paler." },
+          { text: "Get a blood pressure reading before touching the wound", next: "s1_delayed", consequence: "The cuff takes almost a minute to cycle. The bleeding never stopped while you waited — his pressure comes back low, and you've lost time you didn't have." }
+        ]
+      },
+      s1_delayed: {
+        vitals: "HR 128 · BP 92/58 · RR 24",
+        text: "You finally apply direct pressure, but he's noticeably paler and more anxious than when you first arrived.",
+        choices: [
+          { text: "Hold firm, sustained pressure and reassess in a moment", next: "s1_pressure_still_bleeding" }
+        ]
+      },
+      s1_pressure_good: {
+        vitals: "HR 116 · BP 110/72 · RR 20",
+        text: "Direct pressure slows the bleeding significantly, but blood is still visibly soaking through the dressing after a minute of firm pressure.",
+        choices: [
+          { text: "Add more gauze on top without lifting the original dressing, and press harder", next: "s1_pressure_still_bleeding" },
+          { text: "Lift the dressing to see how bad the wound actually looks", next: "s1_lifted_dressing", consequence: "Lifting the dressing disrupts the clot that was just starting to form. The bleeding picks back up as hard as before — you've undone the progress you'd just made." }
+        ]
+      },
+      s1_lifted_dressing: {
+        vitals: "HR 122 · BP 104/68 · RR 22",
+        text: "You reapply firm pressure over the wound again. It takes noticeably longer to slow the bleeding this time.",
+        choices: [
+          { text: "This time, escalate to a tourniquet proximal to the wound rather than relying on pressure alone", next: "s1_tourniquet_good" },
+          { text: "Trust pressure alone again since it worked once already", next: "s1_wait_worse", consequence: "Pressure buys some time but never fully controls it this time. He's losing more blood than he can spare." }
+        ]
+      },
+      s1_pressure_still_bleeding: {
+        vitals: "HR 124 · BP 98/62 · RR 24",
+        text: "Even with firm, sustained pressure and extra gauze, the bleeding hasn't slowed — it's a large arterial wound, and pressure alone isn't keeping up.",
+        choices: [
+          { text: "Apply a tourniquet proximal to the wound", next: "s1_tourniquet_good" },
+          { text: "Keep holding pressure and wait a little longer to see if it helps", next: "s1_wait_worse", consequence: "You wait almost two more minutes. His pulse is now weak and rapid, and he's starting to look confused — bleeding this severe needed a tourniquet, not more patience." }
+        ]
+      },
+      s1_wait_worse: {
+        vitals: "HR 134 · BP 82/50 · RR 26",
+        text: "His skin is pale and clammy, his pulse is thready, and he's asking why everything sounds far away. He's decompensating.",
+        choices: [
+          { text: "Apply a tourniquet now, treat for shock, and call for rapid transport", next: "s1_tourniquet_late" },
+          { text: "Keep applying more gauze and pressure", next: "s1_end_bad" }
+        ]
+      },
+      s1_tourniquet_good: {
+        vitals: "HR 108 · BP 112/74 · RR 18",
+        text: "The tourniquet stops the bleeding completely. You note the time of application, treat him for shock, and prepare for rapid transport. His color is already looking better.",
+        choices: [
+          { text: "Transport now, reassessing vitals en route", next: "s1_end_good" }
+        ]
+      },
+      s1_tourniquet_late: {
+        vitals: "HR 128 · BP 86/54 · RR 24",
+        text: "The tourniquet finally stops the bleeding, but he's already lost a significant amount of blood and is visibly altered and hypotensive.",
+        choices: [
+          { text: "Treat aggressively for shock, transport immediately, and request ALS intercept if available", next: "s1_end_ok" }
+        ]
+      },
+      s1_end_good: { ending: "good", text: "Bleeding controlled fast, shock never truly set in. This is close to a textbook run — the sequence (direct pressure → escalate to a tourniquet the moment pressure isn't keeping up → treat shock → transport) is exactly what kept him stable the whole way to the hospital." },
+      s1_end_ok: { ending: "neutral", text: "He survives, but the delay before the tourniquet went on meant he needed blood products and a longer ICU stay than he otherwise would have. Severe arterial bleeding needs a tourniquet the moment direct pressure stops keeping up — not several more minutes of hoping it will." },
+      s1_end_bad: { ending: "bad", text: "By the time you finally escalate to a tourniquet, he's unresponsive and critically hypotensive. He's still alive when you reach the hospital, but only barely. Uncontrolled severe bleeding is one of the most preventable causes of death in trauma — preventable specifically by not waiting." }
+    }
+  },
+  {
+    id: "s2",
+    title: "Chest Pain at the Grocery Store",
+    domain: "Cardiac & Medical",
+    blurb: "Crushing chest pain, a nervous bystander, and a protocol that has an order for a reason.",
+    startNode: "s2_start",
+    nodes: {
+      s2_start: {
+        vitals: "HR 96 · BP 138/88 · SpO2 98% · Pain 8/10",
+        text: "A 58-year-old woman flagged down a store employee, saying she has crushing chest pain that started 20 minutes ago while shopping. She's sitting on a bench, pale and sweaty, holding her chest.",
+        choices: [
+          { text: "Have her stay seated, apply oxygen only if she's hypoxic or in distress, and begin your assessment", next: "s2_history_good" },
+          { text: "Immediately place her on a nonrebreather at 15 LPM regardless of her oxygen level", next: "s2_over_o2", consequence: "Her SpO2 was already 98% on room air. High-flow oxygen isn't harmless by default in this situation — current guidance targets oxygen to actual need, not routine high-flow for every chest pain call." },
+          { text: "Have her walk to the stretcher herself to save time", next: "s2_walk_bad", consequence: "Walking increases cardiac workload during a possible MI — exactly the wrong move. She becomes noticeably more short of breath just from the short walk." }
+        ]
+      },
+      s2_over_o2: {
+        vitals: "HR 98 · BP 136/86 · SpO2 99%",
+        text: "You back off to titrating oxygen appropriately once you realize her saturation was already fine. She's still anxious and in pain — time to keep assessing.",
+        choices: [
+          { text: "Get a SAMPLE history and ask about nitroglycerin and any aspirin allergy", next: "s2_history_good" }
+        ]
+      },
+      s2_walk_bad: {
+        vitals: "HR 108 · BP 134/86 · SpO2 96%",
+        text: "She's sitting on the stretcher now, more winded than before. You continue your assessment.",
+        choices: [
+          { text: "Get a SAMPLE history and ask about nitroglycerin and any aspirin allergy", next: "s2_history_worse" }
+        ]
+      },
+      s2_history_good: {
+        vitals: "HR 96 · BP 138/88 · SpO2 98%",
+        text: "She's alert and oriented, describes the pain as crushing and radiating to her left arm. No allergies. She has her own prescribed nitroglycerin with her.",
+        choices: [
+          { text: "Give aspirin (chewed) per protocol, and check her blood pressure before assisting with her nitro", next: "s2_meds_good" },
+          { text: "Give nitro first — several doses, before considering aspirin at all", next: "s2_meds_outoforder", consequence: "Order isn't strictly fixed, but you also didn't check her blood pressure before that first dose — her pressure was borderline, and it drops further with nitro. She now feels lightheaded and worse." }
+        ]
+      },
+      s2_history_worse: {
+        vitals: "HR 110 · BP 132/84 · SpO2 96%",
+        text: "Same history, no allergies, her own prescribed nitro on hand — but she's more anxious and short of breath than she needed to be.",
+        choices: [
+          { text: "Give aspirin, check her blood pressure before assisting with her nitro", next: "s2_meds_okay" }
+        ]
+      },
+      s2_meds_good: {
+        vitals: "HR 90 · BP 128/82 · Pain 5/10",
+        text: "Aspirin given, BP checked and adequate, nitro assisted per protocol. Her pain eases. You get a 12-lead if trained and equipped, and prepare for transport.",
+        choices: [
+          { text: "Transport promptly, avoiding unnecessary lights-and-siren stress, reassessing en route", next: "s2_end_good" }
+        ]
+      },
+      s2_meds_outoforder: {
+        vitals: "HR 102 · BP 96/64 · Pain 7/10, lightheaded",
+        text: "You catch the mistake and hold further nitro since her pressure has dropped. She's shaken by the dizziness but stabilizes somewhat.",
+        choices: [
+          { text: "Treat supportively and transport promptly", next: "s2_end_ok" },
+          { text: "Give another dose of nitro to try to fully resolve the pain despite her dizziness", next: "s2_end_bad" }
+        ]
+      },
+      s2_meds_okay: {
+        vitals: "HR 96 · BP 122/80 · Pain 6/10",
+        text: "Medications given correctly this time, though she's more distressed overall than she needed to be given the earlier walk.",
+        choices: [
+          { text: "Transport promptly", next: "s2_end_ok" }
+        ]
+      },
+      s2_end_good: { ending: "good", text: "Every step matched protocol: appropriate oxygen, aspirin, nitro only after confirming her pressure could tolerate it, and a smooth, low-stress transport. This is the version of this call that goes right." },
+      s2_end_ok: { ending: "neutral", text: "She makes it to the hospital and stabilizes, but a couple of avoidable missteps — added exertion, a medication given before confirming it was safe — made the call rougher than it needed to be. None of it was catastrophic, but each one was worth not repeating." },
+      s2_end_bad: { ending: "bad", text: "Another dose drops her blood pressure further — she becomes frankly hypotensive and near-syncopal before you reach the hospital. Nitroglycerin's blood-pressure threshold isn't arbitrary: repeat dosing when a patient is already showing a BP drop can turn a treatable chest pain call into a hemodynamic emergency." }
+    }
+  },
+  {
+    id: "s3",
+    title: "The Choking Toddler",
+    domain: "Airway & Respiratory",
+    blurb: "A 2-year-old, a mouthful of grapes, and a cough that's either working or it isn't.",
+    startNode: "s3_start",
+    nodes: {
+      s3_start: {
+        text: "A frantic father runs up carrying his 2-year-old daughter, who is coughing forcefully but can still make sound. She was eating grapes moments ago.",
+        choices: [
+          { text: "Encourage her to keep coughing and stay calm, watching closely", next: "s3_watch_good" },
+          { text: "Immediately perform back blows and chest thrusts since she's choking", next: "s3_intervene_early", consequence: "She still has a strong, effective cough and can move air — her airway isn't fully blocked. Jumping straight to back blows and chest thrusts on a child who can still cough forcefully can actually push the object deeper." },
+          { text: "Sweep her mouth with your finger to try to find the object", next: "s3_blind_sweep_bad", consequence: "A blind finger sweep on a child risks pushing an object further down the airway, seen or not, and can injure the airway itself. Blind sweeps are specifically avoided in kids — you only remove what you can actually see." }
+        ]
+      },
+      s3_watch_good: {
+        text: "She keeps coughing for another 15 seconds, then suddenly stops coughing entirely, can't make any sound, and starts turning dusky around the lips.",
+        choices: [
+          { text: "Recognize this as a complete airway obstruction and begin back blows and chest thrusts", next: "s3_full_obstruction_good" },
+          { text: "Keep waiting a little longer to see if she starts coughing again", next: "s3_wait_too_long", consequence: "She's no longer moving air at all — this is now a complete obstruction, and waiting longer only burns through her oxygen reserve. A silent, non-coughing choking child needs intervention immediately, not more observation." }
+        ]
+      },
+      s3_intervene_early: {
+        text: "You back off the maneuvers once you notice she's still coughing forcefully and moving air. A few seconds later, she stops coughing and turns dusky.",
+        choices: [
+          { text: "Now begin back blows and chest thrusts — this is a complete obstruction", next: "s3_full_obstruction_good" }
+        ]
+      },
+      s3_blind_sweep_bad: {
+        text: "You don't find anything with the sweep, and she's now gagging and more distressed than before. She stops coughing and turns dusky moments later.",
+        choices: [
+          { text: "Begin back blows and chest thrusts now — no more blind sweeps", next: "s3_full_obstruction_delayed" }
+        ]
+      },
+      s3_wait_too_long: {
+        text: "Several more seconds pass with no air movement at all. Her lips are now clearly blue. You begin back blows and chest thrusts.",
+        choices: [
+          { text: "Continue alternating back blows and chest thrusts, checking the mouth for a visible object after each set", next: "s3_full_obstruction_delayed" }
+        ]
+      },
+      s3_full_obstruction_good: {
+        text: "You alternate back blows and chest thrusts. After the third cycle, a grape pops free and she takes a huge, gasping breath, then starts crying loudly.",
+        choices: [
+          { text: "Reassess her breathing and transport for evaluation", next: "s3_end_good" }
+        ]
+      },
+      s3_full_obstruction_delayed: {
+        text: "You continue cycles of back blows and chest thrusts. She still hasn't cleared the object, and she suddenly goes limp and stops responding.",
+        choices: [
+          { text: "Switch to CPR-style chest compressions, looking in the mouth for a visible object before each rescue breath attempt", next: "s3_end_ok" },
+          { text: "Keep doing back blows and chest thrusts the same way as before, since that's what you'd already started", next: "s3_end_bad" }
+        ]
+      },
+      s3_end_good: { ending: "good", text: "Textbook sequence: let an effective cough do its job, recognize the exact moment it becomes a complete obstruction, and act immediately once it does. She never went more than a few seconds without some air movement." },
+      s3_end_ok: { ending: "neutral", text: "You catch the transition to unresponsiveness and switch approach correctly — the object finally clears and she starts breathing again. It took longer than the best-case run because of an earlier misstep, but recognizing when the approach needs to change is exactly the skill this scenario is testing." },
+      s3_end_bad: { ending: "bad", text: "Once a choking child becomes unresponsive, the approach has to change — CPR-style compressions with a look in the mouth before each rescue breath attempt, not continued back blows and thrusts on a limp child. Missing that transition costs critical time she doesn't have." }
+    }
+  },
+  {
+    id: "s4",
+    title: "Found Down, Diabetic History",
+    domain: "Cardiac & Medical",
+    blurb: "Confused, sweaty, and shaky on the kitchen floor — is it obvious, or does it just look obvious?",
+    startNode: "s4_start",
+    nodes: {
+      s4_start: {
+        text: "You're called to a home for \"a person not acting right.\" You find a 45-year-old man sitting on the kitchen floor, awake but confused, sweaty, and shaky. His wife says he's diabetic and hasn't eaten since this morning.",
+        choices: [
+          { text: "Check his blood glucose if your protocol allows, while assessing his airway and ability to swallow", next: "s4_glucose_good" },
+          { text: "Assume he's intoxicated based on his confused, unsteady presentation", next: "s4_assume_bad", consequence: "Confusion, sweating, and unsteadiness can look identical to intoxication — but his wife just told you he's diabetic and hasn't eaten. Anchoring on \"probably drunk\" nearly costs you a time-sensitive hypoglycemic emergency." },
+          { text: "Wait for him to explain what's wrong before doing anything else", next: "s4_wait_bad", consequence: "He's confused and struggling to get words out — waiting on his own explanation costs you time you don't need to spend, especially with a diabetic history and a skipped meal right in front of you." }
+        ]
+      },
+      s4_assume_bad: {
+        text: "You reconsider once you notice his medical alert bracelet for diabetes. His confusion is worsening.",
+        choices: [
+          { text: "Check his blood glucose now and assess his ability to swallow safely", next: "s4_glucose_late" }
+        ]
+      },
+      s4_wait_bad: {
+        text: "He's getting harder to understand. You decide to stop waiting and start assessing directly.",
+        choices: [
+          { text: "Check his blood glucose and assess his ability to swallow safely", next: "s4_glucose_late" }
+        ]
+      },
+      s4_glucose_good: {
+        vitals: "Glucose 42 mg/dL",
+        text: "His glucose reads 42 mg/dL. He's confused but still awake enough to follow simple commands and swallow on request.",
+        choices: [
+          { text: "Give oral glucose gel between his cheek and gum, and reassess", next: "s4_oralglucose_good" },
+          { text: "Give him a large glass of orange juice to drink quickly", next: "s4_juice_risky", consequence: "He's confused enough that swallowing a full glass of liquid quickly carries real aspiration risk — oral glucose gel, given slowly, is the safer choice when a patient's airway protection is already in question." }
+        ]
+      },
+      s4_glucose_late: {
+        vitals: "Glucose 38 mg/dL",
+        text: "His glucose reads 38 mg/dL, and he's more confused than when you first arrived — slower to respond, and drooling slightly.",
+        choices: [
+          { text: "Reassess whether he's still alert enough to safely swallow before giving anything by mouth", next: "s4_borderline_swallow" }
+        ]
+      },
+      s4_borderline_swallow: {
+        text: "He's borderline — responding to voice, but no longer reliably protecting his own airway.",
+        choices: [
+          { text: "Do not give anything by mouth; secure his airway, position him appropriately, and transport requesting ALS for IV glucose", next: "s4_end_ok" },
+          { text: "Give oral glucose anyway, since he's diabetic and clearly needs the sugar", next: "s4_end_bad" }
+        ]
+      },
+      s4_juice_risky: {
+        text: "He coughs hard on the first big swallow, though nothing seriously goes wrong this time. You switch to oral glucose gel instead.",
+        choices: [
+          { text: "Continue with oral glucose gel and reassess", next: "s4_oralglucose_okay" }
+        ]
+      },
+      s4_oralglucose_good: {
+        vitals: "Glucose 92 mg/dL",
+        text: "Within a few minutes, his confusion clears noticeably. He's now alert, oriented, and a little embarrassed about the scene.",
+        choices: [
+          { text: "Recheck glucose, monitor, and transport for evaluation", next: "s4_end_good" }
+        ]
+      },
+      s4_oralglucose_okay: {
+        vitals: "Glucose 88 mg/dL",
+        text: "His confusion clears after a few minutes, though the earlier coughing incident makes you want to keep a closer eye on his airway during transport.",
+        choices: [
+          { text: "Recheck glucose, monitor closely, and transport", next: "s4_end_ok" }
+        ]
+      },
+      s4_end_good: { ending: "good", text: "You caught the real cause fast, confirmed he could safely swallow, treated it correctly, and watched him return to his normal self within minutes. \"Diabetic, confused, hasn't eaten\" is one of the most reliably fixable presentations you'll see in the field — this is exactly why it should jump out immediately." },
+      s4_end_ok: { ending: "neutral", text: "He recovers, but the path there was rougher than it had to be — either lost time from an early wrong assumption, or a real (if minor) airway risk taken along the way. The underlying rule still held: confirm a patient can safely protect their airway before anything goes by mouth, every time." },
+      s4_end_bad: { ending: "bad", text: "A shortcut on a real safety check turned a fixable hypoglycemic emergency into an actual airway emergency. \"Can he safely swallow\" isn't a formality — skipping it isn't a shortcut, it's a real risk to the patient." }
+    }
+  }
+];
+
+let currentScenario = null;
+let currentNodeId = null;
+let pathLog = [];
+
+function renderPicker(){
+  const grid = document.getElementById('pickerGrid');
+  grid.innerHTML = SCENARIOS.map(s => `
+    <button type="button" class="scenario-card" data-scenario="${s.id}">
+      <div class="scenario-domain">${s.domain}</div>
+      <h3>${s.title}</h3>
+      <p>${s.blurb}</p>
+    </button>
+  `).join('');
+  grid.querySelectorAll('[data-scenario]').forEach(btn => {
+    btn.addEventListener('click', () => startScenario(btn.dataset.scenario));
+  });
+}
+
+function startScenario(id){
+  currentScenario = SCENARIOS.find(s => s.id === id);
+  currentNodeId = currentScenario.startNode;
+  pathLog = [];
+  document.getElementById('pickerScreen').style.display = 'none';
+  document.getElementById('simBox').classList.add('active');
+  renderNode();
+}
+
+function backToPicker(){
+  currentScenario = null;
+  document.getElementById('simBox').classList.remove('active');
+  document.getElementById('pickerScreen').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderNode(consequenceText){
+  const node = currentScenario.nodes[currentNodeId];
+  const box = document.getElementById('simBox');
+
+  if (node.ending) {
+    box.innerHTML = `
+      <div class="sim-header">
+        <span class="sim-domain">${currentScenario.domain}</span>
+        <button type="button" class="back-link" id="backBtn">&larr; All scenarios</button>
+      </div>
+      <span class="ending-badge ${node.ending}">${node.ending === 'good' ? 'Good outcome' : node.ending === 'bad' ? 'Poor outcome' : 'Mixed outcome'}</span>
+      <p class="node-text">${node.text}</p>
+      <div class="sim-actions">
+        <button type="button" class="btn-primary" id="retryBtn">Try This Scenario Again</button>
+        <button type="button" class="btn-secondary" id="anotherBtn">Choose Another Scenario</button>
+      </div>
+      <div class="path-log">
+        <div class="path-log-title">Your path through this call</div>
+        <ol>${pathLog.map(p => `<li>${p}</li>`).join('')}</ol>
+      </div>
+    `;
+    document.getElementById('backBtn').addEventListener('click', backToPicker);
+    document.getElementById('retryBtn').addEventListener('click', () => startScenario(currentScenario.id));
+    document.getElementById('anotherBtn').addEventListener('click', backToPicker);
+    window.scrollTo({ top: box.offsetTop - 20, behavior: 'smooth' });
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="sim-header">
+      <span class="sim-domain">${currentScenario.domain}</span>
+      <button type="button" class="back-link" id="backBtn">&larr; All scenarios</button>
+    </div>
+    ${node.vitals ? `<div class="vitals-bar">${node.vitals}</div>` : ''}
+    ${consequenceText ? `<div class="consequence-banner"><strong>What happened</strong>${consequenceText}</div>` : ''}
+    <p class="node-text">${node.text}</p>
+    <div class="choice-list">
+      ${node.choices.map((c, i) => `<button type="button" class="choice-option" data-choice="${i}">${c.text}</button>`).join('')}
+    </div>
+  `;
+  document.getElementById('backBtn').addEventListener('click', backToPicker);
+  box.querySelectorAll('[data-choice]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const choice = node.choices[parseInt(btn.dataset.choice, 10)];
+      pathLog.push(choice.text + (choice.consequence ? ' — ' + choice.consequence : ''));
+      currentNodeId = choice.next;
+      renderNode(choice.consequence);
+    });
+  });
+  window.scrollTo({ top: box.offsetTop - 20, behavior: 'smooth' });
+}
+
+renderPicker();
+</script>
+</body>
+</html>
