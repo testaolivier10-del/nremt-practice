@@ -409,11 +409,15 @@ function onPointerMove(e){
 }
 
 function firstNonSkinGroupKey(hits){
-  for (const h of hits) {
+  // Three.js's raycaster doesn't check mesh.visible on its own, so a part
+  // hidden by a system filter (or the skin toggle) would otherwise still be
+  // pickable through the gap it left behind — filter those out first.
+  const visibleHits = hits.filter(h => h.object.visible);
+  for (const h of visibleHits) {
     const gk = h.object.userData.groupKey;
     if (gk && gk !== 'skin') return gk;
   }
-  if (hits.length && hits[0].object.userData.groupKey === 'skin' && skinOn) return 'skin';
+  if (visibleHits.length && visibleHits[0].object.userData.groupKey === 'skin' && skinOn) return 'skin';
   return null;
 }
 
