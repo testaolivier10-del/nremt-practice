@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NREMT-EMT Study Notes — Chapter by Chapter</title>
+<meta name="description" content="Full narrative study notes for NREMT-EMT prep, organized by course chapter, growing over time.">
+<style>
+  :root{
+    --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
+    --line:#DCE0DE; --ink:#1A1F1D; --muted:#5C645F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.65;}
+  .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
+  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+  .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 24px;}
+  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
+  .site-nav a{color:var(--accent);text-decoration:none;}
+  .site-nav a:hover{text-decoration:underline;}
+
+  .search-box{
+    width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:5px;
+    font-family:inherit;font-size:15px;background:var(--white);color:var(--ink);margin-bottom:18px;
+  }
+  .no-results{font-size:14px;color:var(--muted);display:none;margin-bottom:20px;}
+
+  .toc{
+    background:var(--white);border:1px solid var(--line);border-radius:6px;
+    padding:16px 20px;margin-bottom:28px;
+  }
+  .toc-title{
+    font-family:'SFMono-Regular',monospace;font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;
+  }
+  .toc-chapter{margin-bottom:10px;}
+  .toc-chapter:last-child{margin-bottom:0;}
+  .toc-chapter > a{font-weight:600;font-size:14.5px;color:var(--ink);text-decoration:none;}
+  .toc-chapter > a:hover{color:var(--accent);}
+  .toc-sections{margin:5px 0 0 16px;padding:0;list-style:none;}
+  .toc-sections li{margin-bottom:3px;}
+  .toc-sections a{font-size:13px;color:var(--muted);text-decoration:none;}
+  .toc-sections a:hover{color:var(--accent);text-decoration:underline;}
+
+  .chapter{margin-bottom:48px;}
+  .chapter-head{
+    font-family:'SFMono-Regular',monospace;font-size:12px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;
+  }
+  .chapter h2{font-size:23px;font-weight:600;margin:0 0 24px;scroll-margin-top:16px;}
+
+  .section{margin-bottom:36px;scroll-margin-top:16px;}
+  .section h3{font-size:19px;font-weight:600;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid var(--line);}
+
+  .topic{margin-bottom:22px;}
+  .topic:last-of-type{margin-bottom:0;}
+  .topic h4{font-size:16px;font-weight:600;margin:0 0 8px;color:var(--navy);}
+  .topic p{font-size:15px;margin:0 0 10px;}
+  .topic p:last-child{margin-bottom:0;}
+
+  .takeaways{
+    background:var(--white);border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:4px;padding:16px 18px;margin-top:20px;
+  }
+  .takeaways .tk-title{
+    font-family:'SFMono-Regular',monospace;font-size:11px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;
+  }
+  .takeaways ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink);}
+  .takeaways li{margin-bottom:6px;}
+  .takeaways li:last-child{margin-bottom:0;}
+
+  .search-hit mark{background:rgba(193,80,46,0.22);color:inherit;border-radius:2px;padding:0 1px;}
+
+  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:60ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>NREMT-EMT Study Notes</h1>
+  <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a></div>
+  <p class="lede">Full narrative study notes organized by course chapter — the "why" and context behind the material, meant to complement the quick-reference pages rather than replace them. This grows over time as more chapters get added.</p>
+
+  <input type="text" class="search-box" id="searchBox" placeholder="Search notes...">
+  <div class="no-results" id="noResults">No notes match your search.</div>
+
+  <div class="toc" id="tocBox">
+    <div class="toc-title">Jump to</div>
+    <div id="tocList"></div>
+  </div>
+
+  <div id="notesRoot"></div>
+
+  <footer>
+    <p>These notes are a supplementary study aid summarizing course concepts in plain language. They are not a substitute for your program's official textbook or instructor — always verify specifics (exact figures, current protocols, legal definitions in your state) against your own course materials.</p>
+  </footer>
+</div>
+
+<script>
+// Each chapter holds sections, each section holds topics (a heading + one or
+// more paragraphs) and an optional list of key-takeaway bullets shown at the
+// end of the section. Appending a new chapter/section/topic here is all that's
+// needed to extend the page — rendering, the table of contents, and search
+// are all generated from this data.
+const CHAPTERS = [
+  {
+    num: 1,
+    title: "Introduction to EMS",
+    sections: [
+      {
+        title: "EMS Systems & Provider Roles",
+        id: "ch1-ems-systems-roles",
+        topics: [
+          {
+            heading: "How EMS became what it is today",
+            paragraphs: [
+              "Modern EMS didn't start as a medical service — it started as transportation. The earliest documented systems, on 18th-century battlefields, existed purely to move wounded soldiers to a physician; no care was given at the point of injury. That pattern — transport first, treatment later — persisted for well over a century. City ambulance services in the early 1900s worked the same way, and by the late 1940s, many communities were served by whichever local business happened to own a vehicle big enough to carry a stretcher, which is why funeral homes often ran ambulance services using hearses.",
+              "The shift toward treating patients before and during transport, rather than just moving them, is genuinely recent. Two federal actions mark the turning point: the 1966 National Highway Safety Act gave the U.S. Department of Transportation authority to set EMS standards nationally, and the National Registry of EMTs was founded in 1970 to create a consistent standard for who counts as qualified. Most state EMT courses today still trace their structure back to the DOT framework that act created."
+            ]
+          },
+          {
+            heading: "Understanding the system as a chain",
+            paragraphs: [
+              "The easiest way to understand how EMS fits together is to follow it from the patient's side, not the provider's: a call goes to an Emergency Medical Dispatcher, who sends the appropriate responders (which might mean an EMR, EMT, AEMT, or paramedic depending on what's dispatched and available), those responders transport the patient by ambulance to an emergency department, and the ED either resolves the problem or serves as the gateway to the rest of the hospital — surgery, specialists, an ICU bed. Every one of the four EMS certification levels (EMR, EMT, AEMT, Paramedic) sits inside that chain, distinguished mainly by how much independent assessment and intervention they're trained and legally permitted to do, from an EMR's initial life-threat stabilization up through a paramedic's full scope of prehospital care."
+            ]
+          },
+          {
+            heading: "What actually falls on the EMT",
+            paragraphs: [
+              "The job is broader than \"treat the patient.\" Safety comes first, in a specific order: yourself, then your crew, then the patient and bystanders — a rule that exists because an injured EMT cannot help anyone. Beyond safety, the role includes assessment before any care decision, the actual delivery of care, safely lifting and moving a patient without hurting either of you, operating the ambulance responsibly, and — a detail that's easy to underweight — a proper transfer of care at the hospital. Leaving before that handoff is complete isn't a shortcut; it's abandonment."
+            ]
+          },
+          {
+            heading: "Quality improvement isn't optional paperwork",
+            paragraphs: [
+              "Every EMS system is supposed to be continuously checking its own work — catching bad outcomes, sloppy protocols, or gaps in training before they repeat. An EMT participates in this mostly through unglamorous means: writing accurate, complete patient care reports (a rushed or incomplete report doesn't just look bad, it actively undermines the system's ability to catch real problems), staying current through continuing education, and being honest in post-call self-review.",
+              "The person overseeing the clinical side of all this is the Medical Director, a physician who owns the protocols an EMT operates under. That oversight comes in two forms worth keeping straight: off-line medical direction is the standing orders you act on without calling anyone — most of what an EMT does day-to-day falls here. On-line medical direction is a live physician giving a specific order in real time, usually reserved for situations protocol doesn't already cover."
+            ]
+          },
+          {
+            heading: "EMS as public health, not just emergency response",
+            paragraphs: [
+              "It's easy to think of EMS purely as the \"ambulance shows up\" moment, but EMS providers regularly do public-health work that has nothing to do with a 911 call: spotting fall hazards in an elderly patient's home, running blood pressure clinics, participating in vaccination drives, distributing bike helmets. There's also a quieter function — call patterns themselves can be an early warning sign of a broader trend, whether that's a flu season ramping up or a spike in opioid overdoses in a particular area."
+            ]
+          },
+          {
+            heading: "Why \"evidence-based\" matters more than it sounds",
+            paragraphs: [
+              "EMS practice used to run heavily on tradition — \"we've always done it this way\" — and one of the clearest lessons from moving toward evidence-based practice is that tradition can be wrong. Oxygen is the textbook example: it used to be given almost reflexively to nearly every patient, treated as a universal good. Research eventually showed that excess oxygen can actually worsen outcomes in conditions like heart attack and stroke, which is why oxygen administration today is targeted rather than automatic. That's the whole point of evidence-based medicine — practices earn their place through actual outcome data, not institutional habit."
+            ]
+          }
+        ],
+        takeaways: [
+          "Modern EMS began purely as battlefield transport (18th century) — treating patients before/during transport is a comparatively recent shift.",
+          "1966 National Highway Safety Act: gave the U.S. DOT authority to set national EMS standards.",
+          "National Registry of EMTs (NREMT) founded in 1970 to standardize who counts as qualified.",
+          "The EMS chain: dispatcher → responders (EMR/EMT/AEMT/Paramedic) → ambulance transport → ED → rest of the hospital as needed.",
+          "The four certification levels differ mainly in scope of independent assessment/intervention allowed.",
+          "Personal safety priority order: yourself → your crew → patient and bystanders.",
+          "Leaving before a complete transfer of care at the hospital is abandonment, not a shortcut.",
+          "Off-line medical direction = standing protocols followed without a call; on-line medical direction = a live physician order in real time.",
+          "The Medical Director (a physician) owns the protocols an EMT operates under.",
+          "Quality improvement depends on accurate PCRs, continuing education, and honest self-review — not just a formality.",
+          "EMS does public-health work beyond 911 calls (home safety checks, BP clinics, vaccination drives) and call patterns can flag broader health trends.",
+          "Evidence-based practice replaced tradition-based practice — e.g., oxygen shifted from routine/automatic to targeted, since excess O2 can worsen outcomes in MI/stroke."
+        ]
+      }
+    ]
+  }
+];
+
+function renderTOC(){
+  const el = document.getElementById('tocList');
+  el.innerHTML = CHAPTERS.map(ch => `
+    <div class="toc-chapter">
+      <a href="#chapter-${ch.num}">Chapter ${ch.num}: ${ch.title}</a>
+      <ul class="toc-sections">
+        ${ch.sections.map(s => `<li><a href="#${s.id}">${s.title}</a></li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+function renderNotes(filterText){
+  const root = document.getElementById('notesRoot');
+  const noResults = document.getElementById('noResults');
+  const q = (filterText || '').trim().toLowerCase();
+
+  const matches = (text) => !q || text.toLowerCase().includes(q);
+  const highlight = (text) => {
+    if (!q) return text;
+    const idx = text.toLowerCase().indexOf(q);
+    if (idx === -1) return text;
+    return text.slice(0, idx) + '<mark>' + text.slice(idx, idx + q.length) + '</mark>' + text.slice(idx + q.length);
+  };
+
+  let anyVisible = false;
+  const html = CHAPTERS.map(ch => {
+    const sectionsHtml = ch.sections.map(sec => {
+      const secMatches = matches(sec.title);
+      const topicsHtml = sec.topics.map(t => {
+        const topicText = t.heading + ' ' + t.paragraphs.join(' ');
+        if (!secMatches && !matches(topicText)) return '';
+        anyVisible = true;
+        return `
+          <div class="topic${q ? ' search-hit' : ''}">
+            <h4>${q ? highlight(t.heading) : t.heading}</h4>
+            ${t.paragraphs.map(p => `<p>${q ? highlight(p) : p}</p>`).join('')}
+          </div>
+        `;
+      }).join('');
+      if (!topicsHtml) return '';
+      const takeawaysHtml = (sec.takeaways && sec.takeaways.length) ? `
+        <div class="takeaways">
+          <div class="tk-title">Key takeaways</div>
+          <ul>${sec.takeaways.map(k => `<li>${k}</li>`).join('')}</ul>
+        </div>
+      ` : '';
+      return `
+        <div class="section" id="${sec.id}">
+          <h3>${sec.title}</h3>
+          ${topicsHtml}
+          ${takeawaysHtml}
+        </div>
+      `;
+    }).join('');
+    if (!sectionsHtml) return '';
+    return `
+      <div class="chapter" id="chapter-${ch.num}">
+        <div class="chapter-head">Chapter ${ch.num}</div>
+        <h2>${ch.title}</h2>
+        ${sectionsHtml}
+      </div>
+    `;
+  }).join('');
+
+  root.innerHTML = html;
+  noResults.style.display = anyVisible ? 'none' : 'block';
+  document.getElementById('tocBox').style.display = q ? 'none' : 'block';
+}
+
+document.getElementById('searchBox').addEventListener('input', (e) => renderNotes(e.target.value));
+renderTOC();
+renderNotes('');
+</script>
+</body>
+</html>
