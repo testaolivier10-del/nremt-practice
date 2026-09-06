@@ -51,7 +51,14 @@
   .chapter h2{font-size:23px;font-weight:600;margin:0 0 24px;scroll-margin-top:16px;}
 
   .section{margin-bottom:36px;scroll-margin-top:16px;}
-  .section h3{font-size:19px;font-weight:600;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid var(--line);}
+  .section-intro{padding-bottom:10px;border-bottom:2px solid var(--line);margin-bottom:16px;}
+  .section-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+  .section-head h3{font-size:19px;font-weight:600;margin:0;}
+  .domain-tag{
+    font-family:'SFMono-Regular',monospace;font-size:10.5px;color:var(--navy);
+    background:rgba(18,32,51,0.08);border-radius:20px;padding:3px 9px;letter-spacing:0.02em;flex-shrink:0;
+  }
+  .section-note{font-size:12.5px;color:var(--muted);font-style:italic;margin:0;}
 
   .topic{margin-bottom:22px;}
   .topic:last-of-type{margin-bottom:0;}
@@ -167,6 +174,107 @@ const CHAPTERS = [
         ]
       }
     ]
+  },
+  {
+    num: 2,
+    title: "Well-Being of the EMT",
+    sections: [
+      {
+        title: "Provider Wellness",
+        id: "ch2-provider-wellness",
+        domain: "EMS Operations",
+        topics: [
+          {
+            heading: "Stress isn't a personal failing — it's a physiological process",
+            paragraphs: [
+              "The body responds to a stressful call the same way it responds to any perceived threat, moving through three predictable stages. First comes the alarm reaction — the sympathetic nervous system firing all at once: pupils dilate, heart rate climbs, airways open wider, blood sugar rises, and cortisol floods the system to help you cope with what's happening. If the stressor resolves, the body moves into resistance, gradually returning toward baseline. But if stress is severe or sustained long enough, the body reaches exhaustion — a state where the adrenal glands, lymph nodes, and digestive system all start showing real physical wear, not just fatigue."
+            ]
+          },
+          {
+            heading: "Not all stress reactions look the same, or arrive on the same timeline",
+            paragraphs: [
+              "An acute reaction shows up during or right after a bad call — the nausea, the shakiness, the difficulty sleeping that night. A delayed reaction, which is what PTSD actually is, can surface days, months, or even years later, often as flashbacks, irritability, or a creeping sense of detachment — and because of the gap, the person experiencing it may never connect the symptoms back to the original incident. That delay is exactly why PTSD needs an actual mental health professional, not just time or willpower. Then there's cumulative stress, or burnout: no single triggering event, just years of low-grade stressors compounding until vague anxiety slides into apathy, physical complaints, sleep disruption, and eventually depression. Because it builds so gradually, the early warning signs are the easiest ones to miss."
+            ]
+          },
+          {
+            heading: "What actually helps",
+            paragraphs: [
+              "The basics matter more than they sound like they should: sleep, diet, exercise, and cutting back on alcohol and caffeine all measurably affect how well someone tolerates the stress of this job. Beyond individual habits, EMS systems generally offer some form of Critical Incident Stress Management — a broader structure of education, peer support, and professional counseling — sometimes including a formal debriefing in the 24-to-72-hour window after a severe call, though this specific practice has fallen out of favor somewhat and isn't automatically recommended the way it once was. The throughline across all of it: seeking support after a hard call is a sign of function, not a sign of weakness."
+            ]
+          },
+          {
+            heading: "Grief has a shape too",
+            paragraphs: [
+              "Patients and families facing a terminal diagnosis or sudden loss often move through a recognizable sequence — denial, anger, bargaining, depression, and eventually acceptance — though not everyone moves through it in order, and not everyone reaches the end of it. Recognizing which stage someone is in doesn't give you a script, but it does help you understand why a grieving family member might lash out in anger or bargain frantically with you as if you had more control over the outcome than you do."
+            ]
+          }
+        ],
+        takeaways: [
+          "Three-stage stress response (General Adaptation Syndrome): alarm reaction → resistance → exhaustion.",
+          "Alarm reaction = sympathetic \"fight or flight\": dilated pupils, increased heart rate, widened airways, elevated blood sugar, cortisol release.",
+          "Exhaustion stage causes real physical wear on the adrenal glands, lymph nodes, and digestive system — not just tiredness.",
+          "Acute stress reaction: during or immediately after a call (nausea, shakiness, trouble sleeping).",
+          "Delayed stress reaction = PTSD: can surface days to years later (flashbacks, irritability, detachment); needs an actual mental health professional, not just time.",
+          "Cumulative stress / burnout: no single trigger, builds gradually — vague anxiety → apathy → physical complaints → sleep disruption → depression.",
+          "Healthy basics (sleep, diet, exercise, limiting alcohol/caffeine) measurably affect stress tolerance.",
+          "CISM (Critical Incident Stress Management) = education, peer support, professional counseling; formal debriefing 24-72 hrs post-incident has fallen out of favor and isn't automatically recommended anymore.",
+          "Seeking support after a hard call is a sign of function, not weakness.",
+          "Stages of grief: denial, anger, bargaining, depression, acceptance — order and completion vary by person."
+        ]
+      }
+    ]
+  },
+  {
+    num: 3,
+    title: "Lifting and Moving Patients",
+    sections: [
+      {
+        title: "Patient Lifting & Moving",
+        id: "ch3-lifting-moving",
+        note: "This chapter doesn't map onto one of the practice exam's six domains — it's a standalone topic in its own right.",
+        topics: [
+          {
+            heading: "Speed and safety are usually in tension, and the situation decides which wins",
+            paragraphs: [
+              "Not every patient gets moved the same way, and the deciding factor is urgency. An emergency move applies when the scene itself is the danger — a burning structure, a car about to be struck by traffic — and there's no time for assessment or spinal precautions at all. In that situation, the safest technique is a long-axis drag, ideally pulling from the shoulders along the line of the body, since this lets the limbs and spine fall into roughly natural alignment even without deliberate stabilization. It doesn't eliminate the risk of worsening a spinal injury, but it minimizes it under circumstances where waiting isn't an option. Urgent and nonurgent moves, by contrast, allow time for a real assessment and appropriate spinal precautions before anyone touches the patient."
+            ]
+          },
+          {
+            heading: "Your own body is part of the equation",
+            paragraphs: [
+              "Back injuries end EMS careers, and the mechanism is almost always the same: bending at the waist instead of the legs, which transfers the full load onto the lumbar spine. Proper body mechanics — keeping the load close, lifting with the legs, avoiding twisting under load — isn't a formality, it's the difference between a career and a disability."
+            ]
+          },
+          {
+            heading: "Choosing how to move someone without a suspected spine injury",
+            paragraphs: [
+              "Once spinal injury is ruled out, several transfer techniques become available, each suited to a different situation: the direct ground lift for moving someone from the ground onto a stretcher, the draw-sheet method for bed-to-stretcher transfers using the loosened bottom sheet, the extremity lift with one rescuer at the wrists and another at the knees, and the direct carry, where two rescuers curl the patient against their chests before lowering them — this last one specifically requires no suspected spine involvement, since it involves real flexion of the torso."
+            ]
+          },
+          {
+            heading: "Positioning depends on the problem, not habit",
+            paragraphs: [
+              "An unresponsive patient with no spinal concern goes into the recovery position on their side, which helps protect the airway from aspiration. Someone in respiratory distress or with chest pain generally wants to sit up — a position of comfort, often semi-Fowler's — because being upright genuinely makes breathing easier; this is also exactly why a stair chair is well-suited to someone with breathing difficulty who needs to come down several flights of stairs, but is contraindicated for anyone with a suspected spinal injury, altered mental status, or unresponsiveness, since none of those patients can safely be managed in a seated, restrained position. A patient in shock is positioned supine, prioritizing perfusion over comfort."
+            ]
+          }
+        ],
+        takeaways: [
+          "Emergency move: used only when the scene itself is immediately dangerous (fire, traffic) and there's no time for assessment or spinal precautions.",
+          "Long-axis drag (pulling from the shoulders along the body's long axis) is the preferred emergency-move technique — keeps limbs/spine roughly aligned even without deliberate stabilization.",
+          "Urgent and nonurgent moves allow time for a real assessment and spinal precautions first.",
+          "Back injuries are usually caused by bending at the waist instead of the legs, loading the lumbar spine.",
+          "Proper body mechanics: keep the load close, lift with the legs, never twist under load.",
+          "Direct ground lift: ground → stretcher.",
+          "Draw-sheet method: bed → stretcher, using the loosened bottom sheet.",
+          "Extremity lift: one rescuer at the wrists, one at the knees.",
+          "Direct carry: two rescuers curl the patient against their chests — requires no suspected spinal injury, since it involves real torso flexion.",
+          "Recovery position: unresponsive patient with no spinal concern — protects the airway from aspiration.",
+          "Semi-Fowler's / position of comfort: respiratory distress or chest pain — being upright eases breathing.",
+          "Stair chair: suited to a breathing-difficulty patient descending stairs; contraindicated with suspected spinal injury, altered mental status, or unresponsiveness.",
+          "Shock: position supine, prioritizing perfusion over comfort."
+        ]
+      }
+    ]
   }
 ];
 
@@ -217,9 +325,19 @@ function renderNotes(filterText){
           <ul>${sec.takeaways.map(k => `<li>${k}</li>`).join('')}</ul>
         </div>
       ` : '';
+      const domainTagHtml = sec.domain
+        ? `<span class="domain-tag">${sec.domain} domain</span>`
+        : '';
+      const noteHtml = sec.note ? `<p class="section-note">${sec.note}</p>` : '';
       return `
         <div class="section" id="${sec.id}">
-          <h3>${sec.title}</h3>
+          <div class="section-intro">
+            <div class="section-head">
+              <h3>${sec.title}</h3>
+              ${domainTagHtml}
+            </div>
+            ${noteHtml}
+          </div>
           ${topicsHtml}
           ${takeawaysHtml}
         </div>
