@@ -17,6 +17,7 @@
   --warn:#C08A2E;
   --font-ui:'Nunito','Segoe UI',system-ui,sans-serif;
   --radius:12px;
+  --on-accent:#FFFFFF;   /* text sitting on a solid navy/accent background — stays white in both themes */
 }
 
 /* Dark theme — toggled via [data-theme="dark"] on <html>, set by the
@@ -49,7 +50,7 @@ footer{
   border-radius:999px;
   border:1px solid var(--line);
   background:var(--white);
-  color:var(--navy);
+  color:var(--ink);
   cursor:pointer;
   font-size:15px;
   line-height:1;
@@ -88,7 +89,7 @@ footer{
   gap:8px;
   font-weight:800;
   font-size:15px;
-  color:var(--navy);
+  color:var(--ink);
   text-decoration:none;
   letter-spacing:-0.01em;
 }
@@ -100,7 +101,7 @@ footer{
   width:24px;height:24px;
   border-radius:8px;
   background:var(--accent);
-  color:var(--white);
+  color:var(--on-accent);
   font-size:13px;
   line-height:1;
 }
@@ -119,7 +120,7 @@ footer{
   cursor:pointer;
   font-size:13px;
   font-weight:700;
-  color:var(--navy);
+  color:var(--ink);
   background:var(--white);
   border:1px solid var(--line);
   border-radius:999px;
@@ -128,9 +129,9 @@ footer{
 }
 .nav-group summary::-webkit-details-marker{display:none;}
 .nav-group summary:hover{border-color:var(--accent);color:var(--accent);}
-.nav-group[open] summary{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.nav-group[open] summary{background:var(--navy);color:var(--on-accent);border-color:var(--navy);}
 .nav-group.has-active summary{color:var(--accent);border-color:var(--accent);}
-.nav-group.has-active[open] summary{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.nav-group.has-active[open] summary{background:var(--navy);color:var(--on-accent);border-color:var(--navy);}
 
 .nav-group__items{
   position:absolute;
