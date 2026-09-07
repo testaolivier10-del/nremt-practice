@@ -6,23 +6,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Auscultation Sound Trainer — EMT Prep</title>
 <meta name="description" content="Listen to real recorded lung sounds — wheezes, crackles, stridor — and train your ear to tell them apart. Click to play, guess which one it is, get instant feedback.">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
-  :root{
-    --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
-    --line:#DCE0DE; --ink:#1A1F1D; --muted:#5C645F; --good:#2E7D4F; --bad:#B23A3A;
-  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.65;}
   .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
   h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
   .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 20px;}
-  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
-  .site-nav a{color:var(--accent);text-decoration:none;}
-  .site-nav a:hover{text-decoration:underline;}
 
   .notice{
-    background:#FBEFE9;border:1px solid #E8C9B8;border-radius:6px;padding:14px 16px;
+    background:#FBEFE9;border:1px solid #E8C9B8;border-radius:10px;padding:14px 16px;
     font-size:13.5px;color:#7A4A30;margin-bottom:28px;
   }
   .notice strong{color:#5E3822;}
@@ -34,7 +30,7 @@
   .sound-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   @media (max-width:520px){.sound-grid{grid-template-columns:1fr;}}
   .sound-card{
-    background:var(--white);border:1px solid var(--line);border-radius:8px;padding:16px;
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
   }
   .sound-card h3{font-size:15.5px;font-weight:600;margin:0 0 6px;color:var(--navy);}
   .sound-card p{font-size:13.5px;color:var(--muted);margin:0 0 12px;}
@@ -44,10 +40,10 @@
     border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-family:inherit;
     cursor:pointer;transition:background .15s;
   }
-  .play-btn:hover{background:#1c3350;}
+  .play-btn:hover{background:var(--navy2);}
   .play-btn:disabled{opacity:0.55;cursor:default;}
   .play-btn.playing{background:var(--accent);}
-  .play-btn.playing:hover{background:#a8431f;}
+  .play-btn.playing:hover{background:#21806F;}
   .play-btn .icon{font-size:12px;}
   .link-out-btn{
     display:inline-flex;align-items:center;gap:6px;background:var(--white);color:var(--navy);
@@ -82,7 +78,7 @@
   .quiz-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;}
   @media (max-width:480px){.quiz-choices{grid-template-columns:1fr;}}
   .choice-btn{
-    background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:12px 10px;
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:12px 10px;
     font-family:inherit;font-size:14.5px;color:var(--ink);cursor:pointer;transition:all .12s;
   }
   .choice-btn:hover:not(:disabled){border-color:var(--accent);}
@@ -97,17 +93,17 @@
   .feedback-verdict.incorrect{color:var(--bad);}
   .feedback p{font-size:14px;color:var(--ink);margin:0 0 16px;}
   .next-btn{
-    background:var(--navy);color:var(--white);border:none;border-radius:6px;padding:11px 22px;
+    background:var(--navy);color:var(--white);border:none;border-radius:var(--radius);padding:11px 22px;
     font-family:inherit;font-size:14px;cursor:pointer;
   }
-  .next-btn:hover{background:#1c3350;}
+  .next-btn:hover{background:var(--navy2);}
 
   .quiz-start{text-align:center;padding:30px 20px;}
   .start-btn{
-    background:var(--accent);color:var(--white);border:none;border-radius:6px;padding:13px 26px;
+    background:var(--accent);color:var(--white);border:none;border-radius:var(--radius);padding:13px 26px;
     font-family:inherit;font-size:15px;cursor:pointer;margin-top:14px;
   }
-  .start-btn:hover{background:#a8431f;}
+  .start-btn:hover{background:#21806F;}
 
   .results-box{text-align:center;padding:20px;}
   .results-score{font-size:40px;font-weight:700;color:var(--navy);margin:6px 0;}
@@ -121,7 +117,8 @@
 <body>
 <div class="wrap">
   <h1>Auscultation Sound Trainer</h1>
-  <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="scenario-sim.html">Scenarios</a></div>
+  <div id="site-header"></div>
+  <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div></noscript>
   <p class="lede">Text can tell you a wheeze is "high-pitched and musical" and a crackle is "discrete and popping" — but that distinction only really locks in once you've actually heard both. Listen to real recorded breath sounds below, then test your ear in quiz mode.</p>
 
   <div class="notice">
@@ -372,5 +369,6 @@ function renderResults(){
 renderListenSection();
 renderQuizRound();
 </script>
+<script src="assets/nav.js" defer></script>
 </body>
 </html>

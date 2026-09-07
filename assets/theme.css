@@ -1,0 +1,126 @@
+/* Shared "health vibe" design tokens + header/nav component styles.
+   Loaded on every page so the palette and header live in one place
+   instead of being copy-pasted per file. */
+
+:root{
+  --navy:#16332E;      /* deep teal-black — headers, buttons, strong text */
+  --navy2:#1F4A42;      /* secondary teal — hover/pressed states */
+  --paper:#F6FBF9;      /* page background — cool mint-white */
+  --white:#FFFFFF;
+  --accent:#2C9C8B;      /* primary teal-mint accent */
+  --accent-2:#E8776A;    /* warm coral — used sparingly for streaks/CTAs */
+  --line:#DCEAE6;
+  --ink:#17231F;
+  --muted:#5B7A72;
+  --good:#2F9E5B;
+  --bad:#D1594A;
+  --warn:#C08A2E;
+  --font-ui:'Nunito','Segoe UI',system-ui,sans-serif;
+  --radius:12px;
+}
+
+footer{
+  font-family:var(--font-ui);
+}
+
+/* ---- Shared site header (injected by nav.js into #site-header) ---- */
+#site-header{margin-bottom:24px;}
+
+.site-header__inner{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px 16px;
+  padding-bottom:14px;
+  margin-bottom:14px;
+  border-bottom:1px solid var(--line);
+  font-family:var(--font-ui);
+}
+
+.site-header__brand{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-weight:800;
+  font-size:15px;
+  color:var(--navy);
+  text-decoration:none;
+  letter-spacing:-0.01em;
+}
+.site-header__brand:hover{color:var(--accent);}
+.site-header__brand .brand-mark{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;height:24px;
+  border-radius:8px;
+  background:var(--accent);
+  color:var(--white);
+  font-size:13px;
+  line-height:1;
+}
+
+.site-header__groups{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.nav-group{
+  position:relative;
+}
+.nav-group summary{
+  list-style:none;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:700;
+  color:var(--navy);
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:6px 14px;
+  user-select:none;
+}
+.nav-group summary::-webkit-details-marker{display:none;}
+.nav-group summary:hover{border-color:var(--accent);color:var(--accent);}
+.nav-group[open] summary{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.nav-group.has-active summary{color:var(--accent);border-color:var(--accent);}
+.nav-group.has-active[open] summary{background:var(--navy);color:var(--white);border-color:var(--navy);}
+
+.nav-group__items{
+  position:absolute;
+  top:calc(100% + 6px);
+  left:0;
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:180px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:6px;
+  box-shadow:0 8px 24px rgba(22,51,46,0.12);
+}
+.nav-group__items a{
+  display:block;
+  padding:7px 10px;
+  border-radius:6px;
+  font-size:13.5px;
+  font-weight:600;
+  color:var(--ink);
+  text-decoration:none;
+}
+.nav-group__items a:hover{background:var(--paper);}
+.nav-group__items a.active{color:var(--accent);background:var(--paper);}
+
+/* No-JS fallback list (hidden once nav.js successfully renders) */
+.site-nav-fallback{font-size:13px;color:var(--muted);margin-bottom:24px;font-family:var(--font-ui);}
+.site-nav-fallback a{color:var(--accent);text-decoration:none;}
+.site-nav-fallback a:hover{text-decoration:underline;}
+
+@media (max-width:520px){
+  .site-header__inner{flex-direction:column;align-items:flex-start;}
+  .nav-group__items{left:auto;right:0;}
+}

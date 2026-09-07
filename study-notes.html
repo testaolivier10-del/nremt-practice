@@ -5,29 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NREMT-EMT Study Notes — Chapter by Chapter</title>
 <meta name="description" content="Full narrative study notes for NREMT-EMT prep, organized by course chapter, growing over time.">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
-  :root{
-    --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
-    --line:#DCE0DE; --ink:#1A1F1D; --muted:#5C645F;
-  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.65;}
   .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
   h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
   .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 24px;}
-  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
-  .site-nav a{color:var(--accent);text-decoration:none;}
-  .site-nav a:hover{text-decoration:underline;}
 
   .search-box{
-    width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:5px;
+    width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:10px;
     font-family:inherit;font-size:15px;background:var(--white);color:var(--ink);margin-bottom:18px;
   }
   .no-results{font-size:14px;color:var(--muted);display:none;margin-bottom:20px;}
 
   .toc{
-    background:var(--white);border:1px solid var(--line);border-radius:6px;
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
     padding:16px 20px;margin-bottom:28px;
   }
   .toc-title{
@@ -139,7 +135,8 @@
 <body>
 <div class="wrap">
   <h1>NREMT-EMT Study Notes</h1>
-  <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div>
+  <div id="site-header"></div>
+  <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div></noscript>
   <p class="lede">Full narrative study notes organized by course chapter — the "why" and context behind the material, meant to complement the quick-reference pages rather than replace them. This grows over time as more chapters get added.</p>
 
   <input type="text" class="search-box" id="searchBox" placeholder="Search notes...">
@@ -3904,5 +3901,6 @@ renderTOC();
 renderNotes('');
 renderRail();
 </script>
+<script src="assets/nav.js" defer></script>
 </body>
 </html>
