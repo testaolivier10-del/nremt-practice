@@ -460,16 +460,15 @@ function resetMeshColor(m){
   m.material.color.setHex(m.userData.baseColor);
   m.material.emissive.setHex(m.userData.baseEmissive || 0x000000);
   m.material.emissiveIntensity = m.userData.baseEmissiveIntensity ?? 1;
-  m.userData.pulsing = false;
 }
 
-// Selection keeps each part's own color and glows with a soft, gently
-// pulsing accent-colored emissive instead of flat-filling the mesh — easier
-// to read as "this is highlighted" rather than "this part turned teal".
+// Selection keeps each part's own color and glows with a soft accent-colored
+// emissive instead of flat-filling the mesh — easier to read as "this is
+// highlighted" rather than "this part turned teal".
 function highlightGroup(groupKey){
   for (const m of meshByGroup[groupKey] || []) {
     m.material.emissive = new THREE.Color(ACCENT_HEX);
-    m.userData.pulsing = true;
+    m.material.emissiveIntensity = 0.4;
   }
 }
 
@@ -655,12 +654,6 @@ document.getElementById('landmarkList').addEventListener('click', (e) => {
 function animate(){
   requestAnimationFrame(animate);
   controls.update();
-  if (selectedGroupKey) {
-    const pulse = 0.35 + 0.18 * Math.sin(performance.now() * 0.002);
-    for (const m of meshByGroup[selectedGroupKey] || []) {
-      if (m.userData.pulsing) m.material.emissiveIntensity = pulse;
-    }
-  }
   renderer.render(scene, camera);
 }
 
