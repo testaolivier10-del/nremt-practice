@@ -336,7 +336,6 @@ function loadModel(){
       allPickable.push(obj);
     });
     scene.add(modelRoot);
-    addPointMarkers();
     applySystemFilter();
     document.getElementById('viewerLoading').classList.add('hidden');
     renderList();
@@ -350,24 +349,6 @@ function loadModel(){
     console.error(err);
     document.getElementById('viewerLoadingText').textContent = 'Could not load the 3D model. Try reloading the page.';
   });
-}
-
-function addPointMarkers(){
-  const geo = new THREE.SphereGeometry(9, 14, 10);
-  for (const p of POINTS_3D) {
-    const mat = new THREE.MeshStandardMaterial({ color: ACCENT_HEX, roughness:0.5, depthTest:false });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(p.x, p.y, p.z);
-    mesh.renderOrder = 999;
-    const groupKey = 'pt_' + p.key;
-    mesh.userData.groupKey = groupKey;
-    mesh.userData.baseColor = ACCENT_HEX;
-    mesh.userData.isPoint = true;
-    mesh.userData.system = p.system;
-    scene.add(mesh);
-    (meshByGroup[groupKey] = meshByGroup[groupKey] || []).push(mesh);
-    allPickable.push(mesh);
-  }
 }
 
 function onPointerDown(e){
