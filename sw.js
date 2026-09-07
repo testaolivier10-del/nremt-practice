@@ -3,7 +3,14 @@
 // the three.js vendor bundle, Google Fonts) is cached the first time it's
 // actually requested, so a first visit isn't stuck downloading 15MB+ before
 // it's usable.
-const CACHE_NAME = 'nremt-prep-v1';
+//
+// Pages/CSS/JS use network-first: when online, always fetch the latest
+// version and update the cache, so a site update reaches every open tab on
+// its next load instead of being stuck behind a stale cache indefinitely.
+// The cached copy is only served as a fallback when the network fails.
+// Bump CACHE_NAME whenever this file changes, so old cached entries are
+// dropped instead of lingering forever.
+const CACHE_NAME = 'nremt-prep-v2';
 const PRECACHE_URLS = [
   'index.html',
   'body-map.html',
@@ -39,9 +46,30 @@ self.addEventListener('activate', event => {
   );
 });
 
+const NETWORK_FIRST_EXTENSIONS = /\.(html|css|js|json)$/;
+
 self.addEventListener('fetch', event => {
   if(event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  const isNetworkFirst = event.request.mode === 'navigate' || NETWORK_FIRST_EXTENSIONS.test(url.pathname);
 
+  if(isNetworkFirst){
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if(response && response.ok){
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        }
+        return response;
+      }).catch(() =>
+        caches.match(event.request).then(cached => cached || (event.request.mode === 'navigate' ? caches.match('index.html') : undefined))
+      )
+    );
+    return;
+  }
+
+  // Everything else (3D model, vendor JS, fonts, images): cache-first, since
+  // these are large/static and don't need to be re-fetched on every visit.
   event.respondWith(
     caches.match(event.request).then(cached => {
       if(cached) return cached;
@@ -51,10 +79,6 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         }
         return response;
-      }).catch(() => {
-        // Offline and not cached: for a page navigation, fall back to the
-        // homepage rather than showing the browser's default error page.
-        if(event.request.mode === 'navigate') return caches.match('index.html');
       });
     })
   );
