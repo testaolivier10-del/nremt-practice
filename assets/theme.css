@@ -18,6 +18,11 @@
   --font-ui:'Nunito','Segoe UI',system-ui,sans-serif;
   --radius:12px;
   --on-accent:#FFFFFF;   /* text sitting on a solid navy/accent background — stays white in both themes */
+  --tint-accent:#E9F2EF; /* pale accent tint — selected/hover states, "medium" badges */
+  --tint-good:#E4F3E9;   /* pale green tint — correct answers, "easy"/good badges */
+  --tint-bad:#F8E6E1;    /* pale red tint — incorrect answers, "hard"/bad badges */
+  --tint-warn:#FCEFD8;   /* pale amber tint — "within reach" badges */
+  --overlay-bg:rgba(255,255,255,0.88); /* translucent panel over the 3D canvas/viewer */
 }
 
 /* Dark theme — toggled via [data-theme="dark"] on <html>, set by the
@@ -35,6 +40,11 @@
   --good:#4FBE79;
   --bad:#E4776A;
   --warn:#D9A54B;
+  --tint-accent:rgba(63,187,166,0.20);
+  --tint-good:rgba(79,190,121,0.20);
+  --tint-bad:rgba(228,119,106,0.20);
+  --tint-warn:rgba(217,165,75,0.20);
+  --overlay-bg:rgba(24,36,34,0.88);
 }
 
 footer{
