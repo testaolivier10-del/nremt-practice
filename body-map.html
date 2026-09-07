@@ -137,7 +137,7 @@
       <span><i style="background:#8B3A2E;"></i>Organ (realistic anatomical color per structure)</span>
       <span><i style="background:#C42020;"></i>Artery</span>
       <span><i style="background:#2A5FA0;"></i>Vein</span>
-      <span><i style="background:#2C9C8B;"></i>Selected</span>
+      <span><i style="background:#0F5C50;"></i>Selected</span>
     </div>
   </div>
 
@@ -210,6 +210,7 @@ const KIND_COLORS = {
 const ROUGHNESS_BY_KIND = { bone:0.75, organ:0.32, vessel:0.25, skin:0.55 };
 const METALNESS_BY_KIND = { bone:0.04, organ:0.03, vessel:0.05, skin:0 };
 const ACCENT_HEX = 0x2C9C8B;
+const SELECT_GLOW_HEX = 0x0F5C50;
 const BG_COLOR = 0xF4F5F3;
 
 let scene, camera, renderer, controls, canvas;
@@ -466,9 +467,14 @@ function resetMeshColor(m){
 // emissive instead of flat-filling the mesh — easier to read as "this is
 // highlighted" rather than "this part turned teal".
 function highlightGroup(groupKey){
+  const glow = new THREE.Color(SELECT_GLOW_HEX);
   for (const m of meshByGroup[groupKey] || []) {
-    m.material.emissive = new THREE.Color(ACCENT_HEX);
-    m.material.emissiveIntensity = 0.4;
+    // A pure emissive add washes out on brightly-lit surfaces (e.g. bone
+    // seen from an angle catching a lot of environment light), so blend the
+    // base color toward the glow too — that stays visible under any lighting.
+    m.material.color.setHex(m.userData.baseColor).lerp(glow, 0.55);
+    m.material.emissive = glow.clone();
+    m.material.emissiveIntensity = 0.75;
   }
 }
 
