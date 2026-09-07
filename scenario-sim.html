@@ -6,20 +6,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clinical Scenario Simulator — EMT Prep</title>
 <meta name="description" content="Branching patient-care scenarios where every choice leads to a real consequence, not just right or wrong. Practice sequencing and judgment, not just recall.">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
-  :root{
-    --navy:#122033; --paper:#F4F5F3; --white:#FFFFFF; --accent:#C1502E;
-    --line:#DCE0DE; --ink:#1A1F1D; --muted:#5C645F; --good:#2E7D4F; --bad:#B23A3A; --warn:#B8863A;
-  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.65;}
   .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
   h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
   .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 28px;}
-  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
-  .site-nav a{color:var(--accent);text-decoration:none;}
-  .site-nav a:hover{text-decoration:underline;}
 
   .picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   @media (max-width:560px){.picker-grid{grid-template-columns:1fr;}}
@@ -50,19 +46,19 @@
 
   .vitals-bar{
     font-family:'SFMono-Regular',monospace;font-size:12px;color:var(--navy);
-    background:rgba(18,32,51,0.06);border-radius:5px;padding:8px 12px;margin-bottom:16px;display:inline-block;
+    background:rgba(22,51,46,0.06);border-radius:8px;padding:8px 12px;margin-bottom:16px;display:inline-block;
   }
   .node-text{font-size:15.5px;margin:0 0 22px;}
 
   .consequence-banner{
-    border-left:3px solid var(--warn);background:rgba(184,134,58,0.1);border-radius:4px;
+    border-left:3px solid var(--warn);background:rgba(184,134,58,0.1);border-radius:8px;
     padding:12px 14px;margin-bottom:20px;font-size:14px;
   }
   .consequence-banner strong{color:var(--warn);display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;font-family:'SFMono-Regular',monospace;}
 
   .choice-list{display:flex;flex-direction:column;gap:9px;}
   .choice-option{
-    text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:6px;
+    text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
     padding:13px 16px;font-family:inherit;font-size:14.5px;color:var(--ink);cursor:pointer;
     transition:border-color .12s,background .12s;
   }
@@ -78,12 +74,12 @@
 
   .sim-actions{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap;}
   .btn-primary{
-    background:var(--navy);color:var(--white);border:none;border-radius:6px;padding:11px 20px;
+    background:var(--navy);color:var(--white);border:none;border-radius:var(--radius);padding:11px 20px;
     font-family:inherit;font-size:14px;cursor:pointer;
   }
-  .btn-primary:hover{background:#1c3350;}
+  .btn-primary:hover{background:var(--navy2);}
   .btn-secondary{
-    background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:11px 20px;
+    background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);padding:11px 20px;
     font-family:inherit;font-size:14px;cursor:pointer;
   }
   .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
@@ -102,7 +98,8 @@
 <body>
 <div class="wrap">
   <h1>Clinical Scenario Simulator</h1>
-  <div class="site-nav"><a href="index.html">&larr; Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a></div>
+  <div id="site-header"></div>
+  <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div></noscript>
   <p class="lede">Multiple choice tests recall. This tests sequencing and judgment — closer to how the real exam's scenario logic actually works. Every choice here leads somewhere real, not just a right/wrong buzzer. Choose carefully; a delay or a skipped step shows up later in the scenario, exactly like it would on an actual call.</p>
 
   <div id="pickerScreen">
@@ -843,5 +840,6 @@ function renderNode(consequenceText){
 
 renderPicker();
 </script>
+<script src="assets/nav.js" defer></script>
 </body>
 </html>

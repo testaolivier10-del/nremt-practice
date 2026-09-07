@@ -8,19 +8,10 @@
 <meta property="og:title" content="NREMT-EMT Practice Exam & Study Tools — Free">
 <meta property="og:description" content="A 920-question bank with difficulty levels, timed exams, domain drills, flashcards, and a missed-question review queue — free, no account needed.">
 <meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
-  :root{
-    --navy:#122033;
-    --navy2:#1C3350;
-    --paper:#F4F5F3;
-    --white:#FFFFFF;
-    --accent:#C1502E;
-    --line:#DCE0DE;
-    --ink:#1A1F1D;
-    --muted:#5C645F;
-    --good:#2F7A4F;
-    --bad:#B0402A;
-  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
@@ -34,9 +25,6 @@
   .top .tag{font-family:'SFMono-Regular','Menlo',monospace;font-size:12px;letter-spacing:0.03em;color:var(--accent);}
   h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
   .lede{color:var(--muted);font-size:15.5px;max-width:52ch;margin:0 0 24px;}
-  .site-nav{font-size:13px;color:var(--muted);margin-bottom:24px;}
-  .site-nav a{color:var(--accent);text-decoration:none;}
-  .site-nav a:hover{text-decoration:underline;}
   .backlink{font-size:13px;color:var(--muted);margin-bottom:18px;display:inline-block;}
   .backlink a{color:var(--muted);}
 
@@ -46,7 +34,7 @@
   .exam-facts{
     background:var(--white);
     border:1px solid var(--line);
-    border-radius:6px;
+    border-radius:var(--radius);
     padding:18px 20px;
     margin-bottom:28px;
     font-size:14px;
@@ -55,21 +43,21 @@
   .exam-facts .row{display:flex;justify-content:space-between;padding:6px 0;}
   .exam-facts .row span:last-child{font-family:'SFMono-Regular',monospace;color:var(--ink);}
 
-  .start-btn{width:100%;padding:15px;background:var(--navy);color:var(--white);border:none;border-radius:4px;font-family:inherit;font-size:16px;cursor:pointer;}
+  .start-btn{width:100%;padding:15px;background:var(--navy);color:var(--white);border:none;border-radius:8px;font-family:inherit;font-size:16px;cursor:pointer;}
   .difficulty-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
   .difficulty-row label{font-size:13px;color:var(--muted);flex-shrink:0;}
   .difficulty-row select{
-    flex:1;padding:10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:13.5px;
+    flex:1;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13.5px;
     background:var(--white);color:var(--ink);
   }
   .start-btn:hover{background:var(--navy2);}
   .review-btn{
     width:100%;padding:15px;background:var(--white);color:var(--navy);
-    border:1px solid var(--navy);border-radius:4px;font-family:inherit;font-size:16px;
+    border:1px solid var(--navy);border-radius:8px;font-family:inherit;font-size:16px;
     cursor:pointer;margin-top:12px;
     display:flex;justify-content:center;align-items:center;gap:8px;
   }
-  .review-btn:hover{background:#EEF1F6;}
+  .review-btn:hover{background:#E9F2EF;}
   .review-btn:disabled{opacity:0.4;cursor:not-allowed;background:var(--white);color:var(--muted);border-color:var(--line);}
   .review-btn .count{
     background:var(--accent);color:var(--white);font-size:12px;font-family:'SFMono-Regular',monospace;
@@ -77,19 +65,19 @@
   }
   .best-score{margin-top:14px;font-size:13px;color:var(--muted);text-align:center;}
   .domain-quiz-box{
-    margin-top:28px;padding:18px 20px;background:var(--white);border:1px solid var(--line);border-radius:6px;
+    margin-top:28px;padding:18px 20px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
   }
   .domain-quiz-title{font-size:13px;color:var(--muted);margin-bottom:12px;}
   .domain-quiz-row{display:flex;gap:8px;margin-bottom:12px;}
   .domain-quiz-row select{
-    flex:1;padding:10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:13.5px;
+    flex:1;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13.5px;
     background:var(--paper);color:var(--ink);
   }
   .domain-btn{
     width:100%;padding:12px;background:var(--paper);color:var(--ink);border:1px solid var(--navy);
-    border-radius:4px;font-family:inherit;font-size:14.5px;cursor:pointer;
+    border-radius:8px;font-family:inherit;font-size:14.5px;cursor:pointer;
   }
-  .domain-btn:hover{background:#EEF1F6;}
+  .domain-btn:hover{background:#E9F2EF;}
   .adaptive-box{border-color:var(--navy);}
   .adaptive-box .domain-quiz-title{display:flex;align-items:center;gap:8px;}
   .adaptive-tag{
@@ -107,7 +95,7 @@
     cursor:pointer;text-decoration:underline;
   }
   .progress-panel{
-    margin-top:20px;padding:20px;background:var(--white);border:1px solid var(--line);border-radius:6px;
+    margin-top:20px;padding:20px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
   }
   .progress-stats{
     display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:14px;
@@ -162,23 +150,23 @@
     padding:2px 7px;border-radius:10px;margin-left:8px;text-transform:none;letter-spacing:0;
   }
   .diff-badge.easy{background:#E4F3E9;color:var(--good);}
-  .diff-badge.medium{background:#FBF0E9;color:var(--accent);}
+  .diff-badge.medium{background:#E7F5F1;color:var(--accent);}
   .diff-badge.hard{background:#F8E6E1;color:var(--bad);}
   .flag-btn{
     flex-shrink:0;padding:5px 12px;background:var(--white);border:1px solid var(--line);border-radius:20px;
     font-family:inherit;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;
   }
   .flag-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .flag-btn.active{background:#FBF0E9;border-color:var(--accent);color:var(--accent);font-weight:600;}
+  .flag-btn.active{background:#E7F5F1;border-color:var(--accent);color:var(--accent);font-weight:600;}
   .q-prompt{font-size:19px;margin-bottom:24px;line-height:1.5;}
   .options{display:grid;gap:10px;margin-bottom:28px;}
-  .option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--white);border:1px solid var(--line);border-radius:5px;cursor:pointer;font-size:15.5px;}
+  .option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--white);border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:15.5px;}
   .option:hover{border-color:var(--navy);}
-  .option.selected{border-color:var(--navy);background:#EEF1F6;}
+  .option.selected{border-color:var(--navy);background:#E9F2EF;}
   .option .letter{font-family:'SFMono-Regular',monospace;font-weight:600;color:var(--muted);flex-shrink:0;}
   .option.selected .letter{color:var(--navy);}
   .nav-row{display:flex;gap:10px;}
-  .nav-row button{flex:1;padding:13px;border-radius:4px;font-family:inherit;font-size:14.5px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--ink);}
+  .nav-row button{flex:1;padding:13px;border-radius:8px;font-family:inherit;font-size:14.5px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--ink);}
   .nav-row button.primary{background:var(--navy);color:var(--white);border:none;}
   .nav-row button:disabled{opacity:0.4;cursor:not-allowed;}
   .jump-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:20px;max-height:80px;overflow-y:auto;}
@@ -188,7 +176,7 @@
     color:var(--muted);display:flex;align-items:center;justify-content:center;
   }
   .jump-btn.current{border-color:var(--navy);color:var(--navy);font-weight:600;}
-  .jump-btn.answered{background:#EEF1F6;}
+  .jump-btn.answered{background:#E9F2EF;}
   .jump-btn.flagged::after{
     content:'';position:absolute;top:-3px;right:-3px;width:7px;height:7px;border-radius:50%;
     background:var(--accent);border:1px solid var(--white);
@@ -210,34 +198,34 @@
   }
 
   #resultsScreen{display:none;}
-  .score-card{background:var(--navy);color:var(--white);border-radius:6px;padding:30px 26px;margin-bottom:32px;}
+  .score-card{background:var(--navy);color:var(--white);border-radius:var(--radius);padding:30px 26px;margin-bottom:32px;}
   .score-card .big{font-size:44px;font-weight:600;font-family:'SFMono-Regular',monospace;}
-  .score-card .sub{color:#B7C2CE;font-size:14px;margin-top:4px;}
+  .score-card .sub{color:#C7DED8;font-size:14px;margin-top:4px;}
   .domain-breakdown{display:grid;gap:8px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.15);}
-  .domain-breakdown .row{display:flex;justify-content:space-between;font-size:13.5px;color:#D7DEE4;}
-  .domain-breakdown .topic-row{padding-left:16px;font-size:11.5px;color:#93A5B3;}
+  .domain-breakdown .row{display:flex;justify-content:space-between;font-size:13.5px;color:#DCEFEA;}
+  .domain-breakdown .topic-row{padding-left:16px;font-size:11.5px;color:#9FB5AE;}
 
-  .readiness-card{background:var(--navy);color:var(--white);border-radius:6px;padding:22px 24px;margin:22px 0;}
-  .readiness-card .r-tag{font-size:11px;color:#8A97A3;text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:6px;}
+  .readiness-card{background:var(--navy);color:var(--white);border-radius:var(--radius);padding:22px 24px;margin:22px 0;}
+  .readiness-card .r-tag{font-size:11px;color:#9FB5AE;text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:6px;}
   .readiness-card .r-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
   .readiness-card .r-num{font-size:38px;font-weight:600;font-family:'SFMono-Regular',monospace;}
   .readiness-card .r-label{font-size:14px;font-weight:600;padding:3px 9px;border-radius:20px;}
-  .readiness-card .r-label.tier-good{background:rgba(47,122,79,0.25);color:#8FE3AE;}
-  .readiness-card .r-label.tier-mid{background:rgba(193,80,46,0.22);color:#F0B08E;}
-  .readiness-card .r-label.tier-low{background:rgba(176,64,42,0.28);color:#F2A08F;}
-  .readiness-card .r-sub{color:#D7DEE4;font-size:13px;margin-top:10px;line-height:1.5;}
-  .readiness-card .r-note{color:#8A97A3;font-size:11.5px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);}
+  .readiness-card .r-label.tier-good{background:rgba(47,158,91,0.25);color:#8FE3AE;}
+  .readiness-card .r-label.tier-mid{background:rgba(232,119,106,0.22);color:#F7B8AC;}
+  .readiness-card .r-label.tier-low{background:rgba(209,89,74,0.28);color:#F2A08F;}
+  .readiness-card .r-sub{color:#DCEFEA;font-size:13px;margin-top:10px;line-height:1.5;}
+  .readiness-card .r-note{color:#9FB5AE;font-size:11.5px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);}
   .readiness-update{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.15);}
-  .readiness-update .r-sub{color:#D7DEE4;font-size:12.5px;margin-top:6px;line-height:1.5;}
+  .readiness-update .r-sub{color:#DCEFEA;font-size:12.5px;margin-top:6px;line-height:1.5;}
   .readiness-update .r-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
   .readiness-update .r-num{font-size:22px;font-weight:600;font-family:'SFMono-Regular',monospace;}
-  .readiness-update .r-tag{font-size:11px;color:#8A97A3;text-transform:uppercase;letter-spacing:0.04em;}
+  .readiness-update .r-tag{font-size:11px;color:#9FB5AE;text-transform:uppercase;letter-spacing:0.04em;}
   .readiness-update .r-label{font-size:12.5px;font-weight:600;padding:2px 8px;border-radius:20px;}
-  .readiness-update .r-label.tier-good{background:rgba(47,122,79,0.25);color:#8FE3AE;}
-  .readiness-update .r-label.tier-mid{background:rgba(193,80,46,0.22);color:#F0B08E;}
-  .readiness-update .r-label.tier-low{background:rgba(176,64,42,0.28);color:#F2A08F;}
-  .readiness-empty{margin:16px 0;padding:14px 16px;background:var(--white);border:1px dashed var(--line);border-radius:6px;font-size:13px;color:var(--muted);text-align:center;}
-  .review-item{background:var(--white);border:1px solid var(--line);border-radius:5px;padding:18px 20px;margin-bottom:14px;}
+  .readiness-update .r-label.tier-good{background:rgba(47,158,91,0.25);color:#8FE3AE;}
+  .readiness-update .r-label.tier-mid{background:rgba(232,119,106,0.22);color:#F7B8AC;}
+  .readiness-update .r-label.tier-low{background:rgba(209,89,74,0.28);color:#F2A08F;}
+  .readiness-empty{margin:16px 0;padding:14px 16px;background:var(--white);border:1px dashed var(--line);border-radius:var(--radius);font-size:13px;color:var(--muted);text-align:center;}
+  .review-item{background:var(--white);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin-bottom:14px;}
   .review-item .r-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
   .review-item .r-domain{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0;}
   .review-item .r-flag-btn{
@@ -245,21 +233,21 @@
     font-family:inherit;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;
   }
   .review-item .r-flag-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .review-item .r-flag-btn.active{background:#FBF0E9;border-color:var(--accent);color:var(--accent);font-weight:600;}
+  .review-item .r-flag-btn.active{background:#E7F5F1;border-color:var(--accent);color:var(--accent);font-weight:600;}
   .review-item .r-q{font-size:16px;margin-bottom:12px;}
-  .review-item .r-answer{font-size:14px;padding:8px 10px;border-radius:4px;margin-bottom:6px;}
+  .review-item .r-answer{font-size:14px;padding:8px 10px;border-radius:8px;margin-bottom:6px;}
   .r-answer.correct{background:#E4F3E9;color:var(--good);}
   .r-answer.incorrect{background:#F8E6E1;color:var(--bad);}
   .r-explain{font-size:14px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
-  .retry-btn{width:100%;padding:14px;background:var(--navy);color:var(--white);border:none;border-radius:4px;font-family:inherit;font-size:15px;cursor:pointer;margin-top:10px;}
+  .retry-btn{width:100%;padding:14px;background:var(--navy);color:var(--white);border:none;border-radius:8px;font-family:inherit;font-size:15px;cursor:pointer;margin-top:10px;}
   .filter-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
   .filter-row button{padding:8px 14px;border:1px solid var(--line);background:var(--white);border-radius:20px;font-family:inherit;font-size:12.5px;cursor:pointer;color:var(--muted);}
   .filter-row button.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
   .cleared-note{
-    background:#E4F3E9;color:var(--good);padding:14px 16px;border-radius:5px;font-size:14px;margin-bottom:20px;
+    background:#E4F3E9;color:var(--good);padding:14px 16px;border-radius:8px;font-size:14px;margin-bottom:20px;
   }
 
-  .streak-card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-bottom:22px;}
+  .streak-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:22px;}
   .streak-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
   .streak-flame-block{display:flex;align-items:baseline;gap:6px;}
   .streak-flame{font-size:20px;}
@@ -276,10 +264,10 @@
   .streak-best{font-size:11.5px;color:var(--muted);margin-top:8px;}
   .streak-settings{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);}
   .streak-settings-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;color:var(--muted);flex-wrap:wrap;}
-  .streak-settings-row select{padding:6px 8px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:12.5px;background:var(--paper);color:var(--ink);}
+  .streak-settings-row select{padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px;background:var(--paper);color:var(--ink);}
   .streak-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0;}
 
-  .ad-slot{margin-top:36px;padding:18px;border:1px dashed var(--line);border-radius:4px;text-align:center;font-size:12px;color:#9AA19C;}
+  .ad-slot{margin-top:36px;padding:18px;border:1px dashed var(--line);border-radius:8px;text-align:center;font-size:12px;color:#9AA19C;}
   footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
 </style>
 </head>
@@ -288,7 +276,8 @@
 
   <div id="introScreen">
     <div class="top"><span class="tag">FULL PRACTICE EXAM</span></div>
-    <div class="site-nav"><a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div>
+    <div id="site-header"></div>
+    <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div></noscript>
     <div id="streakWidget"></div>
     <h1>NREMT-EMT Practice Exam — 100 Questions</h1>
     <p class="lede">A full-length practice exam matching the scale of the real NREMT-EMT cognitive exam. Each attempt randomly draws 100 questions from a 920-question pool — in the same domain proportions every time — so retaking it isn't just re-memorizing the same set. Includes a live 2-hour timer, pace tracker, difficulty filtering, and a review queue for questions you've missed.</p>
@@ -3508,8 +3497,8 @@ function renderProgressChart(){
       : `M${pts[0][0]},${pts[0][1]} L${pts[0][0]+0.01},${pts[0][1]}`;
 
     const svg = `<svg class="progress-chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-      <path d="${line}" fill="none" stroke="#C1502E" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-      ${pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2" fill="#122033"/>`).join('')}
+      <path d="${line}" fill="none" stroke="#2C9C8B" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+      ${pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2" fill="#16332E"/>`).join('')}
     </svg>`;
 
     const listHtml = history.slice().reverse().slice(0,8).map(hEntry => {
@@ -4420,5 +4409,6 @@ document.getElementById('retryBtn').addEventListener('click', () => {
   refreshIntroState();
 });
 </script>
+<script src="assets/nav.js" defer></script>
 </body>
 </html>
