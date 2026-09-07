@@ -1,0 +1,14 @@
+{
+  "name": "NREMT-EMT Practice Exam & Study Tools",
+  "short_name": "NREMT Prep",
+  "description": "Free NREMT-EMT prep: question bank, timed exams, domain drills, flashcards, mnemonics, and progress tracking.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F6FBF9",
+  "theme_color": "#16332E",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

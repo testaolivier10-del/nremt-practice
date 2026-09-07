@@ -19,7 +19,9 @@
       { href: 'body-map.html', label: 'Body Map' },
       { href: 'sound-trainer.html', label: 'Sound Trainer' },
       { href: 'scenario-sim.html', label: 'Scenarios' },
-      { href: 'skillsheets.html', label: 'Skills Guide' }
+      { href: 'skillsheets.html', label: 'Skills Guide' },
+      { href: 'dashboard.html', label: 'Dashboard' },
+      { href: 'search.html', label: 'Search' }
     ]}
   ];
 
@@ -59,11 +61,39 @@
         '<a class="site-header__brand" href="' + HOME_URL + '">' +
           '<span class="brand-mark" aria-hidden="true">+</span> NREMT Prep' +
         '</a>' +
-        '<nav class="site-header__groups" aria-label="Site sections">' + groupsHtml + '</nav>' +
+        '<nav class="site-header__groups" aria-label="Site sections">' + groupsHtml +
+          '<button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">◑</button>' +
+        '</nav>' +
       '</div>';
 
     var fallback = document.querySelector('.site-nav-fallback');
     if(fallback) fallback.remove();
+
+    var toggle = document.getElementById('themeToggle');
+    if(toggle) toggle.addEventListener('click', function(){
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      setTheme(isDark ? 'light' : 'dark');
+    });
+  }
+
+  // ---- Dark mode: applied as early as possible (see the inline snippet in
+  // each page's <head>) to avoid a flash of the wrong theme; this just keeps
+  // the toggle button and localStorage in sync after that. ----
+  var THEME_KEY = 'nremt_theme';
+  function setTheme(mode){
+    if(mode === 'dark'){
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    try{ localStorage.setItem(THEME_KEY, mode); }catch(e){}
+  }
+
+  // ---- Offline support: register the service worker once per page load. ----
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){ /* offline support is best-effort */ });
+    });
   }
 
   if(document.readyState === 'loading'){

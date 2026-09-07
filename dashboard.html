@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>try{if(localStorage.getItem("nremt_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon.svg">
+<meta name="theme-color" content="#16332E">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — NREMT-EMT Prep</title>
+<meta name="description" content="Your study streak, readiness estimate, domain accuracy, and review queue in one place.">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.6;}
+  .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
+  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+  .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 24px;}
+  h2{font-size:18px;font-weight:600;margin:36px 0 12px;}
+
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:8px;}
+  .stat-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;}
+  .stat-card .num{font-family:var(--font-ui);font-weight:800;font-size:28px;color:var(--navy);line-height:1;}
+  .stat-card .lbl{font-family:var(--font-ui);font-size:12px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:0.04em;}
+  .stat-card .sub{font-size:13px;color:var(--muted);margin-top:6px;}
+
+  .readiness-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:8px;}
+  .r-tag{font-family:var(--font-ui);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;}
+  .r-head{display:flex;align-items:baseline;gap:10px;margin:6px 0;}
+  .r-num{font-family:var(--font-ui);font-weight:800;font-size:34px;color:var(--navy);}
+  .r-label{font-family:var(--font-ui);font-weight:700;font-size:13px;padding:3px 10px;border-radius:20px;}
+  .r-label.tier-good{background:#DFF3E6;color:var(--good);}
+  .r-label.tier-mid{background:#FCEFD8;color:var(--warn);}
+  .r-label.tier-low{background:#FBE3DF;color:var(--bad);}
+  .r-sub{font-size:14px;color:var(--muted);}
+  .r-note{font-size:12px;color:var(--muted);margin-top:8px;}
+  .empty-note{font-size:14px;color:var(--muted);background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;}
+
+  .progress-chart{width:100%;height:100px;display:block;margin:10px 0;}
+  .progress-stats{display:flex;gap:18px;font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:4px;}
+  .progress-stats b{color:var(--ink);}
+
+  .domain-row{
+    display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .domain-row:last-child{border-bottom:none;}
+  .domain-row .bar-track{flex:1;height:6px;background:var(--line);border-radius:3px;margin:0 12px;overflow:hidden;}
+  .domain-row .bar-fill{height:100%;}
+  .domain-row .pct{font-family:'SFMono-Regular',monospace;color:var(--muted);width:70px;text-align:right;flex-shrink:0;}
+  .domain-row .name{width:180px;flex-shrink:0;}
+  .box{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:8px;}
+
+  .mastery-bars{display:flex;align-items:flex-end;gap:6px;height:70px;margin:14px 0 6px;}
+  .mastery-bar{flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px;position:relative;}
+  .mastery-bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-family:var(--font-ui);font-size:10.5px;color:var(--muted);}
+  .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .cta-row a{
+    font-family:var(--font-ui);font-weight:700;font-size:13px;color:var(--white);background:var(--navy);
+    padding:9px 16px;border-radius:8px;text-decoration:none;
+  }
+  .cta-row a.secondary{background:var(--white);color:var(--navy);border:1px solid var(--navy);}
+
+  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Dashboard</h1>
+  <div id="site-header"></div>
+  <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a> · <a href="search.html">Search</a></div></noscript>
+  <p class="lede">Everything this site knows about your progress, pulled from this browser's storage — your streak, readiness estimate, domain accuracy, and what's due for review.</p>
+
+  <div class="card-grid" id="statCards"></div>
+
+  <h2>Estimated readiness</h2>
+  <div id="readinessBox"></div>
+
+  <h2>Score over time</h2>
+  <div class="box" id="historyBox"></div>
+
+  <h2>Domain accuracy (all-time, all modes)</h2>
+  <div class="box" id="domainBox"></div>
+
+  <h2>Mastery & review queue</h2>
+  <div class="box" id="masteryBox"></div>
+
+  <footer>
+    <p>All of this is computed from data stored only in your browser (localStorage) — nothing is sent anywhere. Clearing your browser data will reset it.</p>
+  </footer>
+</div>
+
+<script>
+  const DOMAINS = ["Assessment","Airway & Respiratory","Cardiac & Medical","Trauma","OB/Peds & Special Populations","EMS Operations"];
+
+  const HISTORY_KEY = 'nremt_exam100_history';
+  const MASTERY_KEY = 'nremt_mastery';
+  const DOMAIN_STATS_KEY = 'nremt_domain_stats_all';
+  const STREAK_KEY = 'nremt_streak';
+  const MISSED_KEY = 'nremt_exam100_missed';
+  const FLAGGED_KEY = 'nremt_exam100_flagged';
+
+  function readJSON(key, fallback){
+    try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+
+  const history = readJSON(HISTORY_KEY, []);
+  const mastery = readJSON(MASTERY_KEY, {});
+  const domainStats = readJSON(DOMAIN_STATS_KEY, {});
+  const streak = readJSON(STREAK_KEY, {currentStreak:0, longestStreak:0, lastActiveDate:null, dailyCounts:{}, dailyGoal:20});
+  const missed = readJSON(MISSED_KEY, []);
+  const flagged = readJSON(FLAGGED_KEY, []);
+
+  function dayKey(offset){
+    const d = new Date();
+    if(offset) d.setDate(d.getDate()+offset);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function streakDisplay(){
+    const today = dayKey(0), yesterday = dayKey(-1);
+    const broken = streak.lastActiveDate !== null && streak.lastActiveDate !== today && streak.lastActiveDate !== yesterday;
+    return broken ? 0 : (streak.currentStreak || 0);
+  }
+
+  // ---- Stat cards ----
+  const totalAttempts = history.length;
+  const missedCount = Array.isArray(missed) ? missed.length : 0;
+  const flaggedCount = Array.isArray(flagged) ? flagged.length : 0;
+  const cards = [
+    { num: streakDisplay(), lbl: 'Day streak', sub: `Longest: ${streak.longestStreak || 0} days` },
+    { num: streak.dailyCounts && streak.dailyCounts[dayKey(0)] || 0, lbl: 'Studied today', sub: `Goal: ${streak.dailyGoal || 20}` },
+    { num: totalAttempts, lbl: 'Full exams taken', sub: totalAttempts ? `Last: ${new Date(history[history.length-1].date).toLocaleDateString()}` : 'None yet' },
+    { num: missedCount, lbl: 'In review queue', sub: flaggedCount ? `+ ${flaggedCount} flagged` : 'Missed questions' },
+  ];
+  document.getElementById('statCards').innerHTML = cards.map(c => `
+    <div class="stat-card">
+      <div class="num">${c.num}</div>
+      <div class="lbl">${c.lbl}</div>
+      <div class="sub">${c.sub}</div>
+    </div>
+  `).join('');
+
+  // ---- Readiness (mirrors the estimate on the practice-exam page) ----
+  function computeReadiness(){
+    const h = history.filter(x => x.total > 0);
+    if(h.length === 0) return {available:false};
+    const n = h.length;
+    const pcts = h.map(x => x.score / x.total * 100);
+    let weightedSum = 0, weightTotal = 0;
+    pcts.forEach((p,i) => { const w = i+1; weightedSum += p*w; weightTotal += w; });
+    const weightedAvg = weightedSum / weightTotal;
+
+    const domainEntries = Object.entries(domainStats).filter(([,s]) => s.total >= 5);
+    let adjusted = weightedAvg, weakestDomain = null, weakestPct = null;
+    if(domainEntries.length > 0){
+      const withPct = domainEntries.map(([d,s]) => [d, s.correct/s.total*100]);
+      withPct.sort((a,b) => a[1]-b[1]);
+      weakestDomain = withPct[0][0]; weakestPct = withPct[0][1];
+      const totalCorrect = domainEntries.reduce((a,[,s]) => a+s.correct, 0);
+      const totalQs = domainEntries.reduce((a,[,s]) => a+s.total, 0);
+      const overallPct = totalCorrect/totalQs*100;
+      const gap = overallPct - weakestPct;
+      if(gap > 15) adjusted -= (gap-15)*0.5;
+    }
+    adjusted = Math.max(0, Math.min(100, adjusted));
+    const rawProb = 1/(1+Math.exp(-0.13*(adjusted-72)));
+    const confidence = Math.min(1, n/5);
+    const blended = rawProb*confidence + 0.5*(1-confidence);
+    const probabilityPct = Math.max(2, Math.min(98, Math.round(blended*100)));
+    let label, tier;
+    if(probabilityPct >= 80){ label='On track'; tier='good'; }
+    else if(probabilityPct >= 55){ label='Within reach'; tier='mid'; }
+    else { label='Needs more practice'; tier='low'; }
+    return {
+      available:true, probabilityPct, label, tier, attempts:n,
+      weightedAvg: Math.round(weightedAvg),
+      weakestDomain, weakestPct: weakestPct !== null ? Math.round(weakestPct) : null,
+      lowConfidence: n < 3,
+    };
+  }
+  const r = computeReadiness();
+  const readinessBox = document.getElementById('readinessBox');
+  if(!r.available){
+    readinessBox.innerHTML = `<div class="empty-note">Take a full practice exam on the <a href="index.html">Practice Exam</a> page to unlock your estimated readiness score.</div>`;
+  } else {
+    const subParts = [`Recent average ${r.weightedAvg}% across ${r.attempts} full exam${r.attempts===1?'':'s'}`];
+    if(r.weakestDomain) subParts.push(`weakest area: ${r.weakestDomain} (${r.weakestPct}%)`);
+    const note = r.lowConfidence
+      ? 'Based on very few attempts — take a few more full exams for a more reliable estimate.'
+      : 'A rough estimate from your practice history, not an official prediction of NREMT results.';
+    readinessBox.innerHTML = `
+      <div class="readiness-card">
+        <span class="r-tag">Estimated pass probability</span>
+        <div class="r-head"><span class="r-num">${r.probabilityPct}%</span><span class="r-label tier-${r.tier}">${r.label}</span></div>
+        <div class="r-sub">${subParts.join(' · ')}</div>
+        <div class="r-note">${note}</div>
+      </div>
+    `;
+  }
+
+  // ---- Score-over-time chart ----
+  const historyBox = document.getElementById('historyBox');
+  if(history.length === 0){
+    historyBox.innerHTML = `<div class="empty-note">No full exam attempts yet — this fills in after your first one.</div>`;
+  } else {
+    const pcts = history.map(h2 => Math.round(h2.score/h2.total*100));
+    const avg = Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length);
+    const best = Math.max(...pcts);
+    const w=600,h=100,pad=6;
+    const stepX = pcts.length > 1 ? (w-pad*2)/(pcts.length-1) : 0;
+    const pts = pcts.map((p,i) => {
+      const x = pad + i*stepX;
+      const y = h - pad - (p/100)*(h-pad*2);
+      return [x,y];
+    });
+    const line = pts.length > 1
+      ? pts.map((p,i) => (i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')
+      : `M${pts[0][0]},${pts[0][1]} L${pts[0][0]+0.01},${pts[0][1]}`;
+    const svg = `<svg class="progress-chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <path d="${line}" fill="none" stroke="#2C9C8B" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+      ${pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5" fill="#16332E"/>`).join('')}
+    </svg>`;
+    historyBox.innerHTML = `
+      <div class="progress-stats"><span>Average: <b>${avg}%</b></span><span>Best: <b>${best}%</b></span><span>Attempts: <b>${history.length}</b></span></div>
+      ${svg}
+    `;
+  }
+
+  // ---- Domain accuracy ----
+  const domainBox = document.getElementById('domainBox');
+  const attemptedDomains = DOMAINS.filter(d => domainStats[d] && domainStats[d].total > 0);
+  if(attemptedDomains.length === 0){
+    domainBox.innerHTML = `<div class="empty-note">Answer questions in any mode (exam, drill, adaptive, review) to see domain accuracy here.</div>`;
+  } else {
+    domainBox.innerHTML = DOMAINS.map(d => {
+      const s = domainStats[d];
+      const pct = s && s.total ? Math.round(s.correct/s.total*100) : null;
+      const barColor = pct === null ? 'var(--line)' : pct >= 75 ? 'var(--good)' : pct >= 55 ? 'var(--accent)' : 'var(--bad)';
+      const label = pct === null ? 'Not started' : `${pct}% (${s.correct}/${s.total})`;
+      return `
+        <div class="domain-row">
+          <span class="name">${d}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct||0}%;background:${barColor}"></div></div>
+          <span class="pct">${label}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ---- Mastery distribution + due-for-review ----
+  const masteryBox = document.getElementById('masteryBox');
+  const levels = [0,0,0,0,0,0];
+  let dueCount = 0;
+  Object.values(mastery).forEach(rec => {
+    const daysSince = (Date.now() - (rec.lastSeen||0)) / 86400000;
+    const decay = Math.floor(daysSince/4);
+    const effective = Math.max(0, (rec.level||0) - decay);
+    levels[Math.min(5, Math.max(0, effective))]++;
+    if(rec.level > 0 && effective === 0) dueCount++;
+  });
+  const totalTracked = Object.keys(mastery).length;
+  if(totalTracked === 0){
+    masteryBox.innerHTML = `<div class="empty-note">No questions tracked yet — mastery fills in as you answer questions in any mode.</div>`;
+  } else {
+    const maxLevel = Math.max(1, ...levels);
+    masteryBox.innerHTML = `
+      <div class="progress-stats"><span>Questions tracked: <b>${totalTracked}</b></span><span>Due for review: <b>${dueCount}</b></span><span>Missed queue: <b>${missedCount}</b></span></div>
+      <div class="mastery-bars">
+        ${levels.map((count,lvl) => `<div class="mastery-bar" style="height:${Math.max(2, count/maxLevel*70)}px"><span>L${lvl}</span></div>`).join('')}
+      </div>
+      <div style="height:22px"></div>
+      <div class="cta-row">
+        <a href="index.html">Review missed questions</a>
+        <a class="secondary" href="index.html">Adaptive practice</a>
+      </div>
+    `;
+  }
+</script>
+<script src="assets/nav.js" defer></script>
+</body>
+</html>

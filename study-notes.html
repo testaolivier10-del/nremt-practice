@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>try{if(localStorage.getItem("nremt_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon.svg">
+<meta name="theme-color" content="#16332E">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NREMT-EMT Study Notes — Chapter by Chapter</title>
@@ -20,6 +25,12 @@
     width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:10px;
     font-family:inherit;font-size:15px;background:var(--white);color:var(--ink);margin-bottom:18px;
   }
+  .print-btn{
+    font-family:var(--font-ui);font-weight:700;font-size:13px;color:var(--navy);
+    background:var(--white);border:1px solid var(--navy);border-radius:8px;
+    padding:8px 14px;cursor:pointer;margin-bottom:14px;
+  }
+  .print-btn:hover{background:var(--paper);}
   .no-results{font-size:14px;color:var(--muted);display:none;margin-bottom:20px;}
 
   .toc{
@@ -139,6 +150,7 @@
   <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div></noscript>
   <p class="lede">Full narrative study notes organized by course chapter — the "why" and context behind the material, meant to complement the quick-reference pages rather than replace them. This grows over time as more chapters get added.</p>
 
+  <button type="button" class="print-btn" id="printBtn" onclick="window.print()">🖨 Print / Save as PDF</button>
   <input type="text" class="search-box" id="searchBox" placeholder="Search notes...">
   <div class="no-results" id="noResults">No notes match your search.</div>
 

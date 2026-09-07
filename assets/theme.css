@@ -19,8 +19,52 @@
   --radius:12px;
 }
 
+/* Dark theme — toggled via [data-theme="dark"] on <html>, set by the
+   toggle button in nav.js and persisted to localStorage. */
+:root[data-theme="dark"]{
+  --navy:#0E1B18;
+  --navy2:#16332E;
+  --paper:#0F1715;
+  --white:#182422;
+  --accent:#3FBBA6;
+  --accent-2:#E8776A;
+  --line:#2A3A36;
+  --ink:#E7F1EE;
+  --muted:#93A6A0;
+  --good:#4FBE79;
+  --bad:#E4776A;
+  --warn:#D9A54B;
+}
+
 footer{
   font-family:var(--font-ui);
+}
+
+/* ---- Theme toggle button (injected by nav.js) ---- */
+.theme-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;height:32px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--white);
+  color:var(--navy);
+  cursor:pointer;
+  font-size:15px;
+  line-height:1;
+  flex-shrink:0;
+}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ---- Print stylesheet: applies on every page ---- */
+@media print{
+  #site-header, .site-nav-fallback, .theme-toggle, button,
+  .start-btn, .review-btn, .domain-btn, .planner-row button,
+  #searchBox, .print-btn{ display:none !important; }
+  body{background:#fff !important;color:#000 !important;}
+  a{color:#000 !important;text-decoration:underline;}
+  .wrap{max-width:100% !important;padding:0 !important;}
 }
 
 /* ---- Shared site header (injected by nav.js into #site-header) ---- */
