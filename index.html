@@ -1413,18 +1413,48 @@ const QUESTIONS = [
 ];
 
 // The question bank's authored answer order is heavily skewed toward B (and never D) —
-// shuffle each question's options (and remap its correct index to match) once per page
-// load so the correct letter is randomly distributed instead of clustering on one letter.
+// shuffle each question's options (and remap its correct index to match) so the correct
+// letter is randomly distributed instead of clustering on one letter.
+//
+// The chosen order is persisted per-browser (not re-rolled every page load): saved quiz
+// progress (EXAM_STATE_KEY, below) stores each answer as an option INDEX, not option text.
+// Re-shuffling on every load — as this used to do — silently changed what index 0/1/2/3
+// pointed to, so resuming an in-progress exam (or even just reloading mid-quiz) could show
+// "you picked C" for an option the user never clicked, and grade against the new order
+// instead of the one shown when they answered.
+const OPTION_ORDER_KEY = 'nremt_option_order';
 (function shuffleQuestionOptions(){
-  for (const q of QUESTIONS) {
-    const order = q.options.map((_, i) => i);
-    for (let i = order.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [order[i], order[j]] = [order[j], order[i]];
+  let orders = null;
+  try{
+    const raw = localStorage.getItem(OPTION_ORDER_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed) && parsed.length === QUESTIONS.length) orders = parsed;
+    }
+  }catch(e){}
+
+  const isFresh = !orders;
+  if(isFresh) orders = QUESTIONS.map(q => q.options.map((_, i) => i));
+
+  QUESTIONS.forEach((q, qi) => {
+    let order = orders[qi];
+    if(!Array.isArray(order) || order.length !== q.options.length){
+      order = q.options.map((_, i) => i);
+      orders[qi] = order;
+    }
+    if(isFresh){
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
     }
     const oldCorrect = q.correct;
     q.options = order.map(i => q.options[i]);
     q.correct = order.indexOf(oldCorrect);
+  });
+
+  if(isFresh){
+    try{ localStorage.setItem(OPTION_ORDER_KEY, JSON.stringify(orders)); }catch(e){}
   }
 })();
 
