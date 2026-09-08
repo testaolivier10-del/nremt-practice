@@ -242,5 +242,6 @@ button:active{transform:scale(0.98);}
 
 @media (max-width:520px){
   .site-header__inner{flex-direction:column;align-items:flex-start;}
+  .site-header__groups{width:100%;justify-content:flex-end;}
   .nav-group__items{left:auto;right:0;}
 }
