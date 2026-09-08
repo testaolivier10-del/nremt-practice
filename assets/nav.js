@@ -49,8 +49,7 @@
           (active ? ' class="active" aria-current="page"' : '') +
           '>' + escapeHtml(i.label) + '</a>';
       }).join('');
-      return '<details class="nav-group' + (hasActive ? ' has-active' : '') + '"' +
-        (hasActive ? ' open' : '') + '>' +
+      return '<details class="nav-group' + (hasActive ? ' has-active' : '') + '">' +
         '<summary>' + escapeHtml(g.label) + '</summary>' +
         '<div class="nav-group__items">' + itemsHtml + '</div>' +
         '</details>';

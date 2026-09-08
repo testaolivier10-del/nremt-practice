@@ -39,7 +39,7 @@
   .hint{font-family:'SFMono-Regular',monospace;font-size:11.5px;color:var(--muted);letter-spacing:0.02em;text-align:center;margin-bottom:8px;}
 
   .diagram-card{
-    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);
     overflow:hidden;position:relative;margin-bottom:14px;
   }
   #viewer3d{width:100%;height:min(72vh,560px);display:block;touch-action:none;cursor:grab;}
@@ -65,14 +65,14 @@
   }
 
   .inset-card{
-    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);
     padding:18px;margin-bottom:14px;display:none;
   }
   .inset-card.visible{display:block;}
   .inset-card h3{margin:0 0 12px;font-size:16px;font-weight:600;color:var(--ink);}
 
   .info-panel{
-    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);
     padding:16px 18px;margin-bottom:8px;min-height:70px;
   }
   .info-panel .info-placeholder{color:var(--muted);font-size:14px;margin:0;}
@@ -92,17 +92,16 @@
   .landmark-list button.selected{background:var(--navy);color:var(--on-accent);border-color:var(--navy);}
   .landmark-list button.hidden{display:none;}
 
-  .rule9-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:20px;}
+  .rule9-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:18px 20px;margin-bottom:20px;}
   .rule9-card p{font-size:14px;margin:0 0 10px;}
   .rule9-card p:last-child{margin-bottom:0;}
 
-  .terms-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;}
+  .terms-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:16px 20px;margin-bottom:20px;}
   .term-pair{display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;}
   .term-pair:last-child{border-bottom:none;}
   .term-pair b{min-width:100px;flex-shrink:0;color:var(--ink);}
   .term-pair span{color:var(--muted);}
 
-  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
   footer a{color:#9AA19C;}
 </style>
 </head>

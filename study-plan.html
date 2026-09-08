@@ -14,16 +14,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.6;}
-  .wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
-  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
-  .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 20px;}
-  h2{font-size:20px;font-weight:600;margin:44px 0 12px;}
 
   .path-step{
-    display:flex;gap:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    display:flex;gap:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);
     padding:16px 18px;margin-bottom:10px;align-items:flex-start;
   }
   .path-step .num{
@@ -33,7 +26,7 @@
   .path-step .content p{margin:0;font-size:13.5px;color:var(--muted);}
   .path-step .content a{color:var(--ink);}
 
-  .planner-box{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;}
+  .planner-box{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:20px 22px;margin-bottom:20px;}
   .planner-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
   .planner-row label{font-size:14px;color:var(--muted);}
   .planner-row input{
@@ -48,7 +41,7 @@
   .plan-output.show{display:block;}
   .plan-output ul{margin:8px 0;padding-left:20px;}
 
-  .progress-box{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;}
+  .progress-box{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:20px 22px;margin-bottom:20px;}
   .domain-row{
     display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);
     font-size:14px;
@@ -61,7 +54,6 @@
   .plan-output .plan-focus{background:var(--tint-accent);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:13.5px;}
   .empty-note{font-size:13.5px;color:var(--muted);}
 
-  footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
 </style>
 </head>
 <body>

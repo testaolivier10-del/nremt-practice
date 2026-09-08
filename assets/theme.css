@@ -23,6 +23,10 @@
   --tint-bad:#F8E6E1;    /* pale red tint — incorrect answers, "hard"/bad badges */
   --tint-warn:#FCEFD8;   /* pale amber tint — "within reach" badges */
   --overlay-bg:rgba(255,255,255,0.88); /* translucent panel over the 3D canvas/viewer */
+  --radius-sm:8px;
+  --radius-lg:16px;
+  --shadow-card:0 1px 2px rgba(22,51,46,0.05), 0 6px 16px -8px rgba(22,51,46,0.10);
+  --shadow-pop:0 4px 10px rgba(22,51,46,0.08), 0 16px 32px -12px rgba(22,51,46,0.18);
 }
 
 /* Dark theme — toggled via [data-theme="dark"] on <html>, set by the
@@ -45,11 +49,41 @@
   --tint-bad:rgba(228,119,106,0.20);
   --tint-warn:rgba(217,165,75,0.20);
   --overlay-bg:rgba(24,36,34,0.88);
+  --shadow-card:0 1px 2px rgba(0,0,0,0.16), 0 6px 16px -8px rgba(0,0,0,0.30);
+  --shadow-pop:0 4px 10px rgba(0,0,0,0.24), 0 16px 32px -12px rgba(0,0,0,0.40);
 }
+
+/* ---- Shared base layer: reset + page shell + typography, loaded once
+   here instead of being copy-pasted into every page's inline <style>. ---- */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Charter','Georgia',serif;
+  line-height:1.6;
+}
+.wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
+h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+h2{font-size:19px;font-weight:600;margin:44px 0 12px;}
+.lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 24px;}
+.warning{
+  background:#FBF0E9;border:1px solid #E8C4A8;border-radius:var(--radius-sm);padding:14px 16px;
+  font-size:13.5px;color:#7A4A2A;margin-bottom:32px;
+}
+:root[data-theme="dark"] .warning{background:#3A2A1C;border-color:#5C4530;color:#E8C4A8;}
+.warning b{display:block;margin-bottom:4px;}
 
 footer{
   font-family:var(--font-ui);
+  margin-top:44px;font-size:12px;color:var(--muted);max-width:58ch;
 }
+
+/* Smooth, subtle motion on interactive elements site-wide. */
+button, a, .theme-toggle, .nav-group summary{
+  transition:background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .1s ease;
+}
+button:active{transform:scale(0.98);}
 
 /* ---- Theme toggle button (injected by nav.js) ---- */
 .theme-toggle{
@@ -156,7 +190,7 @@ footer{
   border:1px solid var(--line);
   border-radius:10px;
   padding:6px;
-  box-shadow:0 8px 24px rgba(22,51,46,0.12);
+  box-shadow:var(--shadow-pop);
 }
 .nav-group__items a{
   display:block;

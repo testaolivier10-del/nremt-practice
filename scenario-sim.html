@@ -15,11 +15,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{background:var(--paper);color:var(--ink);font-family:'Charter','Georgia',serif;line-height:1.65;}
-  .wrap{max-width:720px;margin:0 auto;padding:40px 22px 90px;}
-  h1{font-size:clamp(24px,4.5vw,32px);font-weight:600;margin:6px 0 10px;letter-spacing:-0.01em;}
+  body{line-height:1.65;}
+  .wrap{max-width:720px;}
   .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 28px;}
 
   .picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -63,7 +60,7 @@
 
   .choice-list{display:flex;flex-direction:column;gap:9px;}
   .choice-option{
-    text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);
     padding:13px 16px;font-family:inherit;font-size:14.5px;color:var(--ink);cursor:pointer;
     transition:border-color .12s,background .12s;
   }
@@ -84,7 +81,7 @@
   }
   .btn-primary:hover{background:var(--navy2);}
   .btn-secondary{
-    background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);padding:11px 20px;
+    background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:11px 20px;
     font-family:inherit;font-size:14px;cursor:pointer;
   }
   .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
