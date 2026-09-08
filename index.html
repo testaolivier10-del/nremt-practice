@@ -36,16 +36,14 @@
   .domain-list span{font-size:12px;padding:5px 10px;background:var(--white);border:1px solid var(--line);border-radius:20px;color:var(--muted);}
 
   .exam-facts{
-    background:var(--white);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:18px 20px;
-    margin-bottom:28px;
-    font-size:14px;
-    color:var(--muted);
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px 24px;
+    padding:16px 0;margin-bottom:28px;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    font-size:13px;color:var(--muted);
   }
-  .exam-facts .row{display:flex;justify-content:space-between;padding:6px 0;}
-  .exam-facts .row span:last-child{font-family:'SFMono-Regular',monospace;color:var(--ink);}
+  .exam-facts .row{display:flex;flex-direction:column;gap:3px;}
+  .exam-facts .row span:first-child{font-size:11.5px;text-transform:uppercase;letter-spacing:0.04em;}
+  .exam-facts .row span:last-child{font-family:'SFMono-Regular',monospace;color:var(--ink);font-size:16px;font-weight:600;}
 
   .start-btn{width:100%;padding:15px;background:var(--navy);color:var(--on-accent);border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;box-shadow:var(--shadow-card);}
   .start-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-pop);}
@@ -278,12 +276,12 @@
 
   .streak-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:16px 18px;margin-bottom:22px;}
   .streak-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-  .streak-flame-block{display:flex;align-items:baseline;gap:6px;}
-  .streak-flame{font-size:20px;}
+  .streak-flame-block{display:flex;align-items:center;gap:7px;}
+  .streak-flame{display:inline-flex;}
   .streak-num{font-size:24px;font-weight:600;font-family:'SFMono-Regular',monospace;color:var(--ink);}
   .streak-word{font-size:13px;color:var(--muted);}
-  .streak-gear{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);padding:2px 6px;}
-  .streak-gear:hover{color:var(--ink);}
+  .streak-gear{display:inline-flex;background:none;border:none;cursor:pointer;color:var(--muted);padding:5px;border-radius:8px;}
+  .streak-gear:hover{color:var(--ink);background:var(--paper);}
   .streak-goal-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);margin-bottom:6px;flex-wrap:wrap;gap:4px;}
   .streak-done{color:var(--good);font-weight:600;}
   .streak-warn{color:var(--accent);font-weight:600;}
@@ -2027,11 +2025,11 @@ function renderStreakWidget(){
     <div class="streak-card">
       <div class="streak-top">
         <div class="streak-flame-block">
-          <span class="streak-flame">🔥</span>
+          <span class="streak-flame" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 2c.6 3-1.2 4.6-2.6 6.2C7.8 10.2 7 12 7 14a5 5 0 0 0 10 0c0-1.6-.7-2.7-1.5-3.8.4 1.8-.3 3-1.3 3.4-.2-2-1.6-3-2.8-4.4-1 1.1-2.4 2.3-2.4 4a2 2 0 0 0 1.3 1.9c-1.6-.1-2.8-1.5-2.8-3.4 0-2.5 2.2-4 3.3-6.4.5-1.1.7-2.2.2-3.3Z" fill="var(--accent-2)"/></svg></span>
           <span class="streak-num">${st.display}</span>
           <span class="streak-word">day${st.display===1?'':'s'}</span>
         </div>
-        <button class="streak-gear" id="streakSettingsToggle" type="button" aria-label="Streak settings">&#9881;</button>
+        <button class="streak-gear" id="streakSettingsToggle" type="button" aria-label="Streak settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 13a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V19a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H10a1.7 1.7 0 0 0 1-1.5V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V10a1.7 1.7 0 0 0 1.5 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button>
       </div>
       <div class="streak-goal-row">
         <span>${st.todayCount}/${st.goal} questions today</span>
