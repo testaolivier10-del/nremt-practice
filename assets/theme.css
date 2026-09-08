@@ -66,7 +66,7 @@ body{
 }
 .wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
 h1{font-size:clamp(26px,4.8vw,34px);font-weight:700;margin:6px 0 12px;letter-spacing:-0.02em;line-height:1.15;}
-h2{font-family:var(--font-ui);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin:48px 0 14px;padding-top:2px;}
+h2{font-family:var(--font-ui);font-size:17px;font-weight:800;letter-spacing:-0.005em;color:var(--ink);margin:48px 0 14px;padding-top:14px;border-top:1px solid var(--line);}
 .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 24px;}
 
 /* ---- Browser surfaces: theme the parts the page doesn't draw ---- */
