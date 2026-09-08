@@ -307,37 +307,37 @@ const SCENARIOS = [
         text: "A frantic father runs up carrying his 2-year-old daughter, who is coughing forcefully but can still make sound. She was eating grapes moments ago.",
         choices: [
           { text: "Encourage her to keep coughing and stay calm, watching closely", next: "s3_watch_good" },
-          { text: "Immediately perform back blows and chest thrusts since she's choking", next: "s3_intervene_early", consequence: "She still has a strong, effective cough and can move air — her airway isn't fully blocked. Jumping straight to back blows and chest thrusts on a child who can still cough forcefully can actually push the object deeper." },
+          { text: "Immediately perform abdominal thrusts since she's choking", next: "s3_intervene_early", consequence: "She still has a strong, effective cough and can move air — her airway isn't fully blocked. Jumping straight to abdominal thrusts on a child who can still cough forcefully can actually push the object deeper." },
           { text: "Sweep her mouth with your finger to try to find the object", next: "s3_blind_sweep_bad", consequence: "A blind finger sweep on a child risks pushing an object further down the airway, seen or not, and can injure the airway itself. Blind sweeps are specifically avoided in kids — you only remove what you can actually see." }
         ]
       },
       s3_watch_good: {
         text: "She keeps coughing for another 15 seconds, then suddenly stops coughing entirely, can't make any sound, and starts turning dusky around the lips.",
         choices: [
-          { text: "Recognize this as a complete airway obstruction and begin back blows and chest thrusts", next: "s3_full_obstruction_good" },
+          { text: "Recognize this as a complete airway obstruction and begin abdominal thrusts", next: "s3_full_obstruction_good" },
           { text: "Keep waiting a little longer to see if she starts coughing again", next: "s3_wait_too_long", consequence: "She's no longer moving air at all — this is now a complete obstruction, and waiting longer only burns through her oxygen reserve. A silent, non-coughing choking child needs intervention immediately, not more observation." }
         ]
       },
       s3_intervene_early: {
         text: "You back off the maneuvers once you notice she's still coughing forcefully and moving air. A few seconds later, she stops coughing and turns dusky.",
         choices: [
-          { text: "Now begin back blows and chest thrusts — this is a complete obstruction", next: "s3_full_obstruction_good" }
+          { text: "Now begin abdominal thrusts — this is a complete obstruction", next: "s3_full_obstruction_good" }
         ]
       },
       s3_blind_sweep_bad: {
         text: "You don't find anything with the sweep, and she's now gagging and more distressed than before. She stops coughing and turns dusky moments later.",
         choices: [
-          { text: "Begin back blows and chest thrusts now — no more blind sweeps", next: "s3_full_obstruction_delayed" }
+          { text: "Begin abdominal thrusts now — no more blind sweeps", next: "s3_full_obstruction_delayed" }
         ]
       },
       s3_wait_too_long: {
-        text: "Several more seconds pass with no air movement at all. Her lips are now clearly blue. You begin back blows and chest thrusts.",
+        text: "Several more seconds pass with no air movement at all. Her lips are now clearly blue. You begin abdominal thrusts.",
         choices: [
-          { text: "Continue alternating back blows and chest thrusts, checking the mouth for a visible object after each set", next: "s3_full_obstruction_delayed" }
+          { text: "Continue delivering abdominal thrusts, checking the mouth for a visible object after each set", next: "s3_full_obstruction_delayed" }
         ]
       },
       s3_full_obstruction_good: {
-        text: "You alternate back blows and chest thrusts. After the third cycle, a grape pops free and she takes a huge, gasping breath, then starts crying loudly.",
+        text: "You deliver a series of abdominal thrusts. After the third cycle, a grape pops free and she takes a huge, gasping breath, then starts crying loudly.",
         choices: [
           { text: "Recheck her airway and breathing before deciding on transport", next: "s3_recheck_good" }
         ]
@@ -351,15 +351,15 @@ const SCENARIOS = [
       },
       s3_end_ok_no_transport: { ending: "neutral", text: "She likely will be fine, but skipping transport after a true complete airway obstruction removes the safety net of a hospital evaluation. Even a child who looks completely recovered after choking should be seen — a retained fragment or aspiration event doesn't always announce itself right away." },
       s3_full_obstruction_delayed: {
-        text: "You continue cycles of back blows and chest thrusts. She still hasn't cleared the object, and she suddenly goes limp and stops responding.",
+        text: "You continue cycles of abdominal thrusts. She still hasn't cleared the object, and she suddenly goes limp and stops responding.",
         choices: [
           { text: "Switch to CPR-style chest compressions, looking in the mouth for a visible object before each rescue breath attempt", next: "s3_end_ok" },
-          { text: "Keep doing back blows and chest thrusts the same way as before, since that's what you'd already started", next: "s3_end_bad" }
+          { text: "Keep doing abdominal thrusts the same way as before, since that's what you'd already started", next: "s3_end_bad" }
         ]
       },
       s3_end_good: { ending: "good", text: "Textbook sequence: let an effective cough do its job, recognize the exact moment it becomes a complete obstruction, act immediately once it does, recheck her afterward, and still transport for evaluation despite how well she looked. She never went more than a few seconds without some air movement, and nothing about the episode goes unassessed." },
       s3_end_ok: { ending: "neutral", text: "You catch the transition to unresponsiveness and switch approach correctly — the object finally clears and she starts breathing again. It took longer than the best-case run because of an earlier misstep, but recognizing when the approach needs to change is exactly the skill this scenario is testing." },
-      s3_end_bad: { ending: "bad", text: "Once a choking child becomes unresponsive, the approach has to change — CPR-style compressions with a look in the mouth before each rescue breath attempt, not continued back blows and thrusts on a limp child. Missing that transition costs critical time she doesn't have." }
+      s3_end_bad: { ending: "bad", text: "Once a choking child becomes unresponsive, the approach has to change — CPR-style compressions with a look in the mouth before each rescue breath attempt, not continued abdominal thrusts on a limp child. Missing that transition costs critical time she doesn't have." }
     }
   },
   {
