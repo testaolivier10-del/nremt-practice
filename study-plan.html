@@ -56,8 +56,9 @@
   .domain-row:last-child{border-bottom:none;}
   .domain-row .bar-track{flex:1;height:6px;background:var(--line);border-radius:3px;margin:0 12px;overflow:hidden;}
   .domain-row .bar-fill{height:100%;background:var(--accent);}
-  .domain-row .pct{font-family:'SFMono-Regular',monospace;color:var(--muted);width:60px;text-align:right;flex-shrink:0;}
+  .domain-row .pct{font-family:'SFMono-Regular',monospace;color:var(--muted);width:110px;text-align:right;flex-shrink:0;white-space:nowrap;}
   .domain-row .name{width:150px;flex-shrink:0;}
+  .plan-output .plan-focus{background:var(--tint-accent);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:13.5px;}
   .empty-note{font-size:13.5px;color:var(--muted);}
 
   footer{margin-top:44px;font-size:12px;color:#9AA19C;max-width:58ch;}
@@ -124,7 +125,7 @@
 
   <h2>Your domain progress</h2>
   <div class="progress-box" id="progressBox">
-    <div class="empty-note">No domain quizzes completed yet on this device. Progress here fills in as you complete domain drills on the practice exam page.</div>
+    <div class="empty-note">No questions answered yet on this device. Progress here fills in as you practice in any mode on the practice exam page — full exams, domain drills, adaptive practice, or review.</div>
   </div>
 
   <footer>
@@ -135,27 +136,47 @@
 <script>
   const DOMAINS = ["Assessment","Airway & Respiratory","Cardiac & Medical","Trauma","OB/Peds & Special Populations","EMS Operations"];
 
+  // Same cross-mode aggregate the practice-exam page's readiness card, weak-domains
+  // panel, and dashboard all read (nremt_domain_stats_all) — so this page agrees
+  // with them instead of tracking domain-drill best-scores separately.
+  function loadDomainStatsAll(){
+    const raw = localStorage.getItem('nremt_domain_stats_all');
+    return raw ? JSON.parse(raw) : {};
+  }
+
   function renderDomainProgress(){
-    const raw = localStorage.getItem('nremt_domain_progress');
-    const data = raw ? JSON.parse(raw) : {};
+    const data = loadDomainStatsAll();
     const box = document.getElementById('progressBox');
-    const attempted = DOMAINS.filter(d => data[d]);
+    const attempted = DOMAINS.filter(d => data[d] && data[d].total > 0);
     if(attempted.length === 0) return;
 
     box.innerHTML = DOMAINS.map(d => {
-      const entry = data[d];
-      const pct = entry ? entry.best : 0;
-      const label = entry ? `${entry.best}% best` : 'Not started';
+      const s = data[d];
+      const pct = s && s.total ? Math.round(s.correct / s.total * 100) : null;
+      const barColor = pct === null ? 'var(--line)' : pct >= 75 ? 'var(--good)' : pct >= 55 ? 'var(--accent)' : 'var(--bad)';
+      const label = pct === null ? 'Not started' : `${pct}% (${s.correct}/${s.total})`;
       return `
         <div class="domain-row">
           <span class="name">${d}</span>
-          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct||0}%;background:${barColor}"></div></div>
           <span class="pct">${label}</span>
         </div>
       `;
     }).join('');
   }
   renderDomainProgress();
+
+  // Weakest domains (5+ answered, same threshold the weak-domains panel on the
+  // practice-exam page uses) so the day-by-day plan below can call them out
+  // by name instead of giving identical generic advice to everyone.
+  function getWeakestDomains(limit){
+    const data = loadDomainStatsAll();
+    return Object.entries(data)
+      .filter(([,s]) => s.total >= 5)
+      .map(([d,s]) => ({domain: d, pct: Math.round(s.correct/s.total*100)}))
+      .sort((a,b) => a.pct - b.pct)
+      .slice(0, limit || 2);
+  }
 
   document.getElementById('planBtn').addEventListener('click', () => {
     const days = parseInt(document.getElementById('daysInput').value, 10);
@@ -192,6 +213,15 @@
           <li>Keep the missed-question queue near zero throughout, rather than saving it for the end</li>
           <li>In the final week, shift to mostly full exams and review, easing off in the last day or two</li>
         </ul>
+      `;
+    }
+    const weak = getWeakestDomains(2).filter(r => r.pct < 80);
+    if(weak.length > 0){
+      const names = weak.map(r => `${r.domain} (${r.pct}%)`).join(' and ');
+      html += `
+        <div class="plan-focus">
+          <b>Based on your practice so far:</b> put extra time into ${names} before rotating through the rest — that's what's actually dragging your accuracy down right now, not a guess.
+        </div>
       `;
     }
     output.innerHTML = html;

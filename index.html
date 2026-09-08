@@ -2202,19 +2202,6 @@ document.getElementById('flaggedReviewBtn').addEventListener('click', () => {
   beginQuiz(false);
 });
 
-const DOMAIN_PROGRESS_KEY = 'nremt_domain_progress';
-function recordDomainProgress(domain, score, total){
-  const raw = localStorage.getItem(DOMAIN_PROGRESS_KEY);
-  const data = raw ? JSON.parse(raw) : {};
-  const pct = Math.round(score/total*100);
-  if(!data[domain]) data[domain] = {attempts:0, best:0, last:0, lastDate:null};
-  data[domain].attempts += 1;
-  data[domain].best = Math.max(data[domain].best, pct);
-  data[domain].last = pct;
-  data[domain].lastDate = Date.now();
-  localStorage.setItem(DOMAIN_PROGRESS_KEY, JSON.stringify(data));
-}
-
 document.getElementById('flashcardBtn').addEventListener('click', () => {
   const domain = document.getElementById('domainSelect').value;
   const diffFilter = document.getElementById('difficultySelect').value;
@@ -2694,10 +2681,6 @@ function showResults(){
       localStorage.setItem(STORAGE_KEY, JSON.stringify({score, total: activeIndices.length, timeMs: elapsed}));
     }
     saveHistoryEntry({score, total: activeIndices.length, timeMs: elapsed, date: Date.now(), domainStats});
-  }
-
-  if(mode === 'domain' && selectedDomain){
-    recordDomainProgress(selectedDomain, score, activeIndices.length);
   }
 
   if(mode === 'full' || mode === 'domain' || mode === 'adaptive'){
