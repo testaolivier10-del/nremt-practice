@@ -138,13 +138,23 @@
   }
 
   #quizScreen{display:none;}
-  .exit-row{margin:4px 0 18px;}
+  .exit-row{margin:4px 0 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
   .exit-link{
     background:none;border:none;padding:0;cursor:pointer;
     font-family:'SFMono-Regular','Menlo',monospace;font-size:12.5px;
     color:var(--muted);
   }
   .exit-link:hover{color:var(--bad);}
+  .submit-top-btn{padding:8px 16px;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer;border:none;color:var(--on-accent);flex-shrink:0;}
+  .resume-exam-card{
+    display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:14px 16px;margin-bottom:16px;border:1px solid var(--accent);border-radius:8px;background:var(--tint-accent);
+  }
+  .resume-exam-text{font-size:13.5px;color:var(--ink);}
+  .resume-exam-actions{display:flex;gap:10px;flex-shrink:0;}
+  .resume-exam-actions .primary{padding:9px 16px;border-radius:8px;font-family:inherit;font-size:13.5px;cursor:pointer;border:none;background:var(--navy);color:var(--on-accent);}
+  .results-top-row{margin-bottom:14px;}
+  .results-top-row .retry-btn{width:auto;padding:9px 16px;margin-top:0;font-size:13.5px;}
   .progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:12.5px;color:var(--muted);font-family:'SFMono-Regular',monospace;}
   .progress-track{height:4px;background:var(--line);border-radius:2px;margin-bottom:28px;overflow:hidden;}
   .progress-fill{height:100%;background:var(--accent);transition:width 0.2s;}
@@ -220,6 +230,15 @@
   .readiness-card .r-label.tier-low{background:rgba(209,89,74,0.28);color:#F2A08F;}
   .readiness-card .r-sub{color:#DCEFEA;font-size:13px;margin-top:10px;line-height:1.5;}
   .readiness-card .r-note{color:#9FB5AE;font-size:11.5px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);}
+  .weak-domains-panel{
+    border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:16px 0;background:var(--white);
+  }
+  .weak-domains-title{font-size:12.5px;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);margin-bottom:10px;}
+  .weak-domain-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;font-size:13.5px;}
+  .weak-domain-row .name{color:var(--ink);}
+  .weak-domain-row .pct{color:var(--muted);font-family:'SFMono-Regular',monospace;font-size:12px;margin-right:8px;}
+  .weak-domain-row button{padding:5px 12px;border-radius:16px;border:1px solid var(--accent);background:var(--tint-accent);color:var(--accent);font-family:inherit;font-size:12px;cursor:pointer;white-space:nowrap;}
+  .weak-domain-row button:hover{background:var(--accent);color:var(--on-accent);}
   .readiness-update{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.15);}
   .readiness-update .r-sub{color:#DCEFEA;font-size:12.5px;margin-top:6px;line-height:1.5;}
   .readiness-update .r-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
@@ -304,6 +323,15 @@
     </div>
 
     <div id="readinessCard"></div>
+    <div id="weakDomainsPanel"></div>
+
+    <div id="resumeExamCard" class="resume-exam-card" style="display:none;">
+      <div class="resume-exam-text" id="resumeExamText"></div>
+      <div class="resume-exam-actions">
+        <button class="primary" id="resumeExamBtn">Resume Exam</button>
+        <button class="exit-link" id="discardExamBtn">Discard</button>
+      </div>
+    </div>
 
     <div class="difficulty-row">
       <label for="difficultySelect">Difficulty</label>
@@ -376,7 +404,10 @@
       <div class="pace-line" id="paceLine">—</div>
     </div>
     <div id="practiceBanner" class="practice-banner"></div>
-    <div class="exit-row"><button id="exitBtn" class="exit-link">&larr; Exit exam</button></div>
+    <div class="exit-row">
+      <button id="exitBtn" class="exit-link">&larr; Exit exam</button>
+      <button class="primary submit-top-btn" id="submitBtnTop" style="background:var(--accent);">Submit Now</button>
+    </div>
 
     <div class="progress-row">
       <span id="progressText">Question 1 of 100</span>
@@ -422,6 +453,7 @@
   </div>
 
   <div id="resultsScreen">
+    <div class="results-top-row"><button class="retry-btn" id="retryBtnTop">&larr; Back to Start</button></div>
     <div class="score-card">
       <div class="big" id="scoreBig">0/100</div>
       <div class="sub" id="scoreSub">0% correct — completed in 0:00:00</div>
@@ -1484,6 +1516,42 @@ const STORAGE_KEY = 'nremt_exam100_best';
 const MISSED_KEY = 'nremt_exam100_missed';
 const HISTORY_KEY = 'nremt_exam100_history';
 
+// ---- In-progress exam autosave: lets exiting mid-quiz (accidentally or on
+// purpose) be resumable instead of losing the attempt outright. Saved on every
+// question render (option picked, next/prev, jump, flag) and cleared only once
+// the attempt is actually finished (showResults) or the user discards it.
+const EXAM_STATE_KEY = 'nremt_inprogress_exam';
+function saveExamState(){
+  const state = {
+    mode, selectedDomain, activeIndices, current, answers, startTime,
+    withTimer: document.getElementById('timerBar').style.display === 'block',
+  };
+  if(mode === 'adaptive' && adaptiveState){
+    state.adaptiveState = {
+      length: adaptiveState.length,
+      targetDifficulty: adaptiveState.targetDifficulty,
+      sessionSeen: Array.from(adaptiveState.sessionSeen),
+      sessionDomainStats: adaptiveState.sessionDomainStats,
+      historicalAcc: adaptiveState.historicalAcc,
+    };
+  }
+  try{ localStorage.setItem(EXAM_STATE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function loadExamState(){
+  try{
+    const raw = localStorage.getItem(EXAM_STATE_KEY);
+    if(!raw) return null;
+    const state = JSON.parse(raw);
+    // A timed exam whose 2-hour window has already elapsed can't meaningfully
+    // resume — the clock would just immediately end it again.
+    if(state.withTimer && Date.now() - state.startTime >= TIME_LIMIT_MS) return null;
+    return state;
+  }catch(e){ return null; }
+}
+function clearExamState(){
+  try{ localStorage.removeItem(EXAM_STATE_KEY); }catch(e){}
+}
+
 function loadHistory(){
   const raw = localStorage.getItem(HISTORY_KEY);
   return raw ? JSON.parse(raw) : [];
@@ -2047,12 +2115,60 @@ function refreshIntroState(){
   document.getElementById('flaggedReviewBtn').disabled = flagged.length === 0;
   renderProgressChart();
   renderReadiness('readinessCard');
+  renderWeakDomainsPanel();
   renderStreakWidget();
+  renderResumeCard();
 }
+
+function examStateSummary(state){
+  const totalLen = state.mode === 'adaptive' ? state.adaptiveState.length : state.activeIndices.length;
+  const answeredCount = state.answers.filter(a => a !== null).length;
+  const labels = {full:'Timed exam', review:'Missed-question review', flagged:'Flagged-question review', domain:'Domain drill', adaptive:'Adaptive practice'};
+  const label = labels[state.mode] || 'Practice session';
+  let extra = '';
+  if(state.withTimer){
+    const remaining = Math.max(0, TIME_LIMIT_MS - (Date.now() - state.startTime));
+    extra = ` · ${formatDuration(remaining)} left`;
+  }
+  return `${label} in progress — question ${state.current+1} of ${totalLen}, ${answeredCount} answered${extra}`;
+}
+function renderResumeCard(){
+  const card = document.getElementById('resumeExamCard');
+  const state = loadExamState();
+  if(!state){ card.style.display = 'none'; return; }
+  card.style.display = 'flex';
+  document.getElementById('resumeExamText').textContent = examStateSummary(state);
+}
+document.getElementById('resumeExamBtn').addEventListener('click', () => {
+  const state = loadExamState();
+  if(!state) return;
+  beginQuiz(state.withTimer, state);
+});
+document.getElementById('discardExamBtn').addEventListener('click', () => {
+  if(confirm('Discard this in-progress attempt? This cannot be undone.')){
+    clearExamState();
+    renderResumeCard();
+  }
+});
+
 migrateDomainStatsIfNeeded();
 refreshIntroState();
 maybeShowStudyReminder();
 setInterval(maybeShowStudyReminder, 15*60*1000);
+
+// Lets the dashboard's per-domain "Practice" links (index.html?domain=X) jump
+// straight into a 20-question drill on that domain, without the user having to
+// manually reselect it from the dropdown. Skipped if there's an in-progress
+// exam to resume — that takes priority over a fresh auto-launch.
+(function(){
+  const domain = new URLSearchParams(location.search).get('domain');
+  if(!domain || loadExamState()) return;
+  const sel = document.getElementById('domainSelect');
+  if(![...sel.options].some(o => o.value === domain)) return;
+  sel.value = domain;
+  history.replaceState(null, '', location.pathname);
+  startDomainQuiz(domain, 20);
+})();
 
 function formatDuration(ms){
   const totalSec = Math.floor(ms/1000);
@@ -2114,6 +2230,7 @@ document.getElementById('flashcardBtn').addEventListener('click', () => {
   fcFlipped = false;
   introScreen.style.display = 'none';
   document.getElementById('flashcardScreen').style.display = 'block';
+  window.scrollTo(0, 0);
   renderFlashcard();
 });
 
@@ -2170,13 +2287,12 @@ document.getElementById('flashcardExitBtn').addEventListener('click', () => {
   if(confirm('Exit flashcard review?')){
     document.getElementById('flashcardScreen').style.display = 'none';
     introScreen.style.display = 'block';
+    window.scrollTo(0, 0);
     refreshIntroState();
   }
 });
 
-document.getElementById('domainStartBtn').addEventListener('click', () => {
-  const domain = document.getElementById('domainSelect').value;
-  const length = parseInt(document.getElementById('domainLength').value, 10);
+function startDomainQuiz(domain, length){
   const diffFilter = document.getElementById('difficultySelect').value;
   let pool = domain === 'all'
     ? QUESTIONS.map((_,i) => i)
@@ -2188,6 +2304,47 @@ document.getElementById('domainStartBtn').addEventListener('click', () => {
   activeIndices = preferUnseen(pool, seen).slice(0, length);
   markSeen(activeIndices);
   beginQuiz(false);
+}
+
+document.getElementById('domainStartBtn').addEventListener('click', () => {
+  const domain = document.getElementById('domainSelect').value;
+  const length = parseInt(document.getElementById('domainLength').value, 10);
+  startDomainQuiz(domain, length);
+});
+
+// ---- Weak-domain suggestions: surfaces the domain(s) dragging down accuracy
+// (cross-mode, same aggregate the readiness card and dashboard use) with a
+// one-click "Practice" action, so acting on a weak area doesn't require
+// manually picking it from the domain-drill dropdown.
+function getWeakestDomains(limit){
+  const agg = loadDomainStatsAll();
+  const rows = Object.entries(agg)
+    .filter(([,s]) => s.total >= 5)
+    .map(([d,s]) => ({domain: d, total: s.total, correct: s.correct, pct: Math.round(s.correct/s.total*100)}))
+    .sort((a,b) => a.pct - b.pct);
+  return rows.slice(0, limit || 3);
+}
+function renderWeakDomainsPanel(){
+  const panel = document.getElementById('weakDomainsPanel');
+  const weak = getWeakestDomains(3).filter(r => r.pct < 80);
+  if(weak.length === 0){ panel.innerHTML = ''; return; }
+  panel.innerHTML = `
+    <div class="weak-domains-panel">
+      <div class="weak-domains-title">Your weaker domains — worth a focused drill</div>
+      ${weak.map(r => `
+        <div class="weak-domain-row">
+          <span class="name">${r.domain}</span>
+          <span class="pct">${r.pct}% (${r.correct}/${r.total})</span>
+          <button type="button" data-domain="${r.domain}">Practice 20</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+document.getElementById('weakDomainsPanel').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-domain]');
+  if(!btn) return;
+  startDomainQuiz(btn.dataset.domain, 20);
 });
 
 // ---- Adaptive Practice ----
@@ -2279,12 +2436,34 @@ document.getElementById('adaptiveStartBtn').addEventListener('click', () => {
   beginQuiz(false);
 });
 
-function beginQuiz(withTimer){
-  current = 0;
+function beginQuiz(withTimer, resumeState){
+  if(resumeState){
+    mode = resumeState.mode;
+    selectedDomain = resumeState.selectedDomain;
+    activeIndices = resumeState.activeIndices;
+    current = resumeState.current;
+    answers = resumeState.answers;
+    startTime = resumeState.startTime;
+    if(resumeState.adaptiveState){
+      adaptiveState = {
+        length: resumeState.adaptiveState.length,
+        targetDifficulty: resumeState.adaptiveState.targetDifficulty,
+        sessionSeen: new Set(resumeState.adaptiveState.sessionSeen),
+        sessionDomainStats: resumeState.adaptiveState.sessionDomainStats,
+        historicalAcc: resumeState.adaptiveState.historicalAcc,
+      };
+    }
+    if(mode === 'full') TARGET_PACE_MS = TIME_LIMIT_MS / activeIndices.length;
+  } else {
+    current = 0;
+    const totalLen0 = mode === 'adaptive' ? adaptiveState.length : activeIndices.length;
+    answers = new Array(totalLen0).fill(null);
+    startTime = Date.now();
+  }
   const totalLen = mode === 'adaptive' ? adaptiveState.length : activeIndices.length;
-  answers = new Array(totalLen).fill(null);
   introScreen.style.display = 'none';
   quizScreen.style.display = 'block';
+  window.scrollTo(0, 0);
   document.getElementById('timerBar').style.display = withTimer ? 'block' : 'none';
   const banner = document.getElementById('practiceBanner');
   if(!withTimer){
@@ -2301,7 +2480,6 @@ function beginQuiz(withTimer){
   } else {
     banner.style.display = 'none';
   }
-  startTime = Date.now();
   renderQuestion();
   renderJumpRow();
   if(withTimer){
@@ -2373,6 +2551,7 @@ function renderQuestion(){
 
   document.getElementById('prevBtn').disabled = current === 0;
   document.getElementById('nextBtn').textContent = current === totalLen-1 ? 'Finish' : 'Next';
+  saveExamState();
 }
 
 function renderJumpRow(){
@@ -2419,34 +2598,36 @@ document.getElementById('nextBtn').addEventListener('click', () => {
   }
 });
 document.getElementById('exitBtn').addEventListener('click', () => {
-  const msg = mode === 'full'
-    ? 'Exit this exam? Your progress on this attempt will not be saved (your best score and missed-question queue from previous attempts are unaffected).'
-    : 'Exit this session? Progress on this session will not be saved.';
-  if(confirm(msg)){
+  if(confirm('Exit for now? Your progress is saved — you can resume this exact attempt from the start screen.')){
     clearInterval(timerInterval);
     quizScreen.style.display = 'none';
     document.getElementById('timerBar').style.display = 'none';
     document.getElementById('practiceBanner').style.display = 'none';
     introScreen.style.display = 'block';
+    window.scrollTo(0, 0);
     refreshIntroState();
   }
 });
 
-document.getElementById('submitBtn').addEventListener('click', () => {
+function confirmSubmitNow(){
   if(confirm('Submit now? You can still review all questions and answers after.')){
     showResults();
   }
-});
+}
+document.getElementById('submitBtn').addEventListener('click', confirmSubmitNow);
+document.getElementById('submitBtnTop').addEventListener('click', confirmSubmitNow);
 
 let allReviewData = [];
 
 function showResults(){
   clearInterval(timerInterval);
+  clearExamState();
   const elapsed = Date.now() - startTime;
   quizScreen.style.display = 'none';
   document.getElementById('timerBar').style.display = 'none';
   document.getElementById('practiceBanner').style.display = 'none';
   resultsScreen.style.display = 'block';
+  window.scrollTo(0, 0);
 
   let score = 0;
   const domainStats = {};
@@ -2576,11 +2757,14 @@ document.querySelectorAll('.filter-row button').forEach(btn => {
   });
 });
 
-document.getElementById('retryBtn').addEventListener('click', () => {
+function backToStart(){
   resultsScreen.style.display = 'none';
   introScreen.style.display = 'block';
+  window.scrollTo(0, 0);
   refreshIntroState();
-});
+}
+document.getElementById('retryBtn').addEventListener('click', backToStart);
+document.getElementById('retryBtnTop').addEventListener('click', backToStart);
 </script>
 <script src="assets/nav.js" defer></script>
 </body>
