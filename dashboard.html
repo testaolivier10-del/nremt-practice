@@ -34,6 +34,16 @@
   .metric .lbl{font-size:12.5px;color:var(--muted);margin-top:5px;}
   .metric .sub{font-size:11.5px;color:var(--muted);margin-top:2px;opacity:0.85;}
 
+  .level-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius);box-shadow:var(--shadow-pop);padding:22px 24px;margin-bottom:8px;}
+  .lvl-head{display:flex;align-items:baseline;gap:10px;margin:6px 0;flex-wrap:wrap;}
+  .lvl-num{font-family:var(--font-ui);font-weight:800;font-size:38px;color:#F4D28C;}
+  .lvl-title{font-family:var(--font-ui);font-weight:700;font-size:13px;padding:3px 10px;border-radius:20px;background:rgba(244,210,140,0.2);color:#F4D28C;}
+  .lvl-track{height:8px;border-radius:4px;background:rgba(255,255,255,0.15);margin:14px 0 6px;overflow:hidden;}
+  .lvl-fill{height:100%;background:#F4D28C;border-radius:4px;}
+  .lvl-sub{font-size:13px;color:#DCEFEA;}
+  .lvl-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15);}
+  .lvl-badge-chip{font-family:var(--font-ui);font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(244,210,140,0.16);color:#F4D28C;}
+
   .readiness-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius);box-shadow:var(--shadow-pop);padding:22px 24px;margin-bottom:8px;}
   .r-tag{font-family:var(--font-ui);font-size:11px;color:#9FB5AE;text-transform:uppercase;letter-spacing:0.04em;}
   .r-head{display:flex;align-items:baseline;gap:10px;margin:6px 0;flex-wrap:wrap;}
@@ -86,6 +96,9 @@
   <p class="lede">Everything this site knows about your progress, pulled from this browser's storage — your streak, readiness estimate, domain accuracy, and what's due for review.</p>
 
   <div class="metric-strip" id="statCards"></div>
+
+  <h2 id="levelSection">Level & XP</h2>
+  <div id="levelBox"></div>
 
   <h2>Estimated readiness</h2>
   <div id="readinessBox"></div>
@@ -154,6 +167,46 @@
       <div class="sub">${c.sub}</div>
     </div>
   `).join('');
+
+  // ---- Level & XP (mirrors the header badge nav.js renders on every page) ----
+  const XP_KEY = 'nremt_xp';
+  const LEVEL_TITLES = [
+    { min: 1, title: 'First Responder' },
+    { min: 3, title: 'EMT Trainee' },
+    { min: 6, title: 'EMT Candidate' },
+    { min: 10, title: 'Field Ready' },
+    { min: 15, title: 'Rig Veteran' },
+    { min: 20, title: 'Code 3 Pro' },
+    { min: 30, title: 'NREMT Legend' },
+  ];
+  const DOMAIN_TIER_LABELS = ['', 'Proficient', 'Advanced', 'Mastered'];
+  const xpState = readJSON(XP_KEY, { total: 0, domainTiers: {} });
+  function xpForLevel(n){ return 100 * (n - 1) * (n - 1); }
+  function levelForXp(xp){ let n = 1; while(xpForLevel(n + 1) <= xp) n++; return n; }
+  function titleForLevel(level){
+    let t = LEVEL_TITLES[0].title;
+    LEVEL_TITLES.forEach(l => { if(level >= l.min) t = l.title; });
+    return t;
+  }
+
+  const levelBox = document.getElementById('levelBox');
+  const lvl = levelForXp(xpState.total);
+  const prevXp = xpForLevel(lvl), nextXp = xpForLevel(lvl + 1);
+  const into = xpState.total - prevXp, span = Math.max(1, nextXp - prevXp);
+  const fillPct = Math.round(into / span * 100);
+  const badgeChips = Object.entries(xpState.domainTiers || {})
+    .filter(([, tier]) => tier > 0)
+    .map(([d, tier]) => `<span class="lvl-badge-chip">${d} · ${DOMAIN_TIER_LABELS[Math.min(tier, 3)]}</span>`)
+    .join('');
+  levelBox.innerHTML = `
+    <div class="level-card">
+      <span class="r-tag">Level</span>
+      <div class="lvl-head"><span class="lvl-num">${lvl}</span><span class="lvl-title">${titleForLevel(lvl)}</span></div>
+      <div class="lvl-sub">${xpState.total} XP total — ${into}/${span} XP to Level ${lvl + 1}</div>
+      <div class="lvl-track"><div class="lvl-fill" style="width:${fillPct}%"></div></div>
+      ${badgeChips ? `<div class="lvl-badges">${badgeChips}</div>` : `<div class="lvl-sub" style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15);">Answer 20+ questions in a domain and hit 70% accuracy to earn your first domain badge.</div>`}
+    </div>
+  `;
 
   // ---- Readiness (mirrors the estimate on the practice-exam page) ----
   function computeReadiness(){

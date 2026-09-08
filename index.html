@@ -1961,6 +1961,9 @@ function recordStudyActivity(n){
     s.currentStreak = (s.lastActiveDate === yesterday) ? s.currentStreak + 1 : 1;
     s.lastActiveDate = today;
     s.longestStreak = Math.max(s.longestStreak, s.currentStreak);
+    // First activity of a new calendar day — award streak XP once per day, no
+    // matter how many more questions/cards get studied today.
+    if(window.LevlXP) window.LevlXP.awardXp(15);
   }
   s.dailyCounts[today] = (s.dailyCounts[today] || 0) + n;
   const keys = Object.keys(s.dailyCounts).sort();
@@ -2648,6 +2651,36 @@ document.getElementById('submitBtnTop').addEventListener('click', confirmSubmitN
 
 let allReviewData = [];
 
+// XP for a completed quiz session (any mode): a flat completion bonus, 10 XP per
+// correct answer, plus a one-time bonus the first time a domain crosses an
+// accuracy milestone (see DOMAIN_TIER_THRESHOLDS in nav.js, which also renders
+// the header's level badge). Awarded once per finished session, not live per
+// question, so it stays a single localStorage write instead of one per answer.
+function awardQuizXp(domainStats, score){
+  if(!window.LevlXP) return;
+  const XP_PER_CORRECT = 10, COMPLETION_BONUS = 25;
+  let xpGain = score * XP_PER_CORRECT + COMPLETION_BONUS;
+
+  const xpState = window.LevlXP.loadXp();
+  const allDomainStats = loadDomainStatsAll();
+  const tierUpdates = {};
+  Object.keys(domainStats).forEach(d => {
+    const agg = allDomainStats[d];
+    if(!agg || agg.total <= 0) return;
+    const pct = agg.correct / agg.total * 100;
+    let tier = xpState.domainTiers[d] || 0;
+    window.LevlXP.DOMAIN_TIER_THRESHOLDS.forEach((t, i) => {
+      if(tier <= i && agg.total >= t.minTotal && pct >= t.pct){
+        xpGain += t.xp;
+        tier = i + 1;
+      }
+    });
+    if(tier !== (xpState.domainTiers[d] || 0)) tierUpdates[d] = tier;
+  });
+
+  window.LevlXP.awardXp(xpGain, tierUpdates);
+}
+
 function showResults(){
   clearInterval(timerInterval);
   clearExamState();
@@ -2686,6 +2719,7 @@ function showResults(){
   saveMissed(Array.from(missedSet));
   recordDomainStatsAll(domainStats);
   if(mode !== 'adaptive') recordStudyActivity(activeIndices.length);
+  awardQuizXp(domainStats, score);
 
   document.getElementById('scoreBig').textContent = `${score}/${activeIndices.length}`;
   document.getElementById('scoreSub').textContent = `${Math.round(score/activeIndices.length*100)}% correct — completed in ${formatDuration(elapsed)}`;

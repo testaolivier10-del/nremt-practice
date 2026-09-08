@@ -112,6 +112,26 @@ button:active{transform:scale(0.98);}
 }
 .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
 
+/* ---- Level badge (injected by nav.js into the header, next to the theme toggle) ---- */
+.level-badge{
+  display:inline-flex;
+  align-items:center;
+  height:32px;
+  padding:0 12px;
+  border-radius:999px;
+  border:1px solid var(--warn);
+  background:var(--tint-warn);
+  color:var(--warn);
+  font-family:var(--font-ui);
+  font-weight:800;
+  font-size:12.5px;
+  letter-spacing:0.01em;
+  text-decoration:none;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.level-badge:hover{background:var(--warn);color:var(--on-accent);}
+
 /* ---- Print stylesheet: applies on every page ---- */
 @media print{
   #site-header, .site-nav-fallback, .theme-toggle, button,
