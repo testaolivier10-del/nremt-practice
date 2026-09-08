@@ -1425,18 +1425,55 @@ function filterPoolByDifficulty(pool, diffFilter, count){
   return filtered.concat(rest);
 }
 
+// Tracks which questions a user has already been served by the full exam and
+// domain drill builders, so repeat runs draw fresh questions first instead of
+// re-serving the same random subset. Once every question in a given pool has
+// already been seen, that pool's seen-state resets so the cycle starts over
+// rather than ever blocking the user from taking a quiz.
+const SEEN_KEY = 'nremt_seen_questions';
+function loadSeen(){
+  try {
+    const raw = localStorage.getItem(SEEN_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch(e){ return new Set(); }
+}
+function saveSeen(seenSet){
+  try { localStorage.setItem(SEEN_KEY, JSON.stringify(Array.from(seenSet))); } catch(e){}
+}
+function markSeen(indices){
+  const seen = loadSeen();
+  indices.forEach(i => seen.add(i));
+  saveSeen(seen);
+}
+// Reorders a pool so not-yet-seen questions come first. If every question in
+// the pool has already been seen, clears seen-state for just this pool so it
+// becomes fully available again instead of forcing endless repeats.
+function preferUnseen(pool, seenSet){
+  const unseen = pool.filter(i => !seenSet.has(i));
+  const alreadySeen = pool.filter(i => seenSet.has(i));
+  if(unseen.length === 0){
+    pool.forEach(i => seenSet.delete(i));
+    saveSeen(seenSet);
+    return shuffle(pool);
+  }
+  return shuffle(unseen).concat(shuffle(alreadySeen));
+}
+
 function buildRandomExamIndices(diffFilter){
   const byDomain = {};
   QUESTIONS.forEach((q, i) => {
     if(!byDomain[q.domain]) byDomain[q.domain] = [];
     byDomain[q.domain].push(i);
   });
+  const seen = loadSeen();
   let selected = [];
   Object.entries(DOMAIN_TARGETS).forEach(([domain, count]) => {
     let pool = shuffle(byDomain[domain] || []);
     pool = filterPoolByDifficulty(pool, diffFilter, count);
+    pool = preferUnseen(pool, seen);
     selected = selected.concat(pool.slice(0, count));
   });
+  markSeen(selected);
   return shuffle(selected);
 }
 
@@ -2147,7 +2184,9 @@ document.getElementById('domainStartBtn').addEventListener('click', () => {
   pool = filterPoolByDifficulty(shuffle(pool), diffFilter, length);
   mode = 'domain';
   selectedDomain = domain === 'all' ? null : domain;
-  activeIndices = shuffle(pool).slice(0, length);
+  const seen = loadSeen();
+  activeIndices = preferUnseen(pool, seen).slice(0, length);
+  markSeen(activeIndices);
   beginQuiz(false);
 });
 
@@ -2183,6 +2222,7 @@ function adaptiveDomainWeight(domain){
 
 function pickNextAdaptiveQuestion(){
   const mastery = loadMastery();
+  const globalSeen = loadSeen();
   const targetRounded = Math.round(adaptiveState.targetDifficulty);
   const candidates = [];
   QUESTIONS.forEach((q, i) => {
@@ -2191,17 +2231,19 @@ function pickNextAdaptiveQuestion(){
     const itemFactor = 6 - lvl; // less-mastered items are weighted higher
     const dWeight = adaptiveDomainWeight(q.domain);
     const diffFactor = DIFF_TO_NUM[q.diff] === targetRounded ? 2 : 1;
-    candidates.push({i, weight: dWeight * itemFactor * diffFactor});
+    const unseenBonus = globalSeen.has(i) ? 1 : 2; // favor questions never served before
+    candidates.push({i, weight: dWeight * itemFactor * diffFactor * unseenBonus});
   });
   if(candidates.length === 0) return null;
   const totalWeight = candidates.reduce((a,c) => a + c.weight, 0);
   let r = Math.random() * totalWeight;
   for(const c of candidates){
     r -= c.weight;
-    if(r <= 0){ adaptiveState.sessionSeen.add(c.i); return c.i; }
+    if(r <= 0){ adaptiveState.sessionSeen.add(c.i); markSeen([c.i]); return c.i; }
   }
   const last = candidates[candidates.length - 1];
   adaptiveState.sessionSeen.add(last.i);
+  markSeen([last.i]);
   return last.i;
 }
 
