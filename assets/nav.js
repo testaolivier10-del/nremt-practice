@@ -58,7 +58,7 @@
     mount.innerHTML =
       '<div class="site-header__inner">' +
         '<a class="site-header__brand" href="' + HOME_URL + '">' +
-          '<span class="brand-mark" aria-hidden="true">+</span> NREMT Prep' +
+          '<span class="brand-mark" aria-hidden="true">+</span> LevlPrep' +
         '</a>' +
         '<nav class="site-header__groups" aria-label="Site sections">' + groupsHtml +
           '<button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">◑</button>' +

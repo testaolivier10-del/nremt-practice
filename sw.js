@@ -1,4 +1,4 @@
-// Offline support for NREMT Prep. Precaches the core pages/assets so the
+// Offline support for LevlPrep. Precaches the core pages/assets so the
 // site works with no connection; everything else (the 3D body-map model,
 // the three.js vendor bundle, Google Fonts) is cached the first time it's
 // actually requested, so a first visit isn't stuck downloading 15MB+ before
@@ -10,7 +10,7 @@
 // The cached copy is only served as a fallback when the network fails.
 // Bump CACHE_NAME whenever this file changes, so old cached entries are
 // dropped instead of lingering forever.
-const CACHE_NAME = 'nremt-prep-v2';
+const CACHE_NAME = 'levlprep-v3';
 const PRECACHE_URLS = [
   'index.html',
   'body-map.html',
