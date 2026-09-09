@@ -239,6 +239,7 @@ button:active{transform:scale(0.98);}
 .auth-modal-close:hover{background:var(--hover-tint);color:var(--ink);}
 .auth-modal form{display:flex;flex-direction:column;gap:12px;}
 .auth-modal label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700;color:var(--muted);}
+.auth-modal label[hidden]{display:none;}
 .auth-modal input{
   font-family:inherit;font-size:14.5px;padding:9px 11px;
   border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--paper);color:var(--ink);

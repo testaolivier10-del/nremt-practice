@@ -317,6 +317,7 @@
         '<form id="authForm">' +
           '<label>Email<input type="email" id="authEmail" required autocomplete="email"></label>' +
           '<label>Password<input type="password" id="authPassword" required autocomplete="current-password" minlength="6"></label>' +
+          '<label id="authConfirmLabel" hidden>Confirm password<input type="password" id="authConfirmPassword" autocomplete="new-password" minlength="6"></label>' +
           '<div class="auth-modal-msg" id="authModalMsg"></div>' +
           '<button type="submit" class="auth-modal-submit" id="authSubmitBtn">Sign in</button>' +
         '</form>' +
@@ -330,10 +331,17 @@
     var mode = 'signin';
     function setMode(m){
       mode = m;
-      document.getElementById('authModalTitle').textContent = m === 'signin' ? 'Sign in' : 'Create account';
-      document.getElementById('authSubmitBtn').textContent = m === 'signin' ? 'Sign in' : 'Create account';
-      document.getElementById('authToggleText').textContent = m === 'signin' ? 'Don’t have an account?' : 'Already have an account?';
-      document.getElementById('authToggleBtn').textContent = m === 'signin' ? 'Create one' : 'Sign in instead';
+      var isSignup = m === 'signup';
+      document.getElementById('authModalTitle').textContent = isSignup ? 'Create account' : 'Sign in';
+      document.getElementById('authSubmitBtn').textContent = isSignup ? 'Create account' : 'Sign in';
+      document.getElementById('authToggleText').textContent = isSignup ? 'Already have an account?' : 'Don’t have an account?';
+      document.getElementById('authToggleBtn').textContent = isSignup ? 'Sign in instead' : 'Create one';
+      document.getElementById('authPassword').autocomplete = isSignup ? 'new-password' : 'current-password';
+      var confirmLabel = document.getElementById('authConfirmLabel');
+      var confirmInput = document.getElementById('authConfirmPassword');
+      confirmLabel.hidden = !isSignup;
+      confirmInput.required = isSignup;
+      if(!isSignup) confirmInput.value = '';
       var msgEl = document.getElementById('authModalMsg');
       msgEl.textContent = '';
       msgEl.className = 'auth-modal-msg';
@@ -357,12 +365,20 @@
         msgEl.className = 'auth-modal-msg error';
         return;
       }
+      if(mode === 'signup'){
+        var confirmPassword = document.getElementById('authConfirmPassword').value;
+        if(password !== confirmPassword){
+          msgEl.textContent = 'Passwords do not match.';
+          msgEl.className = 'auth-modal-msg error';
+          return;
+        }
+      }
       submitBtn.disabled = true;
       msgEl.textContent = '';
       msgEl.className = 'auth-modal-msg';
       var action = mode === 'signin'
         ? client.auth.signInWithPassword({ email: email, password: password })
-        : client.auth.signUp({ email: email, password: password });
+        : client.auth.signUp({ email: email, password: password, options: { emailRedirectTo: window.location.origin + window.location.pathname } });
       action.then(function(res){
         submitBtn.disabled = false;
         if(res.error){
