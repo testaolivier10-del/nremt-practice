@@ -16,114 +16,97 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
 
-  .path-step{
-    display:flex;gap:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);
-    padding:16px 18px;margin-bottom:10px;align-items:flex-start;
-  }
-  .path-step .num{
-    font-family:'SFMono-Regular',monospace;color:var(--accent);font-weight:600;font-size:14px;flex-shrink:0;
-  }
-  .path-step .content h3{margin:0 0 4px;font-size:15.5px;}
-  .path-step .content p{margin:0;font-size:13.5px;color:var(--muted);}
-  .path-step .content a{color:var(--ink);}
-
-  .planner-box{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:20px 22px;margin-bottom:20px;}
-  .planner-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
-  .planner-row label{font-size:14px;color:var(--muted);}
   .planner-row input{
-    width:80px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;
-    font-family:'SFMono-Regular',monospace;font-size:15px;
+    width:96px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+    font-family:var(--font-mono);font-size:15px;background:var(--white);color:var(--ink);
   }
-  .planner-row button{
-    padding:10px 18px;background:var(--navy);color:var(--on-accent);border:none;border-radius:8px;
-    font-family:inherit;font-size:14px;cursor:pointer;
-  }
-  .plan-output{font-size:14.5px;line-height:1.7;display:none;}
-  .plan-output.show{display:block;}
-  .plan-output ul{margin:8px 0;padding-left:20px;}
 
-  .progress-box{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:20px 22px;margin-bottom:20px;}
-  .domain-row{
-    display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);
-    font-size:14px;
-  }
-  .domain-row:last-child{border-bottom:none;}
-  .domain-row .bar-track{flex:1;height:6px;background:var(--line);border-radius:3px;margin:0 12px;overflow:hidden;}
-  .domain-row .bar-fill{height:100%;background:var(--accent);}
-  .domain-row .pct{font-family:'SFMono-Regular',monospace;color:var(--muted);width:110px;text-align:right;flex-shrink:0;white-space:nowrap;}
-  .domain-row .name{width:150px;flex-shrink:0;}
-  .plan-output .plan-focus{background:var(--tint-accent);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:13.5px;}
-  .empty-note{font-size:13.5px;color:var(--muted);}
+  .plan-output{font-size:15.5px;line-height:1.7;display:none;margin-top:24px;padding-top:20px;border-top:1px solid var(--line-soft);}
+  .plan-output.show{display:block;}
+  .plan-output p{margin:0 0 12px;}
+  .plan-output ul{list-style:none;margin:0;padding:0;}
+  .plan-output li{position:relative;padding:7px 0 7px 22px;}
+  .plan-output li::before{content:'—';position:absolute;left:0;color:var(--accent);}
+  .plan-output .plan-focus{background:var(--tint-accent);border-radius:8px;padding:12px 16px;margin-top:14px;font-size:14px;}
+
+  .domain-row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line-soft);font-size:16px;}
+  .domain-row:last-child{border-bottom:0;}
+  .domain-row .name{flex:1 1 150px;min-width:0;}
+  .domain-row .bar-track{flex:1 1 100px;height:5px;border-radius:3px;background:var(--line-soft);overflow:hidden;min-width:60px;}
+  .domain-row .bar-fill{height:100%;}
+  .domain-row .pct{font:12.5px var(--font-mono);color:var(--muted);width:96px;text-align:right;flex-shrink:0;}
+  .empty-note{font-size:15px;color:var(--muted);}
 
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Study Plan</h1>
   <div id="site-header"></div>
-  <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div></noscript>
-  <p class="lede">A suggested order to work through this site's material, plus a pacing planner based on how many days you have left.</p>
+  <noscript><div class="site-nav-fallback" style="max-width:1120px;margin:0 auto;padding:14px clamp(20px,4vw,56px)"><a href="index.html">Home</a> · <a href="practice.html">Practice</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="tools.html">Tools</a> · <a href="dashboard.html">Dashboard</a></div></noscript>
+<div class="xshell">
 
-  <h2>Suggested path</h2>
+  <div class="hero">
+    <div class="eyebrow">Study plan</div>
+    <h1>Work through it in this order.</h1>
+    <p class="lede">A suggested order to work through this site's material, plus a pacing planner based on how many days you have left.</p>
+  </div>
 
-  <div class="path-step">
-    <div class="num">1</div>
-    <div class="content">
-      <h3>Learn the frameworks first</h3>
-      <p>Start with the <a href="mnemonics.html">key mnemonics</a> — SAMPLE, OPQRST, AVPU, and the rest. These show up constantly in the practice questions, so having them solid first makes everything after this faster.</p>
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">Suggested path</div>
+      <div class="xcontent narrow">
+        <div class="step-row">
+          <span class="step-num">01</span>
+          <span><span class="step-title">Learn the frameworks first</span><span class="step-sub">Start with the <a href="mnemonics.html">key mnemonics</a> — SAMPLE, OPQRST, AVPU, and the rest. These show up constantly in the practice questions, so having them solid first makes everything after this faster.</span></span>
+        </div>
+        <div class="step-row">
+          <span class="step-num">02</span>
+          <span><span class="step-title">Drill by domain</span><span class="step-sub">Use the <a href="practice.html">domain-specific mini quizzes</a> to work through each of the six domains individually. This is where you actually find your weak spots, before committing to a full timed exam.</span></span>
+        </div>
+        <div class="step-row">
+          <span class="step-num">03</span>
+          <span><span class="step-title">Take a full timed exam</span><span class="step-sub">Once you've drilled each domain at least once, take the <a href="practice.html">full 100-question timed exam</a> to practice pacing and stamina under real exam-like conditions.</span></span>
+        </div>
+        <div class="step-row">
+          <span class="step-num">04</span>
+          <span><span class="step-title">Clear your missed-question queue</span><span class="step-sub">After each attempt, work through the <a href="practice.html">missed-question review</a> until it's empty. This is the highest-leverage single habit on this site — it directly targets what you actually got wrong.</span></span>
+        </div>
+        <div class="step-row">
+          <span class="step-num">05</span>
+          <span><span class="step-title">Review the psychomotor side separately</span><span class="step-sub">Everything above covers the cognitive exam. Don't forget the <a href="skillsheets.html">psychomotor skills study guide</a> for the hands-on skills week — it's a genuinely separate exam with its own prep.</span></span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="path-step">
-    <div class="num">2</div>
-    <div class="content">
-      <h3>Drill by domain</h3>
-      <p>Use the <a href="index.html">domain-specific mini quizzes</a> to work through each of the six domains individually. This is where you actually find your weak spots, before committing to a full timed exam.</p>
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">How much time do you have?</div>
+      <div class="xcontent narrow">
+        <div class="planner-row" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+          <label for="daysInput" style="font-size:16px;color:var(--muted)">Days until your exam</label>
+          <input type="number" id="daysInput" min="1" placeholder="10">
+          <button id="planBtn" class="btn-dark">Build my plan</button>
+        </div>
+        <div class="plan-output" id="planOutput"></div>
+      </div>
     </div>
   </div>
 
-  <div class="path-step">
-    <div class="num">3</div>
-    <div class="content">
-      <h3>Take a full timed exam</h3>
-      <p>Once you've drilled each domain at least once, take the <a href="index.html">full 100-question timed exam</a> to practice pacing and stamina under real exam-like conditions.</p>
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">Your domain progress</div>
+      <div class="xcontent narrow" id="progressBox">
+        <div class="empty-note">No questions answered yet on this device. Progress here fills in as you practice in any mode on the practice exam page — full exams, domain drills, adaptive practice, or review.</div>
+      </div>
     </div>
   </div>
 
-  <div class="path-step">
-    <div class="num">4</div>
-    <div class="content">
-      <h3>Clear your missed-question queue</h3>
-      <p>After each attempt, work through the <a href="index.html">missed-question review</a> until it's empty. This is the highest-leverage single habit on this site — it directly targets what you actually got wrong.</p>
-    </div>
+  <div class="xsection">
+    <footer style="margin-top:0">
+      <p>Progress and plan data are stored only in your browser (localStorage) and aren't sent anywhere. Clearing your browser data will reset them.</p>
+    </footer>
   </div>
 
-  <div class="path-step">
-    <div class="num">5</div>
-    <div class="content">
-      <h3>Review the psychomotor side separately</h3>
-      <p>Everything above covers the cognitive exam. Don't forget the <a href="skillsheets.html">psychomotor skills study guide</a> for the hands-on skills week — it's a genuinely separate exam with its own prep.</p>
-    </div>
-  </div>
-
-  <h2>How much time do you have?</h2>
-  <div class="planner-box">
-    <div class="planner-row">
-      <label for="daysInput">Days until your exam:</label>
-      <input type="number" id="daysInput" min="1" placeholder="e.g. 10">
-      <button id="planBtn">Build my plan</button>
-    </div>
-    <div class="plan-output" id="planOutput"></div>
-  </div>
-
-  <h2>Your domain progress</h2>
-  <div class="progress-box" id="progressBox">
-    <div class="empty-note">No questions answered yet on this device. Progress here fills in as you practice in any mode on the practice exam page — full exams, domain drills, adaptive practice, or review.</div>
-  </div>
-
-  <footer>
-    <p>Progress and plan data are stored only in your browser (localStorage) and aren't sent anywhere. Clearing your browser data will reset them.</p>
-  </footer>
 </div>
 
 <script>

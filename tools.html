@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>try{if(localStorage.getItem("nremt_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon.svg">
+<meta name="theme-color" content="#16332E">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools — Body Map, Sound Trainer, Scenarios &amp; Skill Sheets</title>
+<meta name="description" content="Interactive body map, lung and heart sound trainer, branching clinical scenarios, protocol flow diagrams and the psychomotor skills study guide.">
+<meta property="og:site_name" content="LevlPrep">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
+<style>
+  .tool-card .screenshot-slot{min-height:150px;margin-bottom:14px;}
+  .tool-card .name{font-size:19px;margin-bottom:2px;}
+  .tool-card .desc{font-size:14.5px;color:var(--muted);text-wrap:pretty;}
+  .flow-row{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line-soft);font-size:16.5px;}
+  .flow-row:last-child{border-bottom:0;}
+  .flow-row .name{min-width:0;text-wrap:pretty;}
+  .flow-row .tag{font:12.5px var(--font-mono);color:var(--muted);white-space:nowrap;}
+  .scenario-row{padding:12px 0;border-bottom:1px solid var(--line-soft);font-size:16.5px;text-wrap:pretty;}
+  .scenario-row:last-child{border-bottom:0;}
+  .station-row{padding:14px 0;border-bottom:1px solid var(--line-soft);}
+  .station-row:last-child{border-bottom:0;}
+  .station-row .name{font-size:18px;margin-bottom:2px;text-wrap:pretty;}
+  .station-row .watch{font-size:14.5px;color:var(--muted);text-wrap:pretty;}
+</style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <noscript><div class="site-nav-fallback" style="max-width:1120px;margin:0 auto;padding:14px clamp(20px,4vw,56px)"><a href="index.html">Home</a> · <a href="practice.html">Practice</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="tools.html">Tools</a> · <a href="dashboard.html">Dashboard</a></div></noscript>
+
+<div class="xshell">
+
+  <div class="hero">
+    <div class="eyebrow">Tools</div>
+    <h1>Practise the parts a question bank can't test.</h1>
+    <p class="lede">Anatomy, sounds, protocol flow and full call simulations, plus the psychomotor skill sheets for the hands‑on exam.</p>
+  </div>
+
+  <div class="xsection">
+    <div class="xgrid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+      <a href="body-map.html" class="tool-card" style="text-decoration:none;color:inherit">
+        <div class="screenshot-slot"><span>body map screenshot</span></div>
+        <div class="name">Body Map</div>
+        <div class="desc">Click through regions, systems and landmarks on a real 3D anatomical model.</div>
+      </a>
+      <a href="sound-trainer.html" class="tool-card" style="text-decoration:none;color:inherit">
+        <div class="screenshot-slot"><span>sound trainer screenshot</span></div>
+        <div class="name">Sound Trainer</div>
+        <div class="desc">Identify wheezes, crackles, stridor and heart sounds by ear.</div>
+      </a>
+      <a href="scenario-sim.html" class="tool-card" style="text-decoration:none;color:inherit">
+        <div class="screenshot-slot"><span>scenario sim screenshot</span></div>
+        <div class="name">Scenarios</div>
+        <div class="desc">Run a branching call from dispatch to handover.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">Eight scenarios</div>
+      <div class="xcontent narrow">
+        <div class="scenario-row">Severe Leg Bleeding After a Motorcycle Crash</div>
+        <div class="scenario-row">Chest Pain at the Grocery Store</div>
+        <div class="scenario-row">The Choking Toddler</div>
+        <div class="scenario-row">Found Down, Diabetic History</div>
+        <div class="scenario-row">Anaphylaxis at a Backyard Barbecue</div>
+        <div class="scenario-row">Sudden Cardiac Arrest at the Gym</div>
+        <div class="scenario-row">Wandering Elderly Patient with Slurred Speech</div>
+        <div class="scenario-row" style="border-bottom:0">Opioid Overdose Behind a Convenience Store</div>
+        <a href="scenario-sim.html" class="link-underline" style="margin-top:18px">Run a scenario</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">Protocol flow diagrams</div>
+      <div class="xcontent narrow">
+        <div class="flow-row"><span class="name">Primary Assessment Sequence</span><span class="tag">assessment</span></div>
+        <div class="flow-row"><span class="name">Adult BLS / CPR Sequence</span><span class="tag">resuscitation</span></div>
+        <div class="flow-row"><span class="name">Adult Foreign Body Airway Obstruction</span><span class="tag">airway</span></div>
+        <div class="flow-row"><span class="name">Anaphylaxis Recognition &amp; Management</span><span class="tag">medical</span></div>
+        <div class="flow-row"><span class="name">Stroke Assessment &amp; Transport Decision</span><span class="tag">medical</span></div>
+        <div class="flow-row"><span class="name">Shock Recognition &amp; General Management</span><span class="tag">trauma</span></div>
+        <div class="flow-row"><span class="name">Spinal Motion Restriction Decision</span><span class="tag">trauma</span></div>
+        <div class="flow-row" style="border-bottom:0"><span class="name">START Triage</span><span class="tag">operations</span></div>
+        <p style="font-size:14px;color:var(--muted);margin:20px 0 0;text-wrap:pretty">These show general, widely‑taught sequences — not a scored skill sheet. Specific protocols can vary by local medical direction.</p>
+        <a href="flowcharts.html" class="link-underline" style="margin-top:14px">Open the flow diagrams</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">The eight psychomotor stations</div>
+      <div class="xcontent narrow">
+        <p style="margin:0 0 20px;font-size:15.5px;color:var(--muted);text-wrap:pretty">The hands‑on exam is scored separately from the cognitive one, on a point sheet plus a shorter list of automatic‑fail critical criteria.</p>
+        <div class="station-row"><div class="name">Patient Assessment — Trauma</div><div class="watch">Manage a life threat the moment you find it during the secondary exam, rather than finishing the whole exam first.</div></div>
+        <div class="station-row"><div class="name">Patient Assessment — Medical</div><div class="watch">State a field impression and management plan out loud at the end — some sheets score this as a distinct step.</div></div>
+        <div class="station-row"><div class="name">Cardiac Arrest Management / AED</div><div class="watch">Minimise hands-off compression time; long pauses around analysis or pulse checks are frequently a critical failure.</div></div>
+        <div class="station-row"><div class="name">BVM Ventilation of an Apneic Adult</div><div class="watch">Ventilating too fast or with too much volume is commonly a critical failure, not just a lost point.</div></div>
+        <div class="station-row"><div class="name">Oxygen Administration by Non-Rebreather Mask</div><div class="watch">Prime the reservoir bag before applying the mask, and say the flow rate out loud.</div></div>
+        <div class="station-row"><div class="name">Long Bone Immobilization</div><div class="watch">PMS checks before and after splinting are separately scored — don't combine them when verbalising.</div></div>
+        <div class="station-row"><div class="name">Joint Immobilization</div><div class="watch">Splint in the position found unless specifically directed otherwise; don't force an angulated joint straight.</div></div>
+        <div class="station-row" style="border-bottom:0"><div class="name">Bleeding Control / Shock Management</div><div class="watch">Direct pressure first — a tourniquet as the opening move on ordinary external bleeding loses the station.</div></div>
+        <p style="font:12px var(--font-ui);color:var(--muted);margin:26px 0 0;max-width:70ch;text-wrap:pretty">General structure only, not exact scored step order. Verify the sequence against your program's official skill sheets and the current NREMT documents before your exam.</p>
+        <a href="skillsheets.html" class="link-underline" style="margin-top:14px">Open the full skill sheet guide</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="xsection">
+    <footer style="margin-top:0">
+      <p>Looking for something specific? Use <a href="search.html">search</a> to look across the question bank and study material at once.</p>
+    </footer>
+  </div>
+
+</div>
+<script src="assets/nav.js" defer></script>
+</body>
+</html>

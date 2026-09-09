@@ -1,29 +1,20 @@
-/* Shared site header: renders the grouped nav into #site-header and
-   highlights the current page. Keeps all 10 pages in sync from one file
-   instead of each page hand-copying its own nav markup. */
+/* Shared site header: renders the flat nav bar into #site-header and
+   highlights the current page/section. Keeps every page in sync from one
+   file instead of each page hand-copying its own nav markup. */
 (function(){
-  var HOME_URL = 'https://testaolivier10-del.github.io/';
-
-  var NAV_GROUPS = [
-    { label: 'Practice', items: [
-      { href: 'index.html', label: 'Practice Exam' },
-      { href: 'study-plan.html', label: 'Study Plan' }
-    ]},
-    { label: 'Study', items: [
-      { href: 'study-notes.html', label: 'Study Notes' },
-      { href: 'mnemonics.html', label: 'Mnemonics' },
-      { href: 'glossary.html', label: 'Glossary' },
-      { href: 'flowcharts.html', label: 'Flow Diagrams' }
-    ]},
-    { label: 'Tools', items: [
-      { href: 'body-map.html', label: 'Body Map' },
-      { href: 'sound-trainer.html', label: 'Sound Trainer' },
-      { href: 'scenario-sim.html', label: 'Scenarios' },
-      { href: 'skillsheets.html', label: 'Skills Guide' },
-      { href: 'dashboard.html', label: 'Dashboard' },
-      { href: 'search.html', label: 'Search' }
-    ]}
+  var NAV_ITEMS = [
+    { href: 'practice.html', label: 'Practice' },
+    { href: 'study-plan.html', label: 'Study Plan' },
+    { href: 'study-notes.html', label: 'Notes' },
+    { href: 'mnemonics.html', label: 'Mnemonics' },
+    { href: 'glossary.html', label: 'Glossary' },
+    { href: 'tools.html', label: 'Tools' },
+    { href: 'dashboard.html', label: 'Dashboard' }
   ];
+
+  // Pages that live "under" Tools (linked from the tools.html hub) but keep
+  // their own URL — the Tools nav link should still read as active on them.
+  var TOOLS_SUBPAGES = ['tools.html', 'body-map.html', 'sound-trainer.html', 'scenario-sim.html', 'skillsheets.html', 'flowcharts.html', 'search.html'];
 
   function currentFile(){
     var p = location.pathname.split('/').pop();
@@ -121,26 +112,19 @@
     if(!mount) return;
     var cur = currentFile();
 
-    var groupsHtml = NAV_GROUPS.map(function(g){
-      var hasActive = g.items.some(function(i){ return i.href === cur; });
-      var itemsHtml = g.items.map(function(i){
-        var active = i.href === cur;
-        return '<a href="' + i.href + '"' +
-          (active ? ' class="active" aria-current="page"' : '') +
-          '>' + escapeHtml(i.label) + '</a>';
-      }).join('');
-      return '<details class="nav-group' + (hasActive ? ' has-active' : '') + '">' +
-        '<summary>' + escapeHtml(g.label) + '</summary>' +
-        '<div class="nav-group__items">' + itemsHtml + '</div>' +
-        '</details>';
+    var itemsHtml = NAV_ITEMS.map(function(item){
+      var active = item.href === cur || (item.href === 'tools.html' && TOOLS_SUBPAGES.indexOf(cur) !== -1);
+      return '<a href="' + item.href + '" class="nav-link' + (active ? ' active' : '') + '"' +
+        (active ? ' aria-current="page"' : '') +
+        '>' + escapeHtml(item.label) + '<span class="rule"></span></a>';
     }).join('');
 
     mount.innerHTML =
       '<div class="site-header__inner">' +
-        '<a class="site-header__brand" href="' + HOME_URL + '">' +
+        '<a class="site-header__brand" href="index.html">' +
           '<span class="brand-mark" aria-hidden="true">+</span> LevlPrep' +
         '</a>' +
-        '<nav class="site-header__groups" aria-label="Site sections">' + groupsHtml +
+        '<nav class="site-header__groups" aria-label="Site sections">' + itemsHtml +
           '<a href="dashboard.html' + (cur === 'dashboard.html' ? '#levelSection' : '') + '" class="level-badge" id="levelBadge" title="Your level">Lvl 1</a>' +
           '<button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">◑</button>' +
         '</nav>' +
@@ -156,7 +140,24 @@
       var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       setTheme(isDark ? 'light' : 'dark');
     });
+
+    syncHeaderHeightVar();
   }
+
+  // ---- Exposes the sticky header's real rendered height as --site-header-h
+  // so pages with their own sticky elements (e.g. the exam timer bar) can
+  // stack directly beneath it instead of overlapping it. Re-measured on
+  // resize since the nav wraps to a second line on narrow screens. ----
+  function syncHeaderHeightVar(){
+    var mount = document.getElementById('site-header');
+    if(!mount) return;
+    document.documentElement.style.setProperty('--site-header-h', mount.offsetHeight + 'px');
+  }
+  var headerResizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(headerResizeTimer);
+    headerResizeTimer = setTimeout(syncHeaderHeightVar, 150);
+  });
 
   // ---- Dark mode: applied as early as possible (see the inline snippet in
   // each page's <head>) to avoid a flash of the wrong theme; this just keeps

@@ -10,9 +10,10 @@
 // The cached copy is only served as a fallback when the network fails.
 // Bump CACHE_NAME whenever this file changes, so old cached entries are
 // dropped instead of lingering forever.
-const CACHE_NAME = 'levlprep-v3';
+const CACHE_NAME = 'levlprep-v4';
 const PRECACHE_URLS = [
   'index.html',
+  'practice.html',
   'body-map.html',
   'flowcharts.html',
   'glossary.html',
@@ -23,6 +24,7 @@ const PRECACHE_URLS = [
   'study-notes.html',
   'study-plan.html',
   'dashboard.html',
+  'tools.html',
   'search.html',
   'manifest.json',
   'assets/theme.css',

@@ -17,36 +17,49 @@
 <style>
 
   .search-box{
-    width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:10px;
-    font-family:inherit;font-size:15px;background:var(--white);color:var(--ink);margin-bottom:24px;
+    width:100%;max-width:520px;padding:13px 15px;border:1px solid var(--line);border-radius:10px;
+    font-family:var(--font-serif);font-size:16px;background:var(--white);color:var(--ink);margin-bottom:18px;
   }
-  .letter-group{margin-bottom:8px;}
-  .letter-group h2{
-    font-family:var(--font-ui);font-size:13px;font-weight:800;color:var(--accent);
-    letter-spacing:0.05em;margin:32px 0 4px;text-transform:uppercase;
+  .letter-index{display:flex;flex-wrap:wrap;gap:2px;}
+  .letter-index a{
+    font:700 13px var(--font-mono);padding:6px 10px;border-radius:5px;text-decoration:none;
+    color:var(--muted);background:transparent;
   }
+  .letter-index a.active{color:var(--ink);background:var(--hover-tint);}
+  .letter-group{scroll-margin-top:calc(var(--site-header-h) + 16px);padding-bottom:28px;}
   .term{
-    padding:13px 0;border-bottom:1px solid var(--line);
+    padding:13px 0;border-bottom:1px solid var(--line-soft);
   }
-  .term .word{font-weight:700;font-size:15px;color:var(--ink);}
-  .term .def{font-size:14px;color:var(--muted);margin-top:3px;}
-  .no-results{font-size:14px;color:var(--muted);display:none;}
+  .term:last-child{border-bottom:0;}
+  .term .word{font-size:17.5px;margin-bottom:2px;}
+  .term .def{font-size:15px;color:var(--muted);text-wrap:pretty;}
+  .no-results{font-size:16px;color:var(--muted);display:none;}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>EMT Terminology Glossary</h1>
   <div id="site-header"></div>
-  <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div></noscript>
-  <p class="lede">Common medical and EMS terminology used throughout the practice exam and course material.</p>
+  <noscript><div class="site-nav-fallback" style="max-width:1120px;margin:0 auto;padding:14px clamp(20px,4vw,56px)"><a href="index.html">Home</a> · <a href="practice.html">Practice</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="tools.html">Tools</a> · <a href="dashboard.html">Dashboard</a></div></noscript>
+<div class="xshell">
 
-  <input type="text" class="search-box" id="searchBox" placeholder="Search terms...">
-  <div class="no-results" id="noResults">No terms match your search.</div>
-  <div id="termList"></div>
+  <div class="hero">
+    <div class="eyebrow">EMT terminology glossary</div>
+    <h1>Terminology, plainly defined.</h1>
+    <p class="lede">Common medical and EMS terminology used throughout the practice exam and course material.</p>
+    <input type="text" class="search-box" id="searchBox" placeholder="Search terms…">
+    <div class="letter-index" id="letterIndex"></div>
+  </div>
 
-  <footer>
-    <p>Definitions here are general medical/EMS terminology, meant as a quick reference — always defer to your own course materials for anything protocol-specific.</p>
-  </footer>
+  <div class="xsection">
+    <div class="no-results" id="noResults">No terms match your search.</div>
+    <div id="termList"></div>
+  </div>
+
+  <div class="xsection">
+    <footer style="margin-top:0">
+      <p>Definitions here are general medical/EMS terminology, meant as a quick reference — always defer to your own course materials for anything protocol-specific.</p>
+    </footer>
+  </div>
+
 </div>
 
 <script>
@@ -203,11 +216,26 @@ const TERMS = [
   {term:"Wheezing", def:"A high-pitched, whistling lung sound produced by air moving through narrowed airways, typical of asthma or COPD."}
 ];
 
+const ALL_LETTERS = [...new Set(TERMS.map(t => t.term[0].toUpperCase()))].sort();
+
 function renderTerms(filter){
   const listEl = document.getElementById('termList');
   const noResultsEl = document.getElementById('noResults');
+  const letterIndexEl = document.getElementById('letterIndex');
   const q = filter.trim().toLowerCase();
   const filtered = TERMS.filter(t => t.term.toLowerCase().includes(q) || t.def.toLowerCase().includes(q));
+
+  const groups = {};
+  filtered.forEach(t => {
+    const letter = t.term[0].toUpperCase();
+    if(!groups[letter]) groups[letter] = [];
+    groups[letter].push(t);
+  });
+  const activeLetters = Object.keys(groups);
+
+  letterIndexEl.innerHTML = ALL_LETTERS.map(letter =>
+    `<a href="#letter-${letter}" class="${activeLetters.includes(letter) ? 'active' : ''}">${letter}</a>`
+  ).join('');
 
   if(filtered.length === 0){
     listEl.innerHTML = '';
@@ -216,22 +244,17 @@ function renderTerms(filter){
   }
   noResultsEl.style.display = 'none';
 
-  const groups = {};
-  filtered.forEach(t => {
-    const letter = t.term[0].toUpperCase();
-    if(!groups[letter]) groups[letter] = [];
-    groups[letter].push(t);
-  });
-
-  listEl.innerHTML = Object.keys(groups).sort().map(letter => `
-    <div class="letter-group">
-      <h2>${letter}</h2>
-      ${groups[letter].map(t => `
-        <div class="term">
-          <div class="word">${t.term}</div>
-          <div class="def">${t.def}</div>
-        </div>
-      `).join('')}
+  listEl.innerHTML = activeLetters.sort().map(letter => `
+    <div class="letter-group xgrid" id="letter-${letter}">
+      <div class="xlabel">${letter}</div>
+      <div class="xcontent narrow">
+        ${groups[letter].map(t => `
+          <div class="term">
+            <div class="word">${t.term}</div>
+            <div class="def">${t.def}</div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `).join('');
 }

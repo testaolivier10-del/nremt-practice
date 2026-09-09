@@ -15,106 +15,124 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
-  .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 24px;}
-  h2{font-size:18px;font-weight:600;margin:36px 0 12px;}
-
-  .metric-strip{
-    display:flex;flex-wrap:wrap;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--shadow-card);margin-bottom:10px;overflow:hidden;
-  }
-  .metric-strip .metric{
-    flex:1 1 140px;padding:16px 18px;position:relative;
-  }
-  .metric-strip .metric + .metric::before{
-    content:'';position:absolute;left:0;top:16px;bottom:16px;width:1px;background:var(--line);
-  }
-  .metric-strip .metric.lead{background:var(--tint-accent);}
-  .metric .num{font-family:var(--font-ui);font-weight:800;font-size:26px;color:var(--ink);line-height:1;letter-spacing:-0.01em;}
+  .metric-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:clamp(20px,3vw,36px);}
+  .metric .num{font:400 clamp(30px,4vw,38px) var(--font-serif);line-height:1.1;letter-spacing:-0.02em;color:var(--ink);}
   .metric.lead .num{color:var(--accent);}
-  .metric .lbl{font-size:12.5px;color:var(--muted);margin-top:5px;}
-  .metric .sub{font-size:11.5px;color:var(--muted);margin-top:2px;opacity:0.85;}
+  .metric .lbl{font:800 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+  .metric .sub{font:12px var(--font-ui);color:var(--muted);margin-top:2px;}
 
-  .level-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius);box-shadow:var(--shadow-pop);padding:22px 24px;margin-bottom:8px;}
-  .lvl-head{display:flex;align-items:baseline;gap:10px;margin:6px 0;flex-wrap:wrap;}
-  .lvl-num{font-family:var(--font-ui);font-weight:800;font-size:38px;color:#F4D28C;}
-  .lvl-title{font-family:var(--font-ui);font-weight:700;font-size:13px;padding:3px 10px;border-radius:20px;background:rgba(244,210,140,0.2);color:#F4D28C;}
-  .lvl-track{height:8px;border-radius:4px;background:rgba(255,255,255,0.15);margin:14px 0 6px;overflow:hidden;}
-  .lvl-fill{height:100%;background:#F4D28C;border-radius:4px;}
-  .lvl-sub{font-size:13px;color:#DCEFEA;}
+  .level-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius);padding:20px 22px;}
+  .lvl-head{display:flex;align-items:baseline;gap:12px;margin:8px 0 12px;flex-wrap:wrap;}
+  .lvl-num{font:400 clamp(36px,5vw,46px) var(--font-serif);letter-spacing:-.03em;color:#F4D28C;}
+  .lvl-title{font:700 12.5px var(--font-ui);padding:3px 10px;border-radius:20px;background:rgba(244,210,140,0.2);color:#F4D28C;}
+  .lvl-track{height:6px;border-radius:3px;background:rgba(255,255,255,0.15);margin:0 0 8px;overflow:hidden;}
+  .lvl-fill{height:100%;background:#F4D28C;border-radius:3px;}
+  .lvl-sub{font:12.5px var(--font-mono);color:#DCEFEA;}
   .lvl-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15);}
-  .lvl-badge-chip{font-family:var(--font-ui);font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(244,210,140,0.16);color:#F4D28C;}
+  .lvl-badge-chip{font:700 11.5px var(--font-ui);padding:4px 10px;border-radius:20px;background:rgba(244,210,140,0.16);color:#F4D28C;}
 
-  .readiness-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius);box-shadow:var(--shadow-pop);padding:22px 24px;margin-bottom:8px;}
-  .r-tag{font-family:var(--font-ui);font-size:11px;color:#9FB5AE;text-transform:uppercase;letter-spacing:0.04em;}
-  .r-head{display:flex;align-items:baseline;gap:10px;margin:6px 0;flex-wrap:wrap;}
-  .r-num{font-family:var(--font-ui);font-weight:800;font-size:38px;color:var(--on-accent);}
-  .r-label{font-family:var(--font-ui);font-weight:700;font-size:13px;padding:3px 10px;border-radius:20px;}
+  .readiness-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius);padding:22px 24px;}
+  .r-tag{font:800 11px var(--font-ui);color:#9FB5AE;text-transform:uppercase;letter-spacing:0.06em;}
+  .r-head{display:flex;align-items:baseline;gap:14px;margin:8px 0 10px;flex-wrap:wrap;}
+  .r-num{font:400 clamp(36px,5vw,48px) var(--font-serif);letter-spacing:-.03em;color:var(--on-accent);}
+  .r-label{font:800 13px var(--font-ui);padding:4px 12px;border-radius:999px;}
   .r-label.tier-good{background:rgba(47,158,91,0.25);color:#8FE3AE;}
   .r-label.tier-mid{background:rgba(232,119,106,0.22);color:#F7B8AC;}
   .r-label.tier-low{background:rgba(209,89,74,0.28);color:#F2A08F;}
-  .r-sub{font-size:14px;color:#DCEFEA;}
-  .r-note{font-size:11.5px;color:#9FB5AE;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.15);}
-  .empty-note{font-size:14px;color:var(--muted);background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:16px 18px;}
+  .r-sub{font-size:16px;color:#DCEFEA;}
+  .r-note{font-size:12.5px;color:#9FB5AE;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);}
+  .empty-note{font-size:15px;color:var(--muted);}
 
-  .progress-chart{width:100%;height:100px;display:block;margin:10px 0;}
-  .progress-stats{display:flex;gap:18px;font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:4px;}
+  .progress-chart{width:100%;height:100px;display:block;margin:14px 0 0;}
+  .progress-stats{display:flex;gap:18px;font:12.5px var(--font-mono);color:var(--muted);margin-bottom:4px;}
   .progress-stats b{color:var(--ink);}
 
   .domain-row{
-    display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);
-    font-size:14px;
+    display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line-soft);
+    font-size:16px;
   }
   .domain-row:last-child{border-bottom:none;}
-  .domain-row .bar-track{flex:1;height:6px;background:var(--line);border-radius:3px;margin:0 12px;overflow:hidden;}
+  .domain-row .bar-track{flex:1 1 100px;height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden;min-width:60px;}
   .domain-row .bar-fill{height:100%;}
-  .domain-row .pct{font-family:'SFMono-Regular',monospace;color:var(--muted);width:70px;text-align:right;flex-shrink:0;}
-  .domain-row .name{width:180px;flex-shrink:0;}
+  .domain-row .pct{font:12.5px var(--font-mono);color:var(--muted);width:96px;text-align:right;flex-shrink:0;}
+  .domain-row .name{flex:1 1 150px;min-width:0;}
   .domain-row .practice-link{
-    flex-shrink:0;margin-left:12px;padding:3px 10px;border-radius:14px;border:1px solid var(--accent);
+    flex-shrink:0;padding:3px 10px;border-radius:14px;border:1px solid var(--accent);
     background:var(--tint-accent);color:var(--accent);font-size:12px;text-decoration:none;white-space:nowrap;
   }
   .domain-row .practice-link:hover{background:var(--accent);color:var(--on-accent);}
-  .box{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:18px 20px;margin-bottom:8px;}
 
-  .mastery-bars{display:flex;align-items:flex-end;gap:6px;height:70px;margin:14px 0 6px;}
+  .mastery-bars{display:flex;align-items:flex-end;gap:8px;height:80px;margin:0 0 26px;}
   .mastery-bar{flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px;position:relative;}
-  .mastery-bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-family:var(--font-ui);font-size:10.5px;color:var(--muted);}
-  .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .mastery-bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font:10.5px var(--font-ui);color:var(--muted);}
+  .cta-row{display:flex;gap:10px;flex-wrap:wrap;}
   .cta-row a{
-    font-family:var(--font-ui);font-weight:700;font-size:13px;color:var(--on-accent);background:var(--navy);
-    padding:9px 16px;border-radius:8px;text-decoration:none;
+    font:800 14px var(--font-ui);color:var(--on-accent);background:var(--navy);
+    padding:12px 22px;border-radius:6px;text-decoration:none;
   }
+  .cta-row a:hover{background:var(--navy2);}
   .cta-row a.secondary{background:var(--white);color:var(--ink);border:1px solid var(--navy);}
+  .cta-row a.secondary:hover{background:var(--hover-tint);}
 
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Dashboard</h1>
   <div id="site-header"></div>
-  <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a> · <a href="search.html">Search</a></div></noscript>
-  <p class="lede">Everything this site knows about your progress, pulled from this browser's storage — your streak, readiness estimate, domain accuracy, and what's due for review.</p>
+  <noscript><div class="site-nav-fallback" style="max-width:1120px;margin:0 auto;padding:14px clamp(20px,4vw,56px)"><a href="index.html">Home</a> · <a href="practice.html">Practice</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="tools.html">Tools</a> · <a href="dashboard.html">Dashboard</a></div></noscript>
+<div class="xshell">
 
-  <div class="metric-strip" id="statCards"></div>
+  <div class="hero">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Dashboard</div>
+        <h1>Where you actually stand.</h1>
+        <p class="lede">Everything this site knows about your progress, pulled from this browser's storage — your streak, readiness estimate, domain accuracy, and what's due for review.</p>
+      </div>
+      <div class="split-divider" id="levelSection">
+        <div class="split-label">Level &amp; XP</div>
+        <div id="levelBox"></div>
+      </div>
+    </div>
+  </div>
 
-  <h2 id="levelSection">Level & XP</h2>
-  <div id="levelBox"></div>
+  <div class="xsection">
+    <div class="metric-strip" id="statCards"></div>
+  </div>
 
-  <h2>Estimated readiness</h2>
-  <div id="readinessBox"></div>
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">Estimated pass probability</div>
+      <div class="xcontent narrow" id="readinessBox"></div>
+    </div>
+  </div>
 
-  <h2>Score over time</h2>
-  <div class="box" id="historyBox"></div>
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">Score over time</div>
+      <div class="xcontent narrow" id="historyBox"></div>
+    </div>
+  </div>
 
-  <h2>Domain accuracy (all-time, all modes)</h2>
-  <div class="box" id="domainBox"></div>
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">Domain accuracy<br>all-time, all modes</div>
+      <div class="xcontent narrow" id="domainBox"></div>
+    </div>
+  </div>
 
-  <h2>Mastery & review queue</h2>
-  <div class="box" id="masteryBox"></div>
+  <div class="xsection">
+    <div class="xgrid">
+      <div class="xlabel">Mastery &amp; review queue</div>
+      <div class="xcontent narrow" id="masteryBox"></div>
+    </div>
+  </div>
 
-  <footer>
-    <p>All of this is computed from data stored only in your browser (localStorage) — nothing is sent anywhere. Clearing your browser data will reset it.</p>
-  </footer>
+  <div class="xsection">
+    <footer style="margin-top:0">
+      <p>All of this is computed from data stored only in your browser (localStorage) — nothing is sent anywhere. Clearing your browser data will reset it.</p>
+    </footer>
+  </div>
+
 </div>
 
 <script>
@@ -249,7 +267,7 @@
   const r = computeReadiness();
   const readinessBox = document.getElementById('readinessBox');
   if(!r.available){
-    readinessBox.innerHTML = `<div class="empty-note">Take a full practice exam on the <a href="index.html">Practice Exam</a> page to unlock your estimated readiness score.</div>`;
+    readinessBox.innerHTML = `<div class="empty-note">Take a full practice exam on the <a href="practice.html">Practice</a> page to unlock your estimated readiness score.</div>`;
   } else {
     const subParts = [`Recent average ${r.weightedAvg}% across ${r.attempts} full exam${r.attempts===1?'':'s'}`];
     if(r.weakestDomain) subParts.push(`weakest area: ${r.weakestDomain} (${r.weakestPct}%)`);
@@ -310,7 +328,7 @@
           <span class="name">${d}</span>
           <div class="bar-track"><div class="bar-fill" style="width:${pct||0}%;background:${barColor}"></div></div>
           <span class="pct">${label}</span>
-          <a class="practice-link" href="index.html?domain=${encodeURIComponent(d)}">Practice</a>
+          <a class="practice-link" href="practice.html?domain=${encodeURIComponent(d)}">Practice</a>
         </div>
       `;
     }).join('');
@@ -339,8 +357,8 @@
       </div>
       <div style="height:22px"></div>
       <div class="cta-row">
-        <a href="index.html">Review missed questions</a>
-        <a class="secondary" href="index.html">Adaptive practice</a>
+        <a href="practice.html">Review missed questions</a>
+        <a class="secondary" href="practice.html">Adaptive practice</a>
       </div>
     `;
   }

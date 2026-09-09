@@ -5,17 +5,21 @@
 :root{
   --navy:#16332E;      /* deep teal-black — headers, buttons, strong text */
   --navy2:#1F4A42;      /* secondary teal — hover/pressed states */
-  --paper:#F6FBF9;      /* page background — cool mint-white */
+  --paper:#FBFAF7;      /* page background — warm editorial paper */
   --white:#FFFFFF;
   --accent:#2C9C8B;      /* primary teal-mint accent */
   --accent-2:#E8776A;    /* warm coral — used sparingly for streaks/CTAs */
-  --line:#DCEAE6;
+  --line:#E3DFD6;
+  --line-soft:#EDEAE3;   /* lighter rule — dividers between rows inside a section */
+  --hover-tint:#F1EEE7;  /* nav/row hover background */
   --ink:#17231F;
   --muted:#5B7A72;
   --good:#2F9E5B;
   --bad:#D1594A;
   --warn:#C08A2E;
   --font-ui:'Nunito','Segoe UI',system-ui,sans-serif;
+  --font-serif:'Charter','Georgia',serif;
+  --font-mono:ui-monospace,Menlo,monospace;
   --radius:12px;
   --on-accent:#FFFFFF;   /* text sitting on a solid navy/accent background — stays white in both themes */
   --tint-accent:#E9F2EF; /* pale accent tint — selected/hover states, "medium" badges */
@@ -27,6 +31,8 @@
   --radius-lg:16px;
   --shadow-card:0 1px 2px rgba(22,51,46,0.05), 0 6px 16px -8px rgba(22,51,46,0.10);
   --shadow-pop:0 4px 10px rgba(22,51,46,0.08), 0 16px 32px -12px rgba(22,51,46,0.18);
+  --header-bg:rgba(251,250,247,0.92); /* translucent .paper, for the blurred sticky nav */
+  --site-header-h:64px; /* fallback; nav.js measures the real rendered height and overrides this */
 }
 
 /* Dark theme — toggled via [data-theme="dark"] on <html>, set by the
@@ -39,6 +45,8 @@
   --accent:#3FBBA6;
   --accent-2:#E8776A;
   --line:#2A3A36;
+  --line-soft:#233330;
+  --hover-tint:#1B2926;
   --ink:#E7F1EE;
   --muted:#93A6A0;
   --good:#4FBE79;
@@ -51,6 +59,7 @@
   --overlay-bg:rgba(24,36,34,0.88);
   --shadow-card:0 1px 2px rgba(0,0,0,0.16), 0 6px 16px -8px rgba(0,0,0,0.30);
   --shadow-pop:0 4px 10px rgba(0,0,0,0.24), 0 16px 32px -12px rgba(0,0,0,0.40);
+  --header-bg:rgba(15,23,21,0.92);
 }
 
 /* ---- Shared base layer: reset + page shell + typography, loaded once
@@ -65,9 +74,60 @@ body{
   font-variant-numeric:tabular-nums;
 }
 .wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
-h1{font-size:clamp(26px,4.8vw,34px);font-weight:700;margin:6px 0 12px;letter-spacing:-0.02em;line-height:1.15;}
+h1{font-size:clamp(30px,4.4vw,44px);font-weight:400;margin:6px 0 12px;letter-spacing:-0.03em;line-height:1.06;}
 h2{font-family:var(--font-ui);font-size:17px;font-weight:800;letter-spacing:-0.005em;color:var(--ink);margin:48px 0 14px;padding-top:14px;border-top:1px solid var(--line);}
-.lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 24px;}
+.lede{color:var(--muted);font-size:17px;max-width:56ch;margin:0 0 24px;text-wrap:pretty;}
+
+/* ---- Editorial site shell: the wide ruled-grid layout used across the
+   redesigned pages (Home, Practice, Study Plan, Notes, Mnemonics, Glossary,
+   Dashboard, Tools). Distinct from the older narrow .wrap column, which
+   the specialized tool pages (body map, sound trainer, scenario sim) still
+   use for their single-column interactive UI. ---- */
+.xshell{max-width:1120px;margin:0 auto;}
+.eyebrow{font:800 11px var(--font-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;}
+.hero{padding:clamp(36px,5vw,56px) clamp(20px,4vw,56px) 40px;border-bottom:1px solid var(--line);}
+.hero h1{margin:0 0 16px;}
+.hero .lede{margin:0;max-width:52ch;}
+.xsection{padding:40px clamp(20px,4vw,56px);border-bottom:1px solid var(--line);}
+.xsection:last-child{border-bottom:0;}
+.xsection-tight{padding-top:20px;}
+.xgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(24px,4vw,40px);}
+.xlabel{font:800 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:4px;max-width:150px;}
+.xcontent{grid-column:span 2;min-width:0;}
+.xcontent.narrow{max-width:64ch;}
+.xrow{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line-soft);}
+.xrow:last-child{border-bottom:0;}
+.xnum{font:700 13px var(--font-mono);color:var(--accent);}
+.xmeta{font:12.5px var(--font-mono);color:var(--muted);white-space:nowrap;}
+.btn-dark{font:800 14px var(--font-ui);color:var(--on-accent);background:var(--navy);padding:12px 22px;border-radius:6px;border:0;cursor:pointer;text-decoration:none;display:inline-block;}
+.btn-dark:hover{background:var(--navy2);color:var(--on-accent);}
+.btn-outline{font:800 14px var(--font-ui);color:var(--ink);background:var(--white);border:1px solid var(--ink);padding:12px 22px;border-radius:6px;cursor:pointer;text-decoration:none;display:inline-block;}
+.btn-outline:hover{background:var(--hover-tint);}
+.link-underline{font:800 14px var(--font-ui);color:var(--ink);background:none;border:0;border-bottom:2px solid var(--accent);padding:0 0 2px;cursor:pointer;text-decoration:none;display:inline-block;}
+.link-underline:hover{color:var(--accent);}
+.screenshot-slot{min-height:200px;border:1px solid var(--line);border-radius:6px;background-image:repeating-linear-gradient(135deg,var(--hover-tint) 0 8px,var(--paper) 8px 16px);display:flex;align-items:flex-end;padding:12px;}
+.screenshot-slot span{font:11px var(--font-mono);color:var(--muted);background:var(--paper);padding:3px 6px;border-radius:3px;}
+
+.kv-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:15px;}
+.kv-row:last-child{border-bottom:0;}
+.kv-row .v{font:12.5px var(--font-mono);color:var(--muted);}
+
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(32px,5vw,56px);align-items:end;}
+.split-divider{border-left:1px solid var(--line);padding-left:clamp(20px,3vw,30px);}
+.split-label{font:800 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+
+.trust-row{display:flex;flex-wrap:wrap;gap:36px;align-items:baseline;justify-content:space-between;}
+.trust-item-title{font:800 14px var(--font-ui);color:var(--ink);}
+.trust-item-sub{font-size:13px;color:var(--muted);}
+.trust-note{font:12px var(--font-ui);color:var(--muted);margin:0;max-width:40ch;}
+
+.chip-pill{font:600 13.5px var(--font-ui);color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:7px 15px;display:inline-block;}
+
+.step-row{display:flex;gap:20px;padding:16px 0;border-bottom:1px solid var(--line-soft);}
+.step-row:last-child{border-bottom:0;}
+.step-num{font:700 13px var(--font-mono);color:var(--accent);padding-top:5px;flex-shrink:0;}
+.step-title{font-size:19px;display:block;margin-bottom:2px;}
+.step-sub{font-size:14.5px;color:var(--muted);}
 
 /* ---- Browser surfaces: theme the parts the page doesn't draw ---- */
 ::selection{background:var(--accent);color:var(--on-accent);}
@@ -142,18 +202,30 @@ button:active{transform:scale(0.98);}
   .wrap{max-width:100% !important;padding:0 !important;}
 }
 
-/* ---- Shared site header (injected by nav.js into #site-header) ---- */
-#site-header{margin-bottom:24px;}
+/* ---- Shared site header: a full-bleed sticky flat nav bar (injected by
+   nav.js into #site-header). Every page places the #site-header mount as
+   the first child of <body>, ahead of its own .wrap/.xshell content, so
+   the bar itself can span the full viewport width while its contents stay
+   aligned to the same 1120px measure as the page below it. ---- */
+#site-header{
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:var(--header-bg);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
 
 .site-header__inner{
+  max-width:1120px;
+  margin:0 auto;
+  padding:14px clamp(20px,4vw,56px);
   display:flex;
   flex-wrap:wrap;
   align-items:center;
   justify-content:space-between;
-  gap:10px 16px;
-  padding-bottom:14px;
-  margin-bottom:14px;
-  border-bottom:1px solid var(--line);
+  gap:10px 20px;
   font-family:var(--font-ui);
 }
 
@@ -166,6 +238,10 @@ button:active{transform:scale(0.98);}
   color:var(--ink);
   text-decoration:none;
   letter-spacing:-0.01em;
+  background:none;
+  border:0;
+  padding:0;
+  cursor:pointer;
 }
 .site-header__brand:hover{color:var(--accent);}
 .site-header__brand .brand-mark{
@@ -184,64 +260,33 @@ button:active{transform:scale(0.98);}
 .site-header__groups{
   display:flex;
   flex-wrap:wrap;
-  gap:6px;
+  align-items:center;
+  gap:4px 2px;
 }
 
-.nav-group{
-  position:relative;
-}
-.nav-group summary{
-  list-style:none;
-  cursor:pointer;
-  font-size:13px;
-  font-weight:700;
-  color:var(--ink);
-  background:var(--white);
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:6px 14px;
-  user-select:none;
-}
-.nav-group summary::-webkit-details-marker{display:none;}
-.nav-group summary:hover{border-color:var(--accent);color:var(--accent);}
-.nav-group[open] summary{background:var(--navy);color:var(--on-accent);border-color:var(--navy);}
-.nav-group.has-active summary{color:var(--accent);border-color:var(--accent);}
-.nav-group.has-active[open] summary{background:var(--navy);color:var(--on-accent);border-color:var(--navy);}
-
-.nav-group__items{
-  position:absolute;
-  top:calc(100% + 6px);
-  left:0;
-  z-index:20;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  min-width:180px;
-  background:var(--white);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:6px;
-  box-shadow:var(--shadow-pop);
-}
-.nav-group__items a{
-  display:block;
-  padding:7px 10px;
+.nav-link{
+  font:700 13.5px var(--font-ui);
+  color:var(--muted);
+  background:none;
+  border:0;
+  padding:7px 11px;
   border-radius:6px;
-  font-size:13.5px;
-  font-weight:600;
-  color:var(--ink);
+  cursor:pointer;
+  white-space:nowrap;
   text-decoration:none;
+  display:inline-block;
 }
-.nav-group__items a:hover{background:var(--paper);}
-.nav-group__items a.active{color:var(--accent);background:var(--paper);}
+.nav-link:hover{color:var(--ink);background:var(--hover-tint);}
+.nav-link.active{color:var(--ink);}
+.nav-link .rule{height:2px;border-radius:2px;margin-top:5px;background:transparent;}
+.nav-link.active .rule{background:var(--accent);}
 
 /* No-JS fallback list (hidden once nav.js successfully renders) */
 .site-nav-fallback{font-size:13px;color:var(--muted);margin-bottom:24px;font-family:var(--font-ui);}
 .site-nav-fallback a{color:var(--accent);text-decoration:none;}
 .site-nav-fallback a:hover{text-decoration:underline;}
 
-@media (max-width:520px){
+@media (max-width:640px){
   .site-header__inner{flex-direction:column;align-items:flex-start;}
-  .nav-group__items{left:0;right:auto;}
-  .nav-group:last-of-type .nav-group__items{left:auto;right:0;}
+  .site-header__groups{gap:2px;}
 }

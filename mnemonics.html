@@ -15,34 +15,39 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
 <style>
-  .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 32px;}
-  .card{
-    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:20px 22px;margin-bottom:16px;
-  }
+  .mnemonics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(28px,4vw,44px);}
+  .card{break-inside:avoid;}
   .card h2{
-    margin:0 0 4px;font-size:19px;display:flex;align-items:baseline;gap:10px;
+    margin:0 0 4px;font:400 26px var(--font-serif);letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
   }
   .card h2 .letters{
-    font-family:'SFMono-Regular',monospace;color:var(--accent);font-size:16px;letter-spacing:0.04em;
+    font-family:var(--font-mono);color:var(--accent);font-size:20px;letter-spacing:0.02em;
   }
-  .card .used-for{font-size:13px;color:var(--muted);margin-bottom:14px;}
-  .breakdown{display:grid;gap:8px;}
+  .card .used-for{font-size:13.5px;color:var(--muted);margin-bottom:14px;text-wrap:pretty;}
+  .breakdown{display:grid;gap:0;}
   .breakdown .row{
-    display:flex;gap:12px;font-size:14.5px;padding:6px 0;border-bottom:1px solid var(--line);
+    display:flex;gap:14px;font-size:15.5px;padding:7px 0;border-bottom:1px solid var(--line-soft);
   }
   .breakdown .row:last-child{border-bottom:none;}
   .breakdown .letter{
-    font-family:'SFMono-Regular',monospace;font-weight:600;color:var(--ink);
-    flex-shrink:0;width:18px;
+    font:700 14px var(--font-mono);color:var(--accent);
+    flex-shrink:0;width:14px;
   }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Key EMT Mnemonics</h1>
   <div id="site-header"></div>
-  <noscript><div class="site-nav-fallback"><a href="index.html">Practice Exam</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Study Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="flowcharts.html">Flow Diagrams</a> · <a href="skillsheets.html">Skills Guide</a> · <a href="body-map.html">Body Map</a> · <a href="sound-trainer.html">Sound Trainer</a> · <a href="scenario-sim.html">Scenarios</a></div></noscript>
-  <p class="lede">Quick reference for the core frameworks used throughout patient assessment and the NREMT cognitive exam.</p>
+  <noscript><div class="site-nav-fallback" style="max-width:1120px;margin:0 auto;padding:14px clamp(20px,4vw,56px)"><a href="index.html">Home</a> · <a href="practice.html">Practice</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="tools.html">Tools</a> · <a href="dashboard.html">Dashboard</a></div></noscript>
+<div class="xshell">
+
+  <div class="hero">
+    <div class="eyebrow">Key EMT mnemonics</div>
+    <h1>The frameworks the questions are built on.</h1>
+    <p class="lede">Quick reference for the core frameworks used throughout patient assessment and the NREMT cognitive exam.</p>
+  </div>
+
+  <div class="xsection">
+  <div class="mnemonics-grid">
 
   <div class="card">
     <h2><span class="letters">SAMPLE</span> History</h2>
@@ -223,9 +228,15 @@
     </div>
   </div>
 
-  <footer>
-    <p>This page is a study aid summarizing widely-taught EMT-B frameworks. As with any study material, cross-check specifics (like exact rule-of-nines percentages for pediatric patients, which differ from the adult figures shown here) against your own course materials.</p>
-  </footer>
+  </div>
+  </div>
+
+  <div class="xsection">
+    <footer style="margin-top:0">
+      <p>This page is a study aid summarizing widely-taught EMT-B frameworks. As with any study material, cross-check specifics (like exact rule-of-nines percentages for pediatric patients, which differ from the adult figures shown here) against your own course materials.</p>
+    </footer>
+  </div>
+
 </div>
 <script src="assets/nav.js" defer></script>
 </body>
