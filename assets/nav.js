@@ -135,6 +135,7 @@
         '</span>' +
         '<nav class="site-header__groups" aria-label="Site sections">' + itemsHtml +
           '<a href="dashboard.html' + (cur === 'dashboard.html' ? '#levelSection' : '') + '" class="level-badge" id="levelBadge" title="Your level">Lvl 1</a>' +
+          '<span id="accountSlot"></span>' +
           '<button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">◑</button>' +
         '</nav>' +
       '</div>';
@@ -143,6 +144,7 @@
     if(fallback) fallback.remove();
 
     renderLevelBadge();
+    renderAccountUI();
 
     var toggle = document.getElementById('themeToggle');
     if(toggle) toggle.addEventListener('click', function(){
@@ -187,6 +189,249 @@
       navigator.serviceWorker.register('sw.js').catch(function(){ /* offline support is best-effort */ });
     });
   }
+
+  // ---- Accounts & cross-device sync ----
+  // Login is entirely optional: every feature already works from localStorage
+  // alone (see practice.html's seen/missed/flagged/mastery/streak tracking and
+  // XP_KEY above). Signing in just layers periodic sync of that same data
+  // through Supabase, keyed by user id and protected by row-level security —
+  // so a signed-in user's progress follows them to a new browser/device
+  // instead of resetting. The publishable key below is meant to be public;
+  // it only grants what the database's RLS policies allow (each user can
+  // read/write their own row and nothing else).
+  var SUPABASE_URL = 'https://bsfcqrczehbcctwhxmrj.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_CuqCLCy8R9PL6ARZJ9TCow_ba0XySYI';
+  var PROGRESS_KEYS = [
+    'nremt_seen_questions', 'nremt_exam100_missed', 'nremt_exam100_flagged',
+    'nremt_exam100_history', 'nremt_exam100_best', 'nremt_mastery',
+    'nremt_domain_stats_all', 'nremt_streak', 'nremt_xp'
+  ];
+  // Deliberately left out of sync: nremt_inprogress_exam (an in-progress
+  // attempt is device-local to avoid two devices racing on the same quiz),
+  // nremt_option_order (just per-browser answer-shuffle display order), and
+  // nremt_theme (a display preference, not progress).
+
+  var sbClient = null;
+  var currentUser = null;
+  var syncTimer = null;
+  var RELOAD_ONCE_KEY = 'nremt_sync_reloaded';
+
+  function loadSupabaseSdk(cb){
+    if(window.supabase && window.supabase.createClient){ cb(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.onload = cb;
+    s.onerror = function(){ /* offline or blocked — accounts just stay unavailable this load */ };
+    document.head.appendChild(s);
+  }
+  function getClient(){
+    if(!sbClient && window.supabase) sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    return sbClient;
+  }
+
+  function collectProgress(){
+    var data = {};
+    PROGRESS_KEYS.forEach(function(k){
+      var v = localStorage.getItem(k);
+      if(v !== null) data[k] = v;
+    });
+    return data;
+  }
+  function applyProgress(data){
+    if(!data) return;
+    Object.keys(data).forEach(function(k){
+      if(PROGRESS_KEYS.indexOf(k) !== -1) localStorage.setItem(k, data[k]);
+    });
+  }
+
+  function pushProgress(){
+    var client = getClient();
+    if(!client || !currentUser) return;
+    client.from('user_progress')
+      .upsert({ id: currentUser.id, data: collectProgress(), updated_at: new Date().toISOString() })
+      .then(function(){ /* best-effort; next timer tick or visibility change retries */ });
+  }
+
+  // First login on a given account: if the cloud already has a saved row,
+  // it wins (most common case — syncing an existing account onto a new
+  // device). If not, this is the account's first sync, so seed the cloud
+  // from whatever guest progress is already on this device rather than
+  // discarding it.
+  function pullProgressOrSeed(user){
+    var client = getClient();
+    return client.from('user_progress').select('data').eq('id', user.id).maybeSingle().then(function(res){
+      if(res.error) return;
+      if(res.data) applyProgress(res.data.data);
+      else pushProgress();
+    });
+  }
+
+  function startSyncTimer(){
+    stopSyncTimer();
+    syncTimer = setInterval(pushProgress, 30000);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+  }
+  function stopSyncTimer(){
+    if(syncTimer) clearInterval(syncTimer);
+    syncTimer = null;
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+  }
+  function onVisibilityChange(){
+    if(document.visibilityState === 'hidden') pushProgress();
+  }
+
+  function renderAccountUI(){
+    var mount = document.getElementById('accountSlot');
+    if(!mount) return;
+    if(currentUser){
+      var label = currentUser.email ? currentUser.email.split('@')[0] : 'Account';
+      mount.innerHTML = '<button type="button" class="account-btn" id="accountBtn" title="' +
+        escapeHtml(currentUser.email || '') + '">' + escapeHtml(label) + '</button>';
+    } else {
+      mount.innerHTML = '<button type="button" class="account-btn" id="accountBtn">Log in</button>';
+    }
+    var btn = document.getElementById('accountBtn');
+    if(btn) btn.addEventListener('click', function(){
+      if(currentUser) openAccountMenu(); else openAuthModal();
+    });
+  }
+
+  function openAccountMenu(){
+    if(confirm('Signed in as ' + currentUser.email + '.\n\nSign out?')){
+      pushProgress();
+      var client = getClient();
+      if(client) client.auth.signOut();
+    }
+  }
+
+  function ensureAuthModal(){
+    if(document.getElementById('authModalOverlay')) return;
+    var overlay = document.createElement('div');
+    overlay.id = 'authModalOverlay';
+    overlay.className = 'auth-modal-overlay';
+    overlay.innerHTML =
+      '<div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">' +
+        '<button type="button" class="auth-modal-close" id="authModalClose" aria-label="Close">&times;</button>' +
+        '<h2 id="authModalTitle">Sign in</h2>' +
+        '<p class="auth-modal-sub">Sign in to sync your progress, streak, and missed-question queue across devices. Everything still works without an account.</p>' +
+        '<form id="authForm">' +
+          '<label>Email<input type="email" id="authEmail" required autocomplete="email"></label>' +
+          '<label>Password<input type="password" id="authPassword" required autocomplete="current-password" minlength="6"></label>' +
+          '<div class="auth-modal-msg" id="authModalMsg"></div>' +
+          '<button type="submit" class="auth-modal-submit" id="authSubmitBtn">Sign in</button>' +
+        '</form>' +
+        '<p class="auth-modal-toggle">' +
+          '<span id="authToggleText">Don’t have an account?</span> ' +
+          '<button type="button" id="authToggleBtn">Create one</button>' +
+        '</p>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    var mode = 'signin';
+    function setMode(m){
+      mode = m;
+      document.getElementById('authModalTitle').textContent = m === 'signin' ? 'Sign in' : 'Create account';
+      document.getElementById('authSubmitBtn').textContent = m === 'signin' ? 'Sign in' : 'Create account';
+      document.getElementById('authToggleText').textContent = m === 'signin' ? 'Don’t have an account?' : 'Already have an account?';
+      document.getElementById('authToggleBtn').textContent = m === 'signin' ? 'Create one' : 'Sign in instead';
+      var msgEl = document.getElementById('authModalMsg');
+      msgEl.textContent = '';
+      msgEl.className = 'auth-modal-msg';
+    }
+
+    document.getElementById('authModalClose').addEventListener('click', closeAuthModal);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) closeAuthModal(); });
+    document.getElementById('authToggleBtn').addEventListener('click', function(){
+      setMode(mode === 'signin' ? 'signup' : 'signin');
+    });
+
+    document.getElementById('authForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var email = document.getElementById('authEmail').value.trim();
+      var password = document.getElementById('authPassword').value;
+      var msgEl = document.getElementById('authModalMsg');
+      var submitBtn = document.getElementById('authSubmitBtn');
+      var client = getClient();
+      if(!client){
+        msgEl.textContent = 'Accounts are unavailable right now — check your connection and try again.';
+        msgEl.className = 'auth-modal-msg error';
+        return;
+      }
+      submitBtn.disabled = true;
+      msgEl.textContent = '';
+      msgEl.className = 'auth-modal-msg';
+      var action = mode === 'signin'
+        ? client.auth.signInWithPassword({ email: email, password: password })
+        : client.auth.signUp({ email: email, password: password });
+      action.then(function(res){
+        submitBtn.disabled = false;
+        if(res.error){
+          msgEl.textContent = res.error.message;
+          msgEl.className = 'auth-modal-msg error';
+          return;
+        }
+        if(mode === 'signup' && res.data && res.data.user && !res.data.session){
+          msgEl.textContent = 'Check your email to confirm your account, then sign in.';
+          msgEl.className = 'auth-modal-msg success';
+          setMode('signin');
+          return;
+        }
+        closeAuthModal();
+      }).catch(function(){
+        submitBtn.disabled = false;
+        msgEl.textContent = 'Something went wrong. Please try again.';
+        msgEl.className = 'auth-modal-msg error';
+      });
+    });
+  }
+
+  function openAuthModal(){
+    ensureAuthModal();
+    document.getElementById('authModalOverlay').classList.add('open');
+    document.getElementById('authEmail').focus();
+  }
+  function closeAuthModal(){
+    var overlay = document.getElementById('authModalOverlay');
+    if(overlay) overlay.classList.remove('open');
+  }
+
+  function handleAuthChange(event, session){
+    var wasSignedOut = !currentUser;
+    currentUser = session ? session.user : null;
+    renderAccountUI();
+    if(event === 'SIGNED_IN' && wasSignedOut){
+      pullProgressOrSeed(currentUser).then(function(){
+        // A one-time reload after the first sync of a session means every
+        // page's already-rendered stats (level badge, dashboard, streak)
+        // reflect the freshly-synced data without needing every page to
+        // separately listen for a sync event.
+        if(!sessionStorage.getItem(RELOAD_ONCE_KEY)){
+          sessionStorage.setItem(RELOAD_ONCE_KEY, '1');
+          location.reload();
+        }
+      });
+      startSyncTimer();
+    }
+    if(event === 'SIGNED_OUT'){
+      stopSyncTimer();
+      sessionStorage.removeItem(RELOAD_ONCE_KEY);
+    }
+  }
+
+  function initAccounts(){
+    loadSupabaseSdk(function(){
+      var client = getClient();
+      if(!client) return;
+      client.auth.onAuthStateChange(handleAuthChange);
+      client.auth.getSession().then(function(res){
+        var session = res.data && res.data.session;
+        currentUser = session ? session.user : null;
+        renderAccountUI();
+        if(currentUser) startSyncTimer();
+      });
+    });
+  }
+  initAccounts();
 
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', renderHeader);

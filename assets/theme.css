@@ -192,11 +192,78 @@ button:active{transform:scale(0.98);}
 }
 .level-badge:hover{background:var(--warn);color:var(--on-accent);}
 
+/* ---- Account button (injected by nav.js) + sign-in/sign-up modal ----
+   Login is optional — the account button just adds cross-device sync of
+   progress on top of the localStorage-only experience everyone already has. */
+.account-btn{
+  display:inline-flex;
+  align-items:center;
+  height:32px;
+  padding:0 14px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--white);
+  color:var(--ink);
+  font-family:var(--font-ui);
+  font-weight:700;
+  font-size:12.5px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  max-width:120px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.account-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+.auth-modal-overlay{
+  position:fixed;inset:0;background:rgba(22,51,46,0.45);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;z-index:1000;
+  opacity:0;pointer-events:none;transition:opacity .15s;
+}
+.auth-modal-overlay.open{opacity:1;pointer-events:auto;}
+.auth-modal{
+  position:relative;width:100%;max-width:360px;
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:var(--shadow-pop);padding:28px 24px 24px;
+  font-family:var(--font-ui);color:var(--ink);
+}
+.auth-modal h2{margin:0 0 6px;font-family:var(--font-display);font-size:20px;}
+.auth-modal-sub{margin:0 0 18px;font-size:13px;color:var(--muted);line-height:1.5;}
+.auth-modal-close{
+  position:absolute;top:14px;right:14px;width:26px;height:26px;
+  border:none;background:transparent;color:var(--muted);cursor:pointer;
+  font-size:20px;line-height:1;border-radius:50%;
+}
+.auth-modal-close:hover{background:var(--hover-tint);color:var(--ink);}
+.auth-modal form{display:flex;flex-direction:column;gap:12px;}
+.auth-modal label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700;color:var(--muted);}
+.auth-modal input{
+  font-family:inherit;font-size:14.5px;padding:9px 11px;
+  border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--paper);color:var(--ink);
+}
+.auth-modal input:focus{outline:none;border-color:var(--accent);}
+.auth-modal-msg{font-size:12.5px;min-height:1.4em;}
+.auth-modal-msg.error{color:var(--bad);}
+.auth-modal-msg.success{color:var(--good);}
+.auth-modal-submit{
+  margin-top:2px;padding:11px;border:none;border-radius:var(--radius-sm);
+  background:var(--navy);color:var(--on-accent);font-family:inherit;font-weight:700;font-size:14.5px;cursor:pointer;
+}
+.auth-modal-submit:hover{background:var(--navy2);}
+.auth-modal-submit:disabled{opacity:0.6;cursor:not-allowed;}
+.auth-modal-toggle{margin:16px 0 0;font-size:12.5px;color:var(--muted);text-align:center;}
+.auth-modal-toggle button{
+  border:none;background:transparent;color:var(--accent);font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer;padding:0;
+}
+.auth-modal-toggle button:hover{text-decoration:underline;}
+
 /* ---- Print stylesheet: applies on every page ---- */
 @media print{
   #site-header, .site-nav-fallback, .theme-toggle, button,
   .start-btn, .review-btn, .domain-btn, .planner-row button,
-  #searchBox, .print-btn{ display:none !important; }
+  #searchBox, .print-btn, .auth-modal-overlay{ display:none !important; }
   body{background:#fff !important;color:#000 !important;}
   a{color:#000 !important;text-decoration:underline;}
   .wrap{max-width:100% !important;padding:0 !important;}
