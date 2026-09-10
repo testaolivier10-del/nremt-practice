@@ -757,6 +757,292 @@ const SCENARIOS = [
       s8_end_good: { ending: "good", text: "Ventilatory support came first, buying time for the naloxone to work without oxygenation depending entirely on it — and once his own breathing returned, you kept watching for the naloxone wearing off before the longer-acting opioid does, since re-sedation on the way to the hospital is a real risk. This is the sequence that treats the actual emergency (he isn't breathing enough) rather than just the cause of it." },
       s8_end_ok: { ending: "neutral", text: "He recovers, but a longer period of severe hypoxia than necessary — from waiting on naloxone alone, from treating recovery position as sufficient, or from delaying naloxone once bagging was already underway — meant more physiologic stress than the best-case run. Airway and breathing come before reversal agents; a patient who isn't breathing adequately needs ventilatory support started immediately, with naloxone as an addition to that, not a replacement for it." }
     }
+  },
+  {
+    id: "s9",
+    title: "Heavy Bleeding After a Home Birth",
+    domain: "OB/Peds & Special Populations",
+    blurb: "The baby's fine. The mother's fundus is soft, and the sheets are soaked.",
+    startNode: "s9_start",
+    nodes: {
+      s9_start: {
+        vitals: "Mother: HR 118 · BP 98/62",
+        text: "You're called to a home birth gone faster than planned — a healthy-looking newborn already delivered and drying in a towel, cord clamped and cut by the midwife's assistant before you arrived. The placenta has also delivered, but the mother is now soaking through towel after towel with bright red vaginal bleeding, and when you rest a hand on her lower abdomen, her uterus feels soft and doughy rather than firm.",
+        choices: [
+          { text: "Massage the fundus firmly in a circular motion while assessing further", next: "s9_massage_good" },
+          { text: "Elevate her legs, apply oxygen, and wait a few minutes to see if the bleeding slows on its own before touching her abdomen", next: "s9_wait_bad", consequence: "A soft, boggy uterus after delivery is uterine atony — the single most common cause of postpartum hemorrhage — and it doesn't fix itself by waiting. Fundal massage stimulates the uterus to contract and clamp down on the open blood vessels at the placental site; the sooner it starts, the sooner the bleeding actually has a chance to slow." },
+          { text: "Focus on a full newborn assessment first, since the baby's condition seems like the more urgent unknown", next: "s9_baby_first_bad", consequence: "The newborn is pink, crying, and moving well — already showing you it's tolerating the transition fine. The mother, meanwhile, has a soft fundus and is actively hemorrhaging: right now she is the less stable patient of the two, and treating her hemorrhage is the more time-critical task in front of you." }
+        ]
+      },
+      s9_wait_bad: {
+        vitals: "Mother: HR 128 · BP 88/56",
+        text: "A couple of minutes pass with no fundal massage. She's noticeably paler, and another towel is already soaked through.",
+        choices: [
+          { text: "Begin firm fundal massage now", next: "s9_massage_late" }
+        ]
+      },
+      s9_baby_first_bad: {
+        vitals: "Mother: HR 124 · BP 90/58",
+        text: "The newborn assessment goes well — strong cry, good color, moving all extremities. When you look back at the mother, she's visibly paler and more of the bedding is soaked through than before.",
+        choices: [
+          { text: "Turn your attention to her now and begin firm fundal massage", next: "s9_massage_late" }
+        ]
+      },
+      s9_massage_late: {
+        vitals: "Mother: HR 120 · BP 94/60",
+        text: "Firm fundal massage finally begins. The uterus starts to firm up under your hand, and the bleeding visibly slows, though she's lost more blood than she needed to by this point.",
+        choices: [
+          { text: "Continue massage, keep her warm, and prepare for immediate transport treating for shock", next: "s9_transport_ok" }
+        ]
+      },
+      s9_massage_good: {
+        vitals: "Mother: HR 112 · BP 102/66",
+        text: "Under firm, steady massage the fundus starts to firm up and round out, and the flow of bright red blood visibly slows within a minute. She's still pale and anxious, but clearly responding.",
+        choices: [
+          { text: "Keep massaging intermittently, place a sanitary pad to monitor ongoing loss, and prepare for prompt transport while treating for shock", next: "s9_ongoing_good" },
+          { text: "Stop massaging now that the fundus feels firm, and focus on cleaning her up before moving her", next: "s9_stop_early_bad", consequence: "A fundus that has just firmed up under active massage can go soft again the moment you stop, especially this soon after delivery — stopping to tidy up rather than continuing to monitor and re-massage as needed risks losing the ground you just gained, and cosmetic cleanup was never the priority here." }
+        ]
+      },
+      s9_stop_early_bad: {
+        vitals: "Mother: HR 120 · BP 92/60",
+        text: "Within a minute of stopping, the fundus softens again and bleeding resumes briskly. You go back to firm massage, annoyed at yourself for the pause.",
+        choices: [
+          { text: "Resume firm massage, keep her warm, and move to immediate transport treating for shock", next: "s9_transport_ok" }
+        ]
+      },
+      s9_ongoing_good: {
+        vitals: "Mother: HR 100 · BP 110/70",
+        text: "The uterus stays firm with intermittent massage and the bleeding has slowed to a trickle. She's shivering, so you've covered her and the newborn to keep both warm. She's alert, anxious, but talking normally.",
+        choices: [
+          { text: "Transport promptly, continuing to reassess the fundus, vitals, and blood loss en route", next: "s9_transport_good" }
+        ]
+      },
+      s9_transport_good: {
+        text: "She remains stable throughout transport, with the fundus staying firm under periodic massage and only minor further bleeding. The newborn stays warm, dry, and pink in your partner's arms the whole way in.",
+        choices: [
+          { text: "Hand off a complete report, including estimated blood loss and time of delivery, to the receiving team", next: "s9_end_good" }
+        ]
+      },
+      s9_transport_ok: {
+        text: "She stays borderline but doesn't fully decompensate during transport, though the earlier delay before massage started means she arrives with a lower blood pressure and more total blood loss than the best-case run.",
+        choices: [
+          { text: "Hand off a complete report, including estimated blood loss and time of delivery", next: "s9_end_ok" }
+        ]
+      },
+      s9_end_good: { ending: "good", text: "You recognized a boggy uterus as postpartum hemorrhage from uterine atony immediately, started fundal massage without delay, kept at it rather than stopping early, treated for shock, and got her and the newborn moving promptly. Postpartum hemorrhage is time-critical — fundal massage is a simple, effective, EMT-scope intervention, but only if it starts right away and continues until bleeding is truly controlled." },
+      s9_end_ok: { ending: "neutral", text: "She survives, but a delay before fundal massage — whether from waiting to see if it resolved on its own, prioritizing the newborn exam first, or stopping the massage too soon — meant more blood loss and a rockier ride in than necessary. A soft, boggy fundus after delivery is the sign to act on immediately, not a finding to revisit after other tasks." }
+    }
+  },
+  {
+    id: "s10",
+    title: "A Toddler Who Can't Catch His Breath",
+    domain: "Airway & Respiratory",
+    blurb: "Wheezing, retractions, and a mother who wants you to just \"give him his inhaler and go.\"",
+    startNode: "s10_start",
+    nodes: {
+      s10_start: {
+        vitals: "HR 156 · RR 44 · SpO2 89%",
+        text: "A 4-year-old boy with a known asthma history is sitting upright on his mother's lap, working hard to breathe. You can hear audible wheezing across the room, and you see visible retractions at his ribs and a slight head-bobbing with each breath. His mother says he's already had three puffs of his rescue inhaler at home with no improvement and just wants you to \"give him another dose and let them go\" so they aren't stuck waiting for you.",
+        choices: [
+          { text: "Perform a rapid assessment of his work of breathing and lung sounds while preparing to assist with a bronchodilator per protocol", next: "s10_assess_good" },
+          { text: "Agree to just give one more dose from his inhaler and let the parents drive to the hospital, since transport wasn't asked for", next: "s10_defer_bad", consequence: "Retractions, head-bobbing, and an SpO2 of 89% in a young child are signs of significant respiratory distress that can progress to failure quickly — handing back an inhaler and stepping aside skips your own assessment and monitoring of a child who is currently in real danger, based on a parent's understandable but risky request." },
+          { text: "Immediately place him supine to get a better look at his chest and auscultate", next: "s10_position_bad", consequence: "A child in respiratory distress who has positioned himself upright is doing that for a reason — it's easing his work of breathing. Forcing a distressed pediatric airway patient flat can worsen air movement and increase his distress right when he can least afford it." }
+        ]
+      },
+      s10_defer_bad: {
+        vitals: "HR 162 · RR 46 · SpO2 86%",
+        text: "You reconsider almost immediately once you actually look at him — the retractions are getting more pronounced and he's tiring visibly.",
+        choices: [
+          { text: "Step back in, assess him properly, and prepare to assist with his bronchodilator under your own monitoring", next: "s10_assess_late" }
+        ]
+      },
+      s10_position_bad: {
+        vitals: "HR 164 · RR 48 · SpO2 85%",
+        text: "The moment you lay him back, he becomes noticeably more distressed and his oxygen saturation drops further. You let him return to sitting upright.",
+        choices: [
+          { text: "Reassess him sitting upright, and prepare to assist with his bronchodilator", next: "s10_assess_late" }
+        ]
+      },
+      s10_assess_good: {
+        vitals: "HR 154 · RR 42 · SpO2 90%",
+        text: "Diffuse expiratory wheezing throughout both lung fields, retractions, and mild nasal flaring. He's tiring but still alert and tracking you with his eyes. This matches a significant asthma exacerbation not fully relieved by his home inhaler.",
+        choices: [
+          { text: "Assist with his prescribed bronchodilator via spacer or nebulizer per protocol, keeping him in the position of comfort", next: "s10_bronchodilator_good" },
+          { text: "Hold off on any further bronchodilator since he's already had three doses at home, and go straight to transport", next: "s10_hold_med_bad", consequence: "Repeat dosing of a bronchodilator like albuterol is generally appropriate for ongoing significant distress and is well within EMT scope to assist with per protocol — withholding it out of caution about \"too much medicine already\" leaves him working this hard to breathe for longer than he needs to." }
+        ]
+      },
+      s10_assess_late: {
+        vitals: "HR 158 · RR 44 · SpO2 88%",
+        text: "Same exam findings — diffuse wheezing, retractions, mild flaring — though he's had a little longer to tire out than the best-case run.",
+        choices: [
+          { text: "Assist with his prescribed bronchodilator per protocol, keeping him upright", next: "s10_bronchodilator_late" }
+        ]
+      },
+      s10_hold_med_bad: {
+        vitals: "HR 168 · RR 48 · SpO2 87%",
+        text: "By the time you're loading him, his breathing is clearly worse, not better. You reconsider and go back to treat him properly.",
+        choices: [
+          { text: "Assist with his bronchodilator now, before moving any further toward transport", next: "s10_bronchodilator_late" }
+        ]
+      },
+      s10_bronchodilator_good: {
+        vitals: "HR 138 · RR 32 · SpO2 95%",
+        text: "Within several minutes his wheezing eases noticeably, retractions lessen, and his oxygen saturation climbs. He's still working somewhat but visibly less distressed, and starting to interact more with his mother.",
+        choices: [
+          { text: "Reassess closely, continue supplemental oxygen as needed, and transport in a position of comfort", next: "s10_end_good" }
+        ]
+      },
+      s10_bronchodilator_late: {
+        vitals: "HR 144 · RR 36 · SpO2 92%",
+        text: "He improves with the treatment, though not quite as much as he might have with an earlier start — he's still working harder than a fully recovered child would be.",
+        choices: [
+          { text: "Reassess, continue supplemental oxygen, and transport in a position of comfort", next: "s10_end_ok" }
+        ]
+      },
+      s10_end_good: { ending: "good", text: "You assessed him properly instead of taking the shortcut the moment invited, let him stay in the position that was actually helping him breathe, and didn't hesitate to assist with another appropriate dose of his bronchodilator despite the earlier doses at home. Pediatric respiratory distress can deteriorate fast — this is the sequence that treats it as the real emergency it is rather than a quick inhaler hand-off." },
+      s10_end_ok: { ending: "neutral", text: "He improves and stabilizes, but a misstep along the way — deferring to the parent's request instead of assessing him yourself, forcing him out of the position that was easing his breathing, or hesitating on an appropriate repeat bronchodilator dose — meant he spent longer in significant distress than he needed to. A distressed child sitting upright and working hard to breathe is telling you what he needs; the job is to support that, not second-guess it." }
+    }
+  },
+  {
+    id: "s11",
+    title: "Collapsed at the Job Site in August",
+    domain: "Cardiac & Medical",
+    blurb: "Two roofers went down in the heat today. Only one of them actually needs to be scared.",
+    startNode: "s11_start",
+    nodes: {
+      s11_start: {
+        vitals: "HR 128 · BP 100/64 · Temp warm to touch, sweating heavily",
+        text: "A 38-year-old roofer collapsed after several hours working on an unshaded roof in 97-degree heat. He's confused, sweating profusely, and his skin is hot and moist. His coworker, standing nearby, mentions a second roofer \"felt sick and sat down under a tree about twenty minutes ago\" but seems otherwise fine.",
+        choices: [
+          { text: "Move this patient to shade immediately, begin aggressive cooling, and assess his mental status closely while sending your partner to check the second worker", next: "s11_cool_good" },
+          { text: "Since he's still sweating and his skin is moist, assume this is heat exhaustion rather than anything more serious and just have him rest and drink water", next: "s11_assume_bad", consequence: "Sweating and moist skin alone don't rule out heat stroke — the classic \"hot, dry skin\" teaching point is a common but incomplete presentation, since a significant number of exertional heat stroke patients are still sweating when found. The finding that actually matters here is his altered mental status: confusion in the setting of heat exposure is a heat emergency until proven otherwise, and giving him water to drink while he's confused also risks aspiration." },
+          { text: "Prioritize the second worker first since he's described as feeling sick, while this patient is at least still responsive", next: "s11_wrong_priority_bad", consequence: "This patient is confused with a rapid pulse and hot, sweat-soaked skin after prolonged heat exposure — that combination is concerning for heat stroke, a true emergency, right in front of you. The second worker is described only as having \"felt sick\" and is now sitting comfortably; without more information he doesn't clearly outrank the patient showing altered mental status right now." }
+        ]
+      },
+      s11_assume_bad: {
+        vitals: "HR 136 · BP 92/58",
+        text: "He's more confused a minute later and starting to sip water clumsily, coughing some of it down the wrong way.",
+        choices: [
+          { text: "Stop the water, move him to shade, and begin aggressive cooling now", next: "s11_cool_late" }
+        ]
+      },
+      s11_wrong_priority_bad: {
+        vitals: "HR 138 · BP 90/56",
+        text: "By the time you get back to him after checking on the second worker (who turns out to be mildly dehydrated but alert and appropriate), your first patient is more confused and his pulse has climbed further.",
+        choices: [
+          { text: "Move him to shade immediately and begin aggressive cooling", next: "s11_cool_late" }
+        ]
+      },
+      s11_cool_late: {
+        vitals: "HR 130 · BP 96/60",
+        text: "You get him into shade and start cooling — wet towels, fanning, ice packs to the neck, groin, and armpits. His mental status is slow to improve given how long he was left in the heat.",
+        choices: [
+          { text: "Continue aggressive cooling, get a set of vitals, and prepare for prompt transport", next: "s11_transport_ok" }
+        ]
+      },
+      s11_cool_good: {
+        vitals: "HR 124 · BP 102/66",
+        text: "Moved into shade quickly, with wet towels and ice packs applied to his neck, armpits, and groin, and a fan moving air across him. His partner reports the second worker is mildly dehydrated and sweating normally, fully alert and oriented — a much less concerning presentation by comparison.",
+        choices: [
+          { text: "Continue active cooling, monitor his mental status closely, and prepare for prompt transport, cooling en route", next: "s11_transport_good" },
+          { text: "Stop cooling once he seems a little more alert, since he's talking again", next: "s11_stop_cooling_bad", consequence: "A brief improvement in responsiveness doesn't mean his core temperature has actually normalized — heat stroke is a core-temperature emergency, and stopping active cooling early based on how alert he sounds, rather than continuing until his temperature and mental status truly recover, risks losing the ground you just gained." }
+        ]
+      },
+      s11_stop_cooling_bad: {
+        vitals: "HR 130 · BP 96/60",
+        text: "Within a couple of minutes his confusion returns and he's sweating heavily again. You resume active cooling.",
+        choices: [
+          { text: "Resume aggressive cooling and prepare for prompt transport, continuing to cool en route", next: "s11_transport_ok" }
+        ]
+      },
+      s11_transport_good: {
+        text: "His mental status steadily clears with ongoing cooling, and he's oriented and asking what happened by the time you reach the hospital, cooling measures still in place the whole way.",
+        choices: [
+          { text: "Hand off a full report, including how long he was exposed and the cooling measures already given", next: "s11_end_good" }
+        ]
+      },
+      s11_transport_ok: {
+        text: "He improves during transport with cooling underway, though the earlier delay meant he spent longer altered and hyperthermic than the best-case run.",
+        choices: [
+          { text: "Hand off a full report on his exposure time and treatment so far", next: "s11_end_ok" }
+        ]
+      },
+      s11_end_good: { ending: "good", text: "You read the altered mental status as the real red flag rather than getting reassured by moist skin, prioritized the patient actually showing signs of a heat emergency, started aggressive cooling immediately, and kept it going instead of stopping at the first sign of improvement. Heat stroke is a true emergency where rapid, sustained cooling is the single intervention that changes outcome the most." },
+      s11_end_ok: { ending: "neutral", text: "He recovers, but a misstep — assuming moist skin ruled out something serious, misjudging which patient needed you first, or easing off cooling too soon — meant more time spent altered and overheated than necessary. Confusion after heat exposure is the finding that should drive urgency here, regardless of how wet or dry the skin feels." }
+    }
+  },
+  {
+    id: "s12",
+    title: "The Agitated Patient in a Locked Apartment",
+    domain: "EMS Operations",
+    blurb: "He's yelling that everyone needs to leave. Getting to him fast isn't the same as getting to him safely.",
+    startNode: "s12_start",
+    nodes: {
+      s12_start: {
+        text: "Dispatch sends you to a welfare check on a 30-year-old man whose neighbor called after hearing yelling and things being thrown for the past hour. Through the door you can hear him shouting incoherently, and the neighbor mentions he has a history of untreated psychiatric illness and \"sometimes keeps a bat by the door.\" No law enforcement has been dispatched yet.",
+        choices: [
+          { text: "Stage at a safe distance and request law enforcement before making any attempt at patient contact", next: "s12_stage_good" },
+          { text: "Knock and try to talk him down yourself, since he technically hasn't threatened anyone yet and time seems important", next: "s12_enter_bad", consequence: "Unpredictable agitation, a reported weapon within reach, and a door you haven't even confirmed is unlocked add up to a real potential for violence — \"he hasn't threatened anyone yet\" isn't the same as a scene that's actually safe. Your own safety has to come first, or you become a second patient with no one left to treat the first one." },
+          { text: "Call for an ambulance transport unit to also respond, but go ahead and make contact now since backup is already inbound", next: "s12_enter_bad", consequence: "Backup being inbound doesn't make the scene safe in the meantime — going in before it actually arrives means facing an unpredictable, possibly armed patient with no support on hand yet, which is exactly the situation staging is meant to prevent." }
+        ]
+      },
+      s12_enter_bad: {
+        text: "You knock and the door swings open — he's holding the bat, wild-eyed, and shouting at you to get out. You back away quickly without incident, but your heart is pounding; that could have gone very differently.",
+        choices: [
+          { text: "Retreat to a safe distance now and request law enforcement before any further contact", next: "s12_stage_late" }
+        ]
+      },
+      s12_stage_good: {
+        text: "You stage two blocks away and update dispatch. Police arrive within several minutes, make contact, and after a tense but non-violent conversation, get him to agree to be seen — the bat is secured by the officers before you're brought in.",
+        choices: [
+          { text: "Once the scene is confirmed secured by law enforcement, approach and begin a calm, non-confrontational assessment", next: "s12_assess_good" }
+        ]
+      },
+      s12_stage_late: {
+        text: "You retreat and request police. They arrive, and after the earlier close call, are especially cautious making entry. It eventually resolves the same way — he agrees to be seen once officers have secured the apartment.",
+        choices: [
+          { text: "Once the scene is confirmed secured, approach and begin a calm, non-confrontational assessment", next: "s12_assess_late" }
+        ]
+      },
+      s12_assess_good: {
+        vitals: "HR 108 · BP 138/86",
+        text: "He's still agitated but talking, no longer holding anything. He mentions he ran out of his psychiatric medication almost two weeks ago and hasn't slept much since. Physically he appears uninjured, though sweaty and tremulous.",
+        choices: [
+          { text: "Speak calmly, avoid arguing or challenging his statements, and check his blood glucose and vitals if he'll allow it, while continuing gentle rapport-building", next: "s12_rapport_good" },
+          { text: "Firmly insist he calm down and cooperate immediately, since officers are right there if needed", next: "s12_confront_bad", consequence: "Confronting an already agitated, sleep-deprived patient with a firm, commanding tone — even with officers present — tends to escalate rather than de-escalate the situation. A calmer, non-confrontational approach is far more likely to get you the cooperation and information you actually need." }
+        ]
+      },
+      s12_assess_late: {
+        vitals: "HR 112 · BP 140/88",
+        text: "Same story — medication lapse, poor sleep, no visible injury, sweaty and tremulous — though he's a bit more guarded after the earlier tense moment at the door.",
+        choices: [
+          { text: "Speak calmly, avoid confrontation, and gently check his vitals and blood glucose if he allows it", next: "s12_rapport_late" }
+        ]
+      },
+      s12_confront_bad: {
+        vitals: "HR 122 · BP 148/92",
+        text: "He becomes louder and more resistant, pacing and refusing to let you near him. Officers stay close as you back off and reset your approach.",
+        choices: [
+          { text: "Switch to a calmer, non-confrontational approach and try again", next: "s12_rapport_late" }
+        ]
+      },
+      s12_rapport_good: {
+        vitals: "HR 96 · BP 128/80",
+        text: "He calms considerably as you keep your tone even and don't argue with him. He allows a blood glucose check (normal) and vitals, and agrees, reluctantly, to be evaluated at the hospital rather than fighting the idea.",
+        choices: [
+          { text: "Transport calmly, with law enforcement following, continuing the same reassuring approach en route", next: "s12_end_good" }
+        ]
+      },
+      s12_rapport_late: {
+        vitals: "HR 104 · BP 132/84",
+        text: "He eventually settles enough to allow a glucose check and vitals, and agrees to go in, though it takes noticeably longer to get there than the smoother version of this call.",
+        choices: [
+          { text: "Transport calmly with law enforcement following, continuing a reassuring approach", next: "s12_end_ok" }
+        ]
+      },
+      s12_end_good: { ending: "good", text: "You staged and waited for law enforcement instead of testing an unsecured scene, then built rapport with a calm, non-confrontational approach once it was actually safe to make contact. Scene safety with a potentially violent behavioral emergency isn't a formality to rush past — it's what makes it possible to actually help a patient like this at all, and de-escalation works far better than confrontation once you're there." },
+      s12_end_ok: { ending: "neutral", text: "The call resolves without anyone getting hurt, but an early misstep — going in before the scene was truly secured, or confronting him rather than de-escalating — made it rockier and slower than it needed to be. \"He hasn't hurt anyone yet\" is not the same as \"this scene is safe,\" and staging for law enforcement on a scene like this isn't overcaution, it's the job." }
+    }
   }
 ];
 
