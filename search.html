@@ -40,6 +40,14 @@
   :root[data-theme="dark"] .result-snippet mark{background:#6b5a1f;}
   .empty-note{font-size:14px;font-weight:700;color:var(--muted);}
 
+  .practice-cta{
+    display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;justify-content:space-between;
+    background:var(--tint-accent);border:2px solid var(--accent);border-radius:16px;
+    padding:16px 18px;margin-bottom:16px;
+  }
+  .practice-cta .t{font-weight:800;font-size:14px;color:var(--ink);}
+  .practice-cta .t b{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);font-weight:900;margin-bottom:3px;}
+
 </style>
 </head>
 <body>
@@ -74,6 +82,42 @@
   const statusEl = document.getElementById('searchStatus');
   const resultsEl = document.getElementById('results');
   const searchBox = document.getElementById('searchBox');
+
+  // The 978-question bank in practice.html is 1.6MB inline and not something
+  // worth indexing client-side here. Instead, when a query looks like it's
+  // about one of the six exam domains, surface a direct deep link into
+  // practice.html's existing ?domain= filter (the same param the homepage's
+  // domain-path nodes and the dashboard's weak-domain links use).
+  const DOMAIN_KEYWORDS = [
+    { domain: 'Assessment', words: ['assessment','scene size-up','size-up','primary survey','secondary survey','vitals','opqrst','sample history'] },
+    { domain: 'Airway & Respiratory', words: ['airway','respiratory','breathing','ventilation','oxygen','copd','asthma','pneumothorax','intubation','bvm'] },
+    { domain: 'Cardiac & Medical', words: ['cardiac','medical','chest pain','arrest','stroke','diabetic','diabetes','seizure','overdose','allergic','anaphylaxis','mi ','myocardial'] },
+    { domain: 'Trauma', words: ['trauma','bleeding','hemorrhage','shock','fracture','wound','burn','head injury','spinal'] },
+    { domain: 'OB/Peds & Special Populations', words: ['ob/peds','pediatric','peds','obstetric','pregnan','delivery','newborn','geriatric','special population'] },
+    { domain: 'EMS Operations', words: ['ems operations','operations','mci','mass casualty','triage','documentation','ambulance safety','hazmat'] },
+  ];
+  function matchDomain(q){
+    const ql = q.toLowerCase();
+    for(const d of DOMAIN_KEYWORDS){
+      if(d.words.some(w => ql.includes(w))) return d.domain;
+    }
+    return null;
+  }
+  function renderPracticeCta(q){
+    const domain = matchDomain(q);
+    if(!domain){ document.getElementById('practiceCta')?.remove(); return; }
+    let cta = document.getElementById('practiceCta');
+    if(!cta){
+      cta = document.createElement('div');
+      cta.id = 'practiceCta';
+      cta.className = 'practice-cta';
+      resultsEl.before(cta);
+    }
+    cta.innerHTML = `
+      <span class="t"><b>Question bank</b>Practice ${escapeHtml(domain)} questions from the 978-question bank</span>
+      <a href="practice.html?domain=${encodeURIComponent(domain)}" class="btn-press alt sm">Practice this in the question bank &rarr;</a>
+    `;
+  }
 
   function extractChunks(doc, page){
     const chunks = [];
@@ -125,7 +169,8 @@
   }
 
   function runSearch(q){
-    if(!q){ resultsEl.innerHTML = ''; return; }
+    if(!q){ resultsEl.innerHTML = ''; document.getElementById('practiceCta')?.remove(); return; }
+    renderPracticeCta(q);
     const ql = q.toLowerCase();
     const scored = INDEX
       .map(c => {
