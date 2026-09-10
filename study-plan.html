@@ -38,6 +38,28 @@
   .domain-row .pct{font:700 12.5px var(--font-mono);color:var(--muted);width:96px;text-align:right;flex-shrink:0;}
   .empty-note{font-size:14.5px;font-weight:700;color:var(--muted);}
 
+  /* Personalized schedule — a real checklist, one card per day/week, instead
+     of a paragraph of advice. */
+  .plan-schedule{display:flex;flex-direction:column;gap:14px;margin-top:18px;}
+  .plan-block{
+    background:var(--white);border:var(--bw) solid var(--line);border-radius:var(--radius-lg);
+    padding:16px 18px;box-shadow:var(--lift);
+  }
+  .plan-block h4{margin:0 0 4px;font-size:14.5px;font-weight:900;}
+  .plan-block .plan-block-sub{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;}
+  .plan-item{
+    display:flex;align-items:flex-start;gap:10px;padding:8px 0;
+    border-top:1px solid var(--line-soft);font-size:13.5px;font-weight:700;
+  }
+  .plan-item:first-of-type{border-top:0;}
+  .plan-item input[type=checkbox]{
+    width:18px;height:18px;margin-top:1px;accent-color:var(--accent);flex-shrink:0;cursor:pointer;
+  }
+  .plan-item label{cursor:pointer;flex:1;min-width:0;}
+  .plan-item label a{color:var(--accent);}
+  .plan-item.done label{color:var(--muted);text-decoration:line-through;}
+  .plan-degraded-note{font-size:13px;font-weight:700;color:var(--muted);margin-top:14px;}
+
 </style>
 </head>
 <body>
@@ -94,6 +116,7 @@
           <span class="empty-note" id="examDateNote" style="font-size:13px"></span>
         </div>
         <div class="plan-output" id="planOutput"></div>
+        <div class="plan-schedule" id="planSchedule"></div>
       </div>
     </div>
   </div>
@@ -187,7 +210,11 @@
   }
 
   const savedExamDate = localStorage.getItem(EXAM_DATE_KEY);
-  if(savedExamDate) examDateInput.value = savedExamDate;
+  if(savedExamDate){
+    examDateInput.value = savedExamDate;
+    const d = daysUntil(savedExamDate);
+    if(d > 0) document.getElementById('daysInput').value = d;
+  }
   refreshExamDateNote();
 
   examDateInput.addEventListener('change', () => {
@@ -201,55 +228,197 @@
     refreshExamDateNote();
   });
 
+  // ---- Personalized week-by-week / day-by-day schedule ----
+  // Builds a real checklist instead of a paragraph of generic advice: weak
+  // domains (from nremt_domain_stats_all) get extra drill volume and get
+  // named directly, and each period also schedules the site's other tools
+  // (flashcards, a scenario sim run, a study-notes chapter review) rather
+  // than just "do more questions". Degrades to an evenly-rotated generic
+  // plan when there's no stats yet (a brand-new user).
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function domainLink(domain, qCount){
+    return `<a href="practice.html?domain=${encodeURIComponent(domain)}" target="_blank" rel="noopener">${qCount}-question drill: ${escapeHtml(domain)}</a>`;
+  }
+  function rotatingDomain(offset, weak){
+    // Cycles through all six domains, but a weak domain reappears more often
+    // than the others by getting an extra slot every other rotation.
+    const others = DOMAINS.filter(d => !weak.includes(d));
+    const cycle = weak.length ? [...weak, ...others, ...weak] : DOMAINS;
+    return cycle[offset % cycle.length];
+  }
+
+  function buildDayItems(dayNum, totalDays, weakNames, isNewUser){
+    const items = [];
+    const weak0 = weakNames[0], weak1 = weakNames[1];
+    if(dayNum === 1){
+      items.push({ id:'mnemonics', text:'Skim the <a href="mnemonics.html" target="_blank" rel="noopener">mnemonics page</a> for a fast framework refresher' });
+    }
+    // Domain drill(s) for the day — weak domains get a second round instead
+    // of a plain single 20-question pass.
+    if(!isNewUser && weak0 && dayNum % 2 === 1){
+      items.push({ id:'drill-weak-'+dayNum, text: domainLink(weak0, 20) + ' <span style="color:var(--muted);font-weight:600">— do two rounds today, this is your weakest domain</span>' });
+    } else if(!isNewUser && weak1 && dayNum % 4 === 0){
+      items.push({ id:'drill-weak2-'+dayNum, text: domainLink(weak1, 20) + ' <span style="color:var(--muted);font-weight:600">— your second-weakest domain</span>' });
+    } else {
+      const d = rotatingDomain(dayNum, isNewUser ? [] : weakNames);
+      items.push({ id:'drill-'+dayNum, text: domainLink(d, 20) });
+    }
+    // Rotate in the other tools every few days instead of every day, so the
+    // checklist stays realistic rather than overloaded.
+    if(dayNum % 3 === 2){
+      items.push({ id:'flash-'+dayNum, text: 'Flashcard review — open <a href="practice.html" target="_blank" rel="noopener">Practice</a>, pick a domain, then "Flashcard Review"' });
+    }
+    if(dayNum % 4 === 0){
+      items.push({ id:'scenario-'+dayNum, text: 'Run one call in the <a href="scenario-sim.html" target="_blank" rel="noopener">scenario simulator</a>' });
+    }
+    if(dayNum % 5 === 0 || dayNum === totalDays){
+      items.push({ id:'review-'+dayNum, text: 'Clear the <a href="practice.html" target="_blank" rel="noopener">missed-question review</a> queue' });
+    }
+    if(dayNum === totalDays){
+      items.push({ id:'final-'+dayNum, text: 'Light review only today — mnemonics and the <a href="skillsheets.html" target="_blank" rel="noopener">skills guide</a>, no new full exams' });
+    } else if(dayNum > 1 && dayNum % 4 === 1){
+      items.push({ id:'exam-'+dayNum, text: 'Take a full <a href="practice.html" target="_blank" rel="noopener">100-question timed exam</a>' });
+    }
+    return items;
+  }
+
+  function buildWeekItems(weekNum, totalWeeks, weakNames, isNewUser){
+    const items = [];
+    const weak0 = weakNames[0], weak1 = weakNames[1];
+    if(weekNum === 1){
+      items.push({ id:'mnemonics-w'+weekNum, text:'Skim the <a href="mnemonics.html" target="_blank" rel="noopener">mnemonics page</a> for a fast framework refresher' });
+    }
+    if(!isNewUser && weak0){
+      items.push({ id:'drill-weak-w'+weekNum, text: domainLink(weak0, 20) + ' <span style="color:var(--muted);font-weight:600">— your weakest domain, twice this week</span>' });
+    } else {
+      items.push({ id:'drill-a-w'+weekNum, text: domainLink(rotatingDomain(weekNum*2, []), 20) });
+    }
+    if(!isNewUser && weak1){
+      items.push({ id:'drill-weak2-w'+weekNum, text: domainLink(weak1, 20) });
+    } else {
+      items.push({ id:'drill-b-w'+weekNum, text: domainLink(rotatingDomain(weekNum*2+1, []), 20) });
+    }
+    items.push({ id:'flash-w'+weekNum, text: 'One flashcard review session — <a href="practice.html" target="_blank" rel="noopener">Practice</a> → pick a domain → "Flashcard Review"' });
+    items.push({ id:'scenario-w'+weekNum, text: 'One run through the <a href="scenario-sim.html" target="_blank" rel="noopener">scenario simulator</a>' });
+    items.push({ id:'notes-w'+weekNum, text: 'One chapter of the <a href="study-notes.html" target="_blank" rel="noopener">study notes</a> — pick one you haven’t reviewed yet' });
+    if(weekNum === totalWeeks){
+      items.push({ id:'final-w'+weekNum, text: 'Ease off in the last day or two — light review only, no new full exams the day before' });
+    } else {
+      items.push({ id:'exam-w'+weekNum, text: 'One full <a href="practice.html" target="_blank" rel="noopener">100-question timed exam</a> to check pacing and stamina' });
+    }
+    items.push({ id:'missed-w'+weekNum, text: 'Keep the <a href="practice.html" target="_blank" rel="noopener">missed-question review</a> queue near zero all week' });
+    return items;
+  }
+
+  const PLAN_CHECKED_KEY = 'nremt_study_plan_checked';
+  function loadChecked(){
+    try{ return JSON.parse(localStorage.getItem(PLAN_CHECKED_KEY) || '{}'); }catch(e){ return {}; }
+  }
+  function saveChecked(map){
+    try{ localStorage.setItem(PLAN_CHECKED_KEY, JSON.stringify(map)); }catch(e){}
+  }
+
+  function renderSchedule(blocks){
+    const box = document.getElementById('planSchedule');
+    const checked = loadChecked();
+    box.innerHTML = blocks.map(b => `
+      <div class="plan-block">
+        <h4>${escapeHtml(b.label)}</h4>
+        ${b.sub ? `<div class="plan-block-sub">${escapeHtml(b.sub)}</div>` : ''}
+        ${b.items.map(it => `
+          <div class="plan-item${checked[it.id] ? ' done' : ''}">
+            <input type="checkbox" id="chk-${it.id}" ${checked[it.id] ? 'checked' : ''}>
+            <label for="chk-${it.id}">${it.text}</label>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+    box.querySelectorAll('.plan-item input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const map = loadChecked();
+        map[cb.id.replace('chk-','')] = cb.checked;
+        saveChecked(map);
+        cb.closest('.plan-item').classList.toggle('done', cb.checked);
+      });
+    });
+  }
+
   document.getElementById('planBtn').addEventListener('click', () => {
     const days = parseInt(document.getElementById('daysInput').value, 10);
     const output = document.getElementById('planOutput');
     if(!days || days < 1){ return; }
 
+    document.querySelector('.plan-degraded-note')?.remove();
+
+    const weakAll = getWeakestDomains(2).filter(r => r.pct < 80);
+    const weakNames = weakAll.map(r => r.domain);
+    const isNewUser = weakAll.length === 0;
+
     let html = '';
     if(days <= 3){
-      html = `
-        <p><b>Tight timeline (${days} day${days===1?'':'s'}).</b> Focus on breadth over depth:</p>
-        <ul>
-          <li>Skim the mnemonics page once, today, for a fast refresher</li>
-          <li>Run one 20-question domain drill per remaining day, prioritizing domains you feel weakest in</li>
-          <li>Take one full timed exam with at least a day of buffer before your actual exam</li>
-          <li>Spend any remaining time entirely in the missed-question review queue</li>
-        </ul>
-      `;
-    } else if(days <= 10){
-      html = `
-        <p><b>${days} days out.</b> A reasonable working plan:</p>
-        <ul>
-          <li>Day 1: mnemonics page, then one domain drill</li>
-          <li>Days 2-${Math.max(2,days-4)}: rotate through the remaining domains, one drill per day</li>
-          <li>Last 3-4 days: alternate full timed exams with missed-question review sessions</li>
-          <li>Final day: light review only — mnemonics and skill sheet guide, no new full exams</li>
-        </ul>
-      `;
+      html = `<p><b>Tight timeline (${days} day${days===1?'':'s'}).</b> Focus on breadth over depth — a checklist for each remaining day is below.</p>`;
+    } else if(days <= 14){
+      html = `<p><b>${days} days out.</b> A day-by-day checklist, below, with your weaker domains getting extra reps.</p>`;
     } else {
-      html = `
-        <p><b>${days} days out — plenty of runway.</b> No need to cram:</p>
-        <ul>
-          <li>Spend the first week on mnemonics plus one domain drill every day or two</li>
-          <li>Add a full timed exam roughly once a week to check pacing and stamina</li>
-          <li>Keep the missed-question queue near zero throughout, rather than saving it for the end</li>
-          <li>In the final week, shift to mostly full exams and review, easing off in the last day or two</li>
-        </ul>
-      `;
+      html = `<p><b>${days} days out — plenty of runway.</b> No need to cram. A week-by-week checklist is below.</p>`;
     }
-    const weak = getWeakestDomains(2).filter(r => r.pct < 80);
-    if(weak.length > 0){
-      const names = weak.map(r => `${r.domain} (${r.pct}%)`).join(' and ');
+    if(weakAll.length > 0){
+      const names = weakAll.map(r => `${r.domain} (${r.pct}%)`).join(' and ');
       html += `
         <div class="plan-focus">
-          <b>Based on your practice so far:</b> put extra time into ${names} before rotating through the rest — that's what's actually dragging your accuracy down right now, not a guess.
+          <b>Based on your practice so far:</b> ${escapeHtml(names)} ${weakAll.length===1?'is':'are'} what's actually dragging your accuracy down right now, so the schedule below gives ${weakAll.length===1?'it':'them'} extra volume rather than treating every domain the same.
         </div>
       `;
     }
     output.innerHTML = html;
     output.classList.add('show');
+
+    let blocks;
+    if(days <= 14){
+      blocks = [];
+      for(let d = 1; d <= days; d++){
+        blocks.push({
+          label: `Day ${d}`,
+          items: buildDayItems(d, days, weakNames, isNewUser),
+        });
+      }
+    } else {
+      const totalWeeks = Math.min(8, Math.ceil(days / 7));
+      blocks = [];
+      for(let w = 1; w <= totalWeeks; w++){
+        blocks.push({
+          label: `Week ${w}`,
+          items: buildWeekItems(w, totalWeeks, weakNames, isNewUser),
+        });
+      }
+      if(Math.ceil(days / 7) > totalWeeks){
+        blocks.push({
+          label: `Weeks ${totalWeeks + 1} onward`,
+          sub: 'Repeat the same weekly rhythm above until the final week.',
+          items: [],
+        });
+      }
+    }
+    renderSchedule(blocks);
+
+    if(isNewUser){
+      const note = document.createElement('p');
+      note.className = 'plan-degraded-note';
+      note.textContent = 'This is a generic plan rotating evenly through all six domains — once you’ve answered a few questions in each, it’ll start prioritizing whichever domains you’re actually weakest in.';
+      document.getElementById('planSchedule').before(note);
+    }
   });
+
+  // Auto-build the schedule on load if a days/date value is already saved,
+  // so returning users see their checklist immediately instead of an empty
+  // planner.
+  (function(){
+    if(document.getElementById('daysInput').value){
+      document.getElementById('planBtn').click();
+    }
+  })();
 </script>
 <script src="assets/nav.js" defer></script>
 </body>
