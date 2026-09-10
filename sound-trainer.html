@@ -14,7 +14,8 @@
 <meta property="og:site_name" content="LevlPrep">
 <link rel="stylesheet" href="assets/theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
 <style>
   body{line-height:1.65;}
   .lede{color:var(--muted);font-size:15.5px;max-width:60ch;margin:0 0 20px;}
@@ -32,7 +33,7 @@
   .sound-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   @media (max-width:520px){.sound-grid{grid-template-columns:1fr;}}
   .sound-card{
-    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:16px;
+    background:var(--white);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--lift);padding:16px;
   }
   .sound-card h3{font-size:15.5px;font-weight:600;margin:0 0 6px;color:var(--ink);}
   .sound-card p{font-size:13.5px;color:var(--muted);margin:0 0 12px;}
@@ -49,7 +50,7 @@
   .play-btn .icon{font-size:12px;}
   .link-out-btn{
     display:inline-flex;align-items:center;gap:6px;background:var(--white);color:var(--ink);
-    border:1px solid var(--line);border-radius:20px;padding:8px 16px;font-size:13px;font-family:inherit;
+    border:2px solid var(--line);border-radius:20px;padding:8px 16px;font-size:13px;font-family:inherit;
     text-decoration:none;transition:border-color .15s,color .15s;
   }
   .link-out-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -60,11 +61,11 @@
   .credit-line a{color:#9AA19C;}
 
   .quiz-box{
-    background:var(--white);border:1px solid var(--line);border-radius:10px;padding:26px 24px;
+    background:var(--white);border:2px solid var(--line);border-radius:10px;padding:26px 24px;
     text-align:center;
   }
   .quiz-progress{
-    font-family:'SFMono-Regular',monospace;font-size:11px;color:var(--muted);
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);
     text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px;
   }
   .quiz-score{float:right;}
@@ -80,7 +81,7 @@
   .quiz-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;}
   @media (max-width:480px){.quiz-choices{grid-template-columns:1fr;}}
   .choice-btn{
-    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:12px 10px;
+    background:var(--paper);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--lift);padding:12px 10px;
     font-family:inherit;font-size:14.5px;color:var(--ink);cursor:pointer;transition:all .12s;
   }
   .choice-btn:hover:not(:disabled){border-color:var(--accent);}

@@ -13,20 +13,21 @@
 <meta property="og:site_name" content="LevlPrep">
 <link rel="stylesheet" href="assets/theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
 <style>
   .mnemonics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(28px,4vw,44px);}
   .card{break-inside:avoid;}
   .card h2{
-    margin:0 0 4px;font:400 26px var(--font-serif);letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+    margin:0 0 4px;font:900 23px var(--font-ui);letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding-top:0;border-top:0;
   }
   .card h2 .letters{
-    font-family:var(--font-mono);color:var(--accent);font-size:20px;letter-spacing:0.02em;
+    font-family:var(--font-mono);font-weight:700;color:var(--accent);font-size:18px;letter-spacing:0.02em;
   }
-  .card .used-for{font-size:13.5px;color:var(--muted);margin-bottom:14px;text-wrap:pretty;}
+  .card .used-for{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px;text-wrap:pretty;}
   .breakdown{display:grid;gap:0;}
   .breakdown .row{
-    display:flex;gap:14px;font-size:15.5px;padding:7px 0;border-bottom:1px solid var(--line-soft);
+    display:flex;gap:14px;font-size:15px;font-weight:700;padding:8px 0;border-bottom:1px solid var(--line-soft);
   }
   .breakdown .row:last-child{border-bottom:none;}
   .breakdown .letter{

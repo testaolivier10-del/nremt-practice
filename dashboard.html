@@ -13,67 +13,83 @@
 <meta property="og:site_name" content="LevlPrep">
 <link rel="stylesheet" href="assets/theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
 <style>
-  .metric-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:clamp(20px,3vw,36px);}
-  .metric .num{font:400 clamp(30px,4vw,38px) var(--font-serif);line-height:1.1;letter-spacing:-0.02em;color:var(--ink);}
-  .metric.lead .num{color:var(--accent);}
-  .metric .lbl{font:800 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
-  .metric .sub{font:12px var(--font-ui);color:var(--muted);margin-top:2px;}
+  /* Dashboard layout. Panels, stat cards, tracks, calendar and badges all come
+     from the shared system in assets/theme.css; this only sets the page grid
+     and the few dashboard-specific bits (level card, readiness card, charts). */
+  .dash-grid{display:grid;grid-template-columns:1.35fr 0.65fr;gap:28px;padding:26px 0 56px;align-items:start;}
+  .dash-col > .panel{margin-bottom:20px;}
+  .dash-col > .panel:last-child{margin-bottom:0;}
+  .stat-row{padding:26px 0 6px;}
+  .empty-note{font-size:14px;font-weight:700;color:var(--muted);}
+  .empty-note a{color:var(--accent);}
 
-  .level-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius);padding:20px 22px;}
-  .lvl-head{display:flex;align-items:baseline;gap:12px;margin:8px 0 12px;flex-wrap:wrap;}
-  .lvl-num{font:400 clamp(36px,5vw,46px) var(--font-serif);letter-spacing:-.03em;color:#F4D28C;}
-  .lvl-title{font:700 12.5px var(--font-ui);padding:3px 10px;border-radius:20px;background:rgba(244,210,140,0.2);color:#F4D28C;}
-  .lvl-track{height:6px;border-radius:3px;background:rgba(255,255,255,0.15);margin:0 0 8px;overflow:hidden;}
-  .lvl-fill{height:100%;background:#F4D28C;border-radius:3px;}
-  .lvl-sub{font:12.5px var(--font-mono);color:#DCEFEA;}
-  .lvl-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15);}
-  .lvl-badge-chip{font:700 11.5px var(--font-ui);padding:4px 10px;border-radius:20px;background:rgba(244,210,140,0.16);color:#F4D28C;}
+  /* Level & XP — the dark card in the right rail. */
+  .level-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius-lg);padding:22px;}
+  .lvl-head{display:flex;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap;}
+  .lvl-ring{
+    width:52px;height:52px;border-radius:50%;flex-shrink:0;
+    background:rgba(244,210,140,0.16);border:3px solid #F4D28C;color:#F4D28C;
+    display:flex;align-items:center;justify-content:center;font:900 15px var(--font-ui);
+  }
+  .lvl-title{font:900 13px var(--font-ui);color:#F4D28C;display:block;}
+  .lvl-titlesub{font:700 12px var(--font-mono);color:#9FB5AE;display:block;margin-top:2px;}
+  .lvl-track{height:12px;border-radius:var(--radius-pill);background:rgba(255,255,255,0.15);margin:0 0 8px;overflow:hidden;}
+  .lvl-fill{height:100%;background:#F4D28C;border-radius:var(--radius-pill);transition:width .4s ease;}
+  .lvl-sub{font:700 11.5px var(--font-mono);color:#DCEFEA;}
+  .lvl-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:14px;border-top:2px solid rgba(255,255,255,0.15);}
+  .lvl-badge-chip{font:900 11.5px var(--font-ui);padding:5px 11px;border-radius:var(--radius-pill);background:rgba(244,210,140,0.16);color:#F4D28C;}
 
-  .readiness-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius);padding:22px 24px;}
-  .r-tag{font:800 11px var(--font-ui);color:#9FB5AE;text-transform:uppercase;letter-spacing:0.06em;}
+  /* Readiness — dark card, big number. */
+  .readiness-card{background:var(--navy);color:var(--on-accent);border-radius:var(--radius-lg);padding:24px;}
+  .r-tag{font:900 11px var(--font-ui);color:#9FB5AE;text-transform:uppercase;letter-spacing:0.06em;}
   .r-head{display:flex;align-items:baseline;gap:14px;margin:8px 0 10px;flex-wrap:wrap;}
-  .r-num{font:400 clamp(36px,5vw,48px) var(--font-serif);letter-spacing:-.03em;color:var(--on-accent);}
-  .r-label{font:800 13px var(--font-ui);padding:4px 12px;border-radius:999px;}
+  .r-num{font:900 clamp(34px,5vw,44px) var(--font-ui);letter-spacing:-.03em;color:var(--on-accent);}
+  .r-label{font:900 13px var(--font-ui);padding:5px 13px;border-radius:var(--radius-pill);}
   .r-label.tier-good{background:rgba(47,158,91,0.25);color:#8FE3AE;}
   .r-label.tier-mid{background:rgba(232,119,106,0.22);color:#F7B8AC;}
   .r-label.tier-low{background:rgba(209,89,74,0.28);color:#F2A08F;}
-  .r-sub{font-size:16px;color:#DCEFEA;}
-  .r-note{font-size:12.5px;color:#9FB5AE;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);}
-  .empty-note{font-size:15px;color:var(--muted);}
+  .r-sub{font-size:14px;font-weight:700;color:#DCEFEA;}
+  .r-note{font-size:12px;font-weight:600;color:#9FB5AE;margin-top:12px;padding-top:12px;border-top:2px solid rgba(255,255,255,0.15);}
 
+  /* Charts + stat lines shared by the history and mastery panels. */
   .progress-chart{width:100%;height:100px;display:block;margin:14px 0 0;}
-  .progress-stats{display:flex;gap:18px;font:12.5px var(--font-mono);color:var(--muted);margin-bottom:4px;}
+  .progress-stats{display:flex;flex-wrap:wrap;gap:8px 18px;font:700 12.5px var(--font-mono);color:var(--muted);margin-bottom:4px;}
   .progress-stats b{color:var(--ink);}
 
-  .domain-row{
-    display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line-soft);
-    font-size:16px;
-  }
-  .domain-row:last-child{border-bottom:none;}
-  .domain-row .bar-track{flex:1 1 100px;height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden;min-width:60px;}
-  .domain-row .bar-fill{height:100%;}
-  .domain-row .pct{font:12.5px var(--font-mono);color:var(--muted);width:96px;text-align:right;flex-shrink:0;}
-  .domain-row .name{flex:1 1 150px;min-width:0;}
+  /* Domain mastery rows. */
+  .domain-row{padding:12px 0;border-top:1px solid var(--line-soft);}
+  .domain-row:first-child{border-top:0;padding-top:0;}
+  .dm-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;font-weight:800;margin-bottom:8px;}
+  .dm-top .pct{font:700 12.5px var(--font-mono);color:var(--muted);flex-shrink:0;}
+  .dm-track{height:10px;border-radius:var(--radius-pill);background:var(--track);overflow:hidden;}
+  .dm-fill{height:100%;border-radius:var(--radius-pill);transition:width .4s ease;}
   .domain-row .practice-link{
-    flex-shrink:0;padding:3px 10px;border-radius:14px;border:1px solid var(--accent);
-    background:var(--tint-accent);color:var(--accent);font-size:12px;text-decoration:none;white-space:nowrap;
+    flex-shrink:0;padding:4px 11px;border-radius:var(--radius-pill);border:2px solid var(--accent);
+    background:var(--tint-accent);color:var(--accent);font:900 11px var(--font-ui);
+    text-decoration:none;white-space:nowrap;
   }
   .domain-row .practice-link:hover{background:var(--accent);color:var(--on-accent);}
 
-  .mastery-bars{display:flex;align-items:flex-end;gap:8px;height:80px;margin:0 0 26px;}
-  .mastery-bar{flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px;position:relative;}
-  .mastery-bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font:10.5px var(--font-ui);color:var(--muted);}
-  .cta-row{display:flex;gap:10px;flex-wrap:wrap;}
-  .cta-row a{
-    font:800 14px var(--font-ui);color:var(--on-accent);background:var(--navy);
-    padding:12px 22px;border-radius:6px;text-decoration:none;
-  }
-  .cta-row a:hover{background:var(--navy2);}
-  .cta-row a.secondary{background:var(--white);color:var(--ink);border:1px solid var(--navy);}
-  .cta-row a.secondary:hover{background:var(--hover-tint);}
+  /* Recent activity rows. */
+  .activity-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line-soft);font-size:13.5px;}
+  .activity-row:first-child{border-top:0;padding-top:0;}
+  .activity-row .name{font-weight:900;}
+  .activity-row .meta{color:var(--muted);font-weight:700;font-size:12.5px;}
+  .activity-row .score{font:700 13px var(--font-mono);color:var(--accent);flex-shrink:0;}
 
+  /* Mastery distribution bars. */
+  .mastery-bars{display:flex;align-items:flex-end;gap:8px;height:80px;margin:14px 0 26px;}
+  .mastery-bar{flex:1;background:var(--accent);border-radius:6px 6px 0 0;min-height:3px;position:relative;}
+  .mastery-bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font:800 10.5px var(--font-ui);color:var(--muted);}
+
+  .cta-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  @media(max-width:900px){
+    .dash-grid{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
@@ -81,57 +97,61 @@
   <noscript><div class="site-nav-fallback" style="max-width:1120px;margin:0 auto;padding:14px clamp(20px,4vw,56px)"><a href="index.html">Home</a> · <a href="practice.html">Practice</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="tools.html">Tools</a> · <a href="dashboard.html">Dashboard</a></div></noscript>
 <div class="xshell">
 
-  <div class="hero">
-    <div class="split">
-      <div>
-        <div class="eyebrow">Dashboard</div>
-        <h1>Where you actually stand.</h1>
-        <p class="lede">Everything this site knows about your progress, pulled from this browser's storage — your streak, readiness estimate, domain accuracy, and what's due for review.</p>
+  <div class="page-head">
+    <h1>Your progress</h1>
+    <p id="headSub">Everything this browser knows about how you're doing.</p>
+  </div>
+
+  <div class="stat-row" id="statCards"></div>
+
+  <div class="dash-grid">
+    <div class="dash-col">
+      <div class="panel">
+        <h2>Domain mastery</h2>
+        <div id="domainBox"></div>
       </div>
-      <div class="split-divider" id="levelSection">
-        <div class="split-label">Level &amp; XP</div>
+
+      <div class="panel">
+        <h2>Recent activity</h2>
+        <div id="activityBox"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Score over time</h2>
+        <div id="historyBox"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Mastery &amp; review queue</h2>
+        <div id="masteryBox"></div>
+      </div>
+    </div>
+
+    <div class="dash-col">
+      <div id="levelSection" style="margin-bottom:20px">
         <div id="levelBox"></div>
       </div>
+
+      <div class="panel">
+        <h2 id="streakHeading">Study streak</h2>
+        <div class="cal-grid" id="calGrid"></div>
+        <div style="margin-top:12px;font:700 11.5px var(--font-mono);color:var(--muted)" id="calNote"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Badges</h2>
+        <div class="badge-grid" id="badgeGrid"></div>
+      </div>
+
+      <div id="readinessBox" style="margin-bottom:20px"></div>
+
+      <a href="practice.html" class="btn-press alt wide">Continue practicing</a>
     </div>
   </div>
 
-  <div class="xsection">
-    <div class="metric-strip" id="statCards"></div>
-  </div>
-
-  <div class="xsection">
-    <div class="xgrid">
-      <div class="xlabel">Estimated pass probability</div>
-      <div class="xcontent narrow" id="readinessBox"></div>
-    </div>
-  </div>
-
-  <div class="xsection">
-    <div class="xgrid">
-      <div class="xlabel">Score over time</div>
-      <div class="xcontent narrow" id="historyBox"></div>
-    </div>
-  </div>
-
-  <div class="xsection">
-    <div class="xgrid">
-      <div class="xlabel">Domain accuracy<br>all-time, all modes</div>
-      <div class="xcontent narrow" id="domainBox"></div>
-    </div>
-  </div>
-
-  <div class="xsection">
-    <div class="xgrid">
-      <div class="xlabel">Mastery &amp; review queue</div>
-      <div class="xcontent narrow" id="masteryBox"></div>
-    </div>
-  </div>
-
-  <div class="xsection">
-    <footer style="margin-top:0">
-      <p>All of this is computed from data stored only in your browser (localStorage) — nothing is sent anywhere. Clearing your browser data will reset it.</p>
-    </footer>
-  </div>
+  <footer>
+    <p>All of this is computed from data stored only in your browser (localStorage) — nothing is sent anywhere. Clearing your browser data will reset it.</p>
+  </footer>
 
 </div>
 
@@ -172,19 +192,112 @@
   const totalAttempts = history.length;
   const missedCount = Array.isArray(missed) ? missed.length : 0;
   const flaggedCount = Array.isArray(flagged) ? flagged.length : 0;
+  // Overall accuracy across every mode, so the top row leads with the number
+  // people actually want rather than a count of attempts.
+  let allTotal = 0, allCorrect = 0;
+  DOMAINS.forEach(d => {
+    const st = domainStats[d];
+    if(st && st.total){ allTotal += st.total; allCorrect += st.correct; }
+  });
+  const overallPct = allTotal ? Math.round(allCorrect / allTotal * 100) : null;
+
+  const ICONS = {
+    attempts: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+    target:   '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>',
+    flame:    '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2c1 4-3 5-3 9a3 3 0 006 0c1.5 1 2 3 2 4.5A5.5 5.5 0 0111.5 21 6 6 0 016 15c0-5 4-6 4-9 0-1.5-.5-2.5-1-3.5C10.5 2 11 2 12 2z" fill="currentColor"/></svg>',
+    exam:     '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2.5" stroke="currentColor" stroke-width="2.2"/><path d="M8 9h8M8 13h8M8 17h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  };
   const cards = [
-    { num: streakDisplay(), lbl: 'Day streak', sub: `Longest: ${streak.longestStreak || 0} days`, lead: true },
-    { num: streak.dailyCounts && streak.dailyCounts[dayKey(0)] || 0, lbl: 'Studied today', sub: `Goal: ${streak.dailyGoal || 20}` },
-    { num: totalAttempts, lbl: 'Full exams taken', sub: totalAttempts ? `Last: ${new Date(history[history.length-1].date).toLocaleDateString()}` : 'None yet' },
-    { num: missedCount, lbl: 'In review queue', sub: flaggedCount ? `+ ${flaggedCount} flagged` : 'Missed questions' },
+    { num: allTotal, lbl: 'Questions attempted', icon: ICONS.attempts, tint: 'var(--tint-accent)', color: 'var(--accent)' },
+    { num: overallPct === null ? '—' : overallPct + '%', lbl: 'Overall accuracy', icon: ICONS.target, tint: 'var(--tint-coral)', color: 'var(--coral)' },
+    { num: streakDisplay(), lbl: 'Day streak', icon: ICONS.flame, tint: 'var(--tint-amber)', color: 'var(--amber)' },
+    { num: totalAttempts, lbl: 'Full exams taken', icon: ICONS.exam, tint: 'var(--tint-accent)', color: 'var(--accent)' },
   ];
   document.getElementById('statCards').innerHTML = cards.map(c => `
-    <div class="metric${c.lead ? ' lead' : ''}">
-      <div class="num">${c.num}</div>
-      <div class="lbl">${c.lbl}</div>
-      <div class="sub">${c.sub}</div>
+    <div class="stat-card">
+      <div class="icon" style="background:${c.tint};color:${c.color}">${c.icon}</div>
+      <div class="v">${c.num}</div>
+      <div class="l">${c.lbl}</div>
     </div>
   `).join('');
+
+  // ---- Streak calendar: the last 14 days, marked from dailyCounts ----
+  (function renderCalendar(){
+    const counts = streak.dailyCounts || {};
+    const goal = streak.dailyGoal || 20;
+    const todayKey = dayKey(0);
+    const DOW = ['S','M','T','W','T','F','S'];
+    let html = '', studiedDays = 0;
+    for(let i = 13; i >= 0; i--){
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const done = (counts[k] || 0) > 0;
+      if(done) studiedDays++;
+      const cls = 'cal-day' + (done ? ' done' : '') + (k === todayKey ? ' today' : '');
+      html += `<div class="${cls}" title="${k}${done ? ' — ' + counts[k] + ' questions' : ''}">${DOW[d.getDay()]}</div>`;
+    }
+    document.getElementById('calGrid').innerHTML = html;
+    const cur = streakDisplay();
+    document.getElementById('streakHeading').textContent = cur ? `${cur}-day streak` : 'Study streak';
+    const todayCount = counts[todayKey] || 0;
+    document.getElementById('calNote').textContent =
+      `${studiedDays}/14 days studied · today ${todayCount}/${goal}`;
+  })();
+
+  // ---- Badges: earned from the same records the rest of the page reads ----
+  (function renderBadges(){
+    // Same quadratic curve nav.js uses; read here so this block doesn't depend
+    // on the Level & XP section further down.
+    function badgeLevel(){
+      const total = (readJSON('nremt_xp', {total:0}).total) || 0;
+      let n = 1; while(100 * n * n <= total) n++;
+      return n;
+    }
+    const longest = streak.longestStreak || 0;
+    const best = history.length ? Math.max(...history.map(h2 => Math.round(h2.score/h2.total*100))) : 0;
+    const defs = [
+      { icon: '🎖️', label: '7-day streak',  earned: longest >= 7 },
+      { icon: '🔥', label: '30-day streak', earned: longest >= 30 },
+      { icon: '🚑', label: 'First exam',    earned: history.length >= 1 },
+      { icon: '💯', label: '90%+ exam',     earned: best >= 90 },
+      { icon: '📚', label: '500 questions', earned: allTotal >= 500 },
+      { icon: '🏅', label: 'Level 10',      earned: badgeLevel() >= 10 },
+    ];
+    document.getElementById('badgeGrid').innerHTML = defs.map(b => `
+      <div class="badge">
+        <div class="badge-circle${b.earned ? '' : ' locked'}">${b.earned ? b.icon : '🔒'}</div>
+        <span>${b.label}</span>
+      </div>
+    `).join('');
+  })();
+
+  // ---- Recent activity: the last few full exams, newest first ----
+  (function renderActivity(){
+    const box = document.getElementById('activityBox');
+    if(!history.length){
+      box.innerHTML = `<div class="empty-note">Finish a practice exam or drill and it shows up here.</div>`;
+      return;
+    }
+    const fmt = ts => {
+      const d = new Date(ts), now = new Date();
+      const days = Math.floor((now.setHours(0,0,0,0) - new Date(ts).setHours(0,0,0,0)) / 86400000);
+      if(days === 0) return 'Today';
+      if(days === 1) return 'Yesterday';
+      if(days < 7) return days + ' days ago';
+      return d.toLocaleDateString();
+    };
+    box.innerHTML = history.slice(-6).reverse().map(h2 => {
+      const pct = Math.round(h2.score/h2.total*100);
+      return `<div class="activity-row">
+        <div>
+          <div class="name">${h2.total}-question exam</div>
+          <div class="meta">${fmt(h2.date)} · ${h2.score}/${h2.total} correct</div>
+        </div>
+        <span class="score">${pct}%</span>
+      </div>`;
+    }).join('');
+  })();
 
   // ---- Level & XP (mirrors the header badge nav.js renders on every page) ----
   const XP_KEY = 'nremt_xp';
@@ -218,11 +331,17 @@
     .join('');
   levelBox.innerHTML = `
     <div class="level-card">
-      <span class="r-tag">Level</span>
-      <div class="lvl-head"><span class="lvl-num">${lvl}</span><span class="lvl-title">${titleForLevel(lvl)}</span></div>
-      <div class="lvl-sub">${xpState.total} XP total — ${into}/${span} XP to Level ${lvl + 1}</div>
+      <span class="r-tag">Level &amp; XP</span>
+      <div class="lvl-head">
+        <span class="lvl-ring">L${lvl}</span>
+        <span>
+          <span class="lvl-title">${titleForLevel(lvl)}</span>
+          <span class="lvl-titlesub">${xpState.total} XP total</span>
+        </span>
+      </div>
       <div class="lvl-track"><div class="lvl-fill" style="width:${fillPct}%"></div></div>
-      ${badgeChips ? `<div class="lvl-badges">${badgeChips}</div>` : `<div class="lvl-sub" style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15);">Answer 20+ questions in a domain and hit 70% accuracy to earn your first domain badge.</div>`}
+      <div class="lvl-sub">${into} / ${span} XP to Level ${lvl + 1}</div>
+      ${badgeChips ? `<div class="lvl-badges">${badgeChips}</div>` : `<div class="lvl-sub" style="margin-top:14px;padding-top:14px;border-top:2px solid rgba(255,255,255,0.15);">Answer 20+ questions in a domain and hit 70% accuracy to earn your first domain badge.</div>`}
     </div>
   `;
 
@@ -319,16 +438,20 @@
     domainBox.innerHTML = `<div class="empty-note">Answer questions in any mode (exam, drill, adaptive, review) to see domain accuracy here.</div>`;
   } else {
     domainBox.innerHTML = DOMAINS.map(d => {
-      const s = domainStats[d];
-      const pct = s && s.total ? Math.round(s.correct/s.total*100) : null;
-      const barColor = pct === null ? 'var(--line)' : pct >= 75 ? 'var(--good)' : pct >= 55 ? 'var(--accent)' : 'var(--bad)';
-      const label = pct === null ? 'Not started' : `${pct}% (${s.correct}/${s.total})`;
+      const st = domainStats[d];
+      const pct = st && st.total ? Math.round(st.correct/st.total*100) : null;
+      const barColor = pct === null ? 'var(--line)' : pct >= 75 ? 'var(--good)' : pct >= 55 ? 'var(--accent)' : 'var(--coral)';
+      const label = pct === null ? 'Not started' : `${pct}% (${st.correct}/${st.total})`;
       return `
         <div class="domain-row">
-          <span class="name">${d}</span>
-          <div class="bar-track"><div class="bar-fill" style="width:${pct||0}%;background:${barColor}"></div></div>
-          <span class="pct">${label}</span>
-          <a class="practice-link" href="practice.html?domain=${encodeURIComponent(d)}">Practice</a>
+          <div class="dm-top">
+            <span>${d}</span>
+            <span style="display:flex;align-items:center;gap:10px">
+              <span class="pct">${label}</span>
+              <a class="practice-link" href="practice.html?domain=${encodeURIComponent(d)}">Practice</a>
+            </span>
+          </div>
+          <div class="dm-track"><div class="dm-fill" style="width:${pct||0}%;background:${barColor}"></div></div>
         </div>
       `;
     }).join('');
@@ -357,8 +480,8 @@
       </div>
       <div style="height:22px"></div>
       <div class="cta-row">
-        <a href="practice.html">Review missed questions</a>
-        <a class="secondary" href="practice.html">Adaptive practice</a>
+        <a class="btn-press sm" href="practice.html">Review missed questions</a>
+        <a class="btn-outline" href="practice.html" style="padding:11px 20px;font-size:13.5px">Adaptive practice</a>
       </div>
     `;
   }

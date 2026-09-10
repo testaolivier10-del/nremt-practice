@@ -24,14 +24,59 @@
 </script>
 <link rel="stylesheet" href="assets/theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
 <style>
-  .home-list-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:15px;}
-  .home-list-row:last-child{border-bottom:0;}
-  .home-list-row .num{font:12.5px var(--font-mono);color:var(--muted);}
-  .domain-item{padding:12px 0;border-bottom:1px solid var(--line-soft);}
-  .domain-item .name{font-size:18px;}
-  .domain-item .desc{font-size:13.5px;color:var(--muted);text-wrap:pretty;}
+  /* Homepage-only layout. Everything visual (cards, buttons, path nodes,
+     XP/streak chips) comes from the shared system in assets/theme.css. */
+  .home-hero{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(32px,5vw,52px);align-items:center;}
+
+  /* Hero progress card — level ring, XP bar, and the four most-practiced domains. */
+  .progress-card{
+    background:var(--white);border:var(--bw) solid var(--line);border-radius:22px;
+    padding:26px 26px 22px;box-shadow:0 6px 0 var(--line);
+  }
+  .progress-card__top{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+  .level-chip{display:flex;align-items:center;gap:12px;flex:1;min-width:0;}
+  .level-chip .t b{display:block;font-weight:900;font-size:16px;}
+  .level-chip .t span{font-size:12.5px;color:var(--muted);font-weight:700;}
+
+  /* Six-domain skill path + its sticky side rail. */
+  .path-row{display:grid;grid-template-columns:1.15fr 0.85fr;gap:clamp(28px,4vw,48px);align-items:start;margin-top:40px;}
+  .side-rail{position:sticky;top:calc(var(--site-header-h) + 16px);display:flex;flex-direction:column;gap:16px;}
+
+  /* Dark feature panel for the interactive tools. */
+  .feature-card{
+    background:var(--navy);border-radius:22px;padding:36px clamp(20px,4vw,44px);
+    display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;color:#fff;
+  }
+  .feature-card .icon-circle{
+    width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);
+    display:flex;align-items:center;justify-content:center;margin:0 auto;
+  }
+  .feature-card h2{font-weight:900;font-size:clamp(22px,2.8vw,28px);margin:0 0 12px;color:#fff;}
+  .feature-card p{opacity:.85;font-size:15px;font-weight:600;margin:0 0 20px;max-width:38ch;}
+
+  /* Sample-question section. */
+  .sample-row{display:grid;grid-template-columns:0.85fr 1.15fr;gap:clamp(28px,4vw,48px);align-items:center;}
+  .sample-list{display:flex;flex-direction:column;gap:14px;}
+  .sample-list .row{
+    display:flex;align-items:center;gap:12px;font-weight:800;font-size:14.5px;
+    padding:12px 16px;background:var(--white);border:var(--bw) solid var(--line);border-radius:14px;
+  }
+  .sample-list .row .n{
+    width:26px;height:26px;border-radius:8px;background:var(--tint-accent);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;font:900 12px var(--font-mono);flex-shrink:0;
+  }
+  .qcard{background:var(--white);border:var(--bw) solid var(--line);border-radius:var(--radius-lg);padding:26px;box-shadow:var(--lift-lg);}
+  .qcard .qtext{font-weight:800;font-size:16px;margin:14px 0 18px;line-height:1.5;}
+  .qcard .qopt{font-size:14.5px;padding:13px 16px;box-shadow:var(--lift-sm);}
+
+  @media(max-width:900px){
+    .home-hero,.feature-card,.path-row,.sample-row{grid-template-columns:1fr;}
+    .side-rail{position:static;}
+    .feature-card{text-align:center;}
+  }
 </style>
 </head>
 <body>
@@ -41,62 +86,235 @@
 <div class="xshell">
 
   <div class="hero">
-    <div class="split">
+    <div class="home-hero">
       <div>
-        <div class="eyebrow">NREMT‑EMT · Cognitive exam</div>
-        <h1>A complete study companion, in one browser tab.</h1>
-        <p class="lede">Forty chapters of written notes, a six‑domain question bank, mnemonics, protocol flow diagrams and scenario simulations. Free to use, no account, and everything you do stays on your own device.</p>
+        <div class="eyebrow">NREMT&#8209;EMT &middot; Cognitive exam</div>
+        <h1>Level up before the real exam does.</h1>
+        <p class="lede">978 practice questions across six domains, forty chapters of notes, and scenario sims that run a call start to finish. Free, offline, no account.</p>
+        <div class="hero-ctas">
+          <a href="practice.html" class="btn-press">Start practicing</a>
+          <a href="#sample" class="link-quiet">See a sample question</a>
+        </div>
       </div>
-      <div class="split-divider">
-        <div class="split-label">What's inside</div>
-        <div class="home-list-row"><span>Practice exams &amp; drills</span><span class="num">01</span></div>
-        <div class="home-list-row"><span>Study notes</span><span class="num">02</span></div>
-        <div class="home-list-row"><span>Mnemonics &amp; glossary</span><span class="num">03</span></div>
-        <div class="home-list-row"><span>Protocol flow diagrams</span><span class="num">04</span></div>
-        <div class="home-list-row"><span>Body map &amp; lung sounds</span><span class="num">05</span></div>
-        <div class="home-list-row" style="border-bottom:0"><span>Scenario simulator</span><span class="num">06</span></div>
-        <a href="practice.html" class="btn-dark" style="margin-top:22px">Begin a practice exam</a>
+
+      <!-- Live progress card. Rendered from localStorage by the script below;
+           this markup is the signed-out / brand-new-user state. -->
+      <div class="progress-card">
+        <div class="progress-card__top">
+          <div class="level-chip">
+            <div class="level-ring" id="heroLevelRing">L1</div>
+            <div class="t">
+              <b id="heroLevelTitle">First Responder</b>
+              <span id="heroLevelSub">Level 1 &middot; 0 XP</span>
+            </div>
+          </div>
+          <div class="streak-chip" id="heroStreak" hidden>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c1 4-3 5-3 9a3 3 0 006 0c1.5 1 2 3 2 4.5A5.5 5.5 0 0111.5 21 6 6 0 016 15c0-5 4-6 4-9 0-1.5-.5-2.5-1-3.5C10.5 2 11 2 12 2z" fill="currentColor"/></svg>
+            <span id="heroStreakCount">0</span>
+          </div>
+        </div>
+
+        <div class="xp-track"><div class="xp-fill" id="heroXpFill" style="width:0%"></div></div>
+        <div class="xp-label" id="heroXpLabel">0 / 100 XP to Level 2</div>
+
+        <div id="heroDomains" style="margin-top:14px"></div>
       </div>
     </div>
   </div>
 
   <div class="xsection">
-    <div class="xgrid">
-      <div class="xlabel">The six domains</div>
-      <div class="xcontent" style="grid-column:span 2;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 clamp(24px,4vw,40px)">
-        <div class="domain-item"><div class="name">Assessment</div><div class="desc">Scene size-up, primary and secondary survey, vitals</div></div>
-        <div class="domain-item"><div class="name">Airway &amp; Respiratory</div><div class="desc">Adjuncts, ventilation, oxygenation, obstruction</div></div>
-        <div class="domain-item"><div class="name">Cardiac &amp; Medical</div><div class="desc">Arrest, chest pain, diabetic and neurologic emergencies</div></div>
-        <div class="domain-item"><div class="name">Trauma</div><div class="desc">Bleeding, shock, head, spine and chest injury</div></div>
-        <div class="domain-item"><div class="name">OB/Peds &amp; Special Populations</div><div class="desc">Delivery, neonates, paediatric and geriatric care</div></div>
-        <div class="domain-item" style="border-bottom:0"><div class="name">EMS Operations</div><div class="desc">Safety, MCI, extrication, documentation</div></div>
+    <div class="section-head">
+      <h2>The six domains</h2>
+      <p class="section-lede">Full coverage of the exam blueprint. Clear one to build confidence on the next.</p>
+    </div>
+
+    <div class="path-row">
+      <div class="path">
+        <div class="node left">
+          <a class="node-circle" href="practice.html?domain=Assessment" style="--c:#2C9C8B;--cd:#1F7A6C" aria-label="Practice Assessment">
+            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="16" stroke="#2C9C8B" stroke-width="3"/><path d="M13 20h5l2-6 4 12 2-6h5" stroke="#2C9C8B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <div class="node-text"><div class="n">Assessment</div><div class="d">Scene size-up, vitals, survey</div></div>
+        </div>
+        <div class="node right">
+          <a class="node-circle" href="practice.html?domain=Airway%20%26%20Respiratory" style="--c:#E8776A;--cd:#C15A4E" aria-label="Practice Airway &amp; Respiratory">
+            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M12 26c0-8 4-14 8-14s8 6 8 14" stroke="#E8776A" stroke-width="3" stroke-linecap="round"/><circle cx="12" cy="27" r="2.6" fill="#E8776A"/><circle cx="28" cy="27" r="2.6" fill="#E8776A"/></svg>
+          </a>
+          <div class="node-text"><div class="n">Airway &amp; Respiratory</div><div class="d">Ventilation, oxygenation</div></div>
+        </div>
+        <div class="node left">
+          <a class="node-circle" href="practice.html?domain=Cardiac%20%26%20Medical" style="--c:#C9973A;--cd:#A67A28" aria-label="Practice Cardiac &amp; Medical">
+            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 30s-11-6.5-11-14a6 6 0 0111-3 6 6 0 0111 3c0 7.5-11 14-11 14z" stroke="#C9973A" stroke-width="3" stroke-linejoin="round"/></svg>
+          </a>
+          <div class="node-text"><div class="n">Cardiac &amp; Medical</div><div class="d">Arrest, chest pain, diabetic</div></div>
+        </div>
+        <div class="node right">
+          <a class="node-circle" href="practice.html?domain=Trauma" style="--c:#2C9C8B;--cd:#1F7A6C" aria-label="Practice Trauma">
+            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 30l8-16 4 8 4-6 8 14" stroke="#2C9C8B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <div class="node-text"><div class="n">Trauma</div><div class="d">Bleeding, shock, injury</div></div>
+        </div>
+        <div class="node left">
+          <a class="node-circle" href="practice.html?domain=OB%2FPeds%20%26%20Special%20Populations" style="--c:#E8776A;--cd:#C15A4E" aria-label="Practice OB/Peds and Special Populations">
+            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="15" cy="14" r="4" stroke="#E8776A" stroke-width="3"/><circle cx="27" cy="20" r="6" stroke="#E8776A" stroke-width="3"/><path d="M15 20v8" stroke="#E8776A" stroke-width="3" stroke-linecap="round"/></svg>
+          </a>
+          <div class="node-text"><div class="n">OB/Peds &amp; Special Pops</div><div class="d">Delivery, paediatric, geriatric</div></div>
+        </div>
+        <div class="node center">
+          <a class="node-circle" href="practice.html?domain=EMS%20Operations" style="--c:#C9973A;--cd:#A67A28" aria-label="Practice EMS Operations">
+            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><rect x="9" y="12" width="22" height="16" rx="2" stroke="#C9973A" stroke-width="3"/><path d="M9 18h22M16 12v-3h8v3" stroke="#C9973A" stroke-width="3" stroke-linecap="round"/></svg>
+          </a>
+          <div class="node-text"><div class="n">EMS Operations</div><div class="d">Safety, MCI, documentation</div></div>
+        </div>
+      </div>
+
+      <div class="side-rail" id="sideRail">
+        <div class="tip-card">
+          <div class="k">Start here</div>
+          <div class="v">A 20-question domain drill</div>
+          <div class="s">Short, focused, and enough to put a first reading on each of the six domains. Your weakest one shows up here once you've answered a few.</div>
+          <div style="margin-top:14px"><a href="practice.html" class="btn-press alt sm">Start a drill</a></div>
+        </div>
+        <div class="tip-card">
+          <div class="k">Or go long</div>
+          <div class="v">100-question timed exam</div>
+          <div class="s">Full-length, exam-paced, scored by domain when you finish.</div>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="xsection">
-    <div class="xgrid" style="align-items:center">
-      <div>
-        <h2 style="font:400 clamp(24px,3.4vw,30px) var(--font-serif);letter-spacing:-.02em;margin:0 0 12px;line-height:1.15;padding-top:0;border-top:0">Learn the anatomy by pointing at it.</h2>
-        <p style="color:var(--muted);font-size:16px;margin:0 0 18px;max-width:46ch;text-wrap:pretty">An interactive body map, a lung and heart sound trainer, and eight branching scenarios that ask you to run a call from dispatch to handover.</p>
-        <a href="body-map.html" class="link-underline">Open the body map</a>
+    <div class="feature-card">
+      <div class="icon-circle">
+        <svg width="56" height="70" viewBox="0 0 56 70" fill="none" aria-hidden="true">
+          <circle cx="28" cy="12" r="9" stroke="#fff" stroke-opacity=".9" stroke-width="2.5"/>
+          <path d="M28 21v24M28 30l-12 7M28 30l12 7M28 45l-7 21M28 45l7 21" stroke="#fff" stroke-opacity=".9" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
       </div>
-      <div class="screenshot-slot"><span>body map screenshot</span></div>
+      <div>
+        <h2>Learn the anatomy by pointing at it.</h2>
+        <p>An interactive body map, a lung and heart sound trainer, and eight branching scenarios that ask you to run a call from dispatch to handover.</p>
+        <a href="body-map.html" class="btn-press alt">Open the body map</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="xsection" id="sample">
+    <div class="sample-row">
+      <div>
+        <h2 style="margin-top:0">Try one.</h2>
+        <p class="section-lede" style="margin:0 0 24px;text-align:left">Real exam formatting, pulled straight from the practice bank.</p>
+        <div class="sample-list">
+          <div class="row"><span class="n">A</span> Single-best-answer</div>
+          <div class="row"><span class="n">N</span> Select-N (choose all that apply)</div>
+          <div class="row"><span class="n">S</span> Sequencing (put steps in order)</div>
+        </div>
+      </div>
+      <div class="qcard">
+        <span class="tag domain">Trauma</span> <span class="tag diff">Moderate</span>
+        <div class="qtext">A patient has a penetrating chest wound with an audible sucking sound on inspiration. Your next action is to:</div>
+        <div class="qopt"><span class="letter">A</span> Apply high-flow oxygen via non-rebreather</div>
+        <div class="qopt correct"><span class="letter">B</span> Seal the wound with an occlusive dressing</div>
+        <div class="qopt"><span class="letter">C</span> Begin positive-pressure ventilation</div>
+        <div class="qopt" style="margin-bottom:0"><span class="letter">D</span> Position the patient supine and transport</div>
+      </div>
     </div>
   </div>
 
   <div class="xsection">
     <div class="trust-row">
-      <div style="display:flex;gap:36px;flex-wrap:wrap">
-        <div><div class="trust-item-title">Free, no account</div><div class="trust-item-sub">Nothing to sign up for.</div></div>
-        <div><div class="trust-item-title">Works offline</div><div class="trust-item-sub">Install it and study anywhere.</div></div>
-        <div><div class="trust-item-title">Private by default</div><div class="trust-item-sub">Progress stays in your browser.</div></div>
-      </div>
-      <p class="trust-note">Independent study aid. Not affiliated with or endorsed by the National Registry of Emergency Medical Technicians.</p>
+      <div class="trust-pill">Free, no account</div>
+      <div class="trust-pill">Works offline</div>
+      <div class="trust-pill">Private by default</div>
     </div>
+    <p class="disclaimer">Independent study aid. Not affiliated with or endorsed by the National Registry of Emergency Medical Technicians.</p>
   </div>
 
 </div>
+
+<script>
+// ---- Hero progress card. Reads the same localStorage records the dashboard
+// and practice pages write, so the homepage reflects real progress instead of
+// placeholder numbers. Everything degrades to the level-1 empty state. ----
+(function(){
+  var DOMAINS = ["Assessment","Airway & Respiratory","Cardiac & Medical","Trauma","OB/Peds & Special Populations","EMS Operations"];
+  var SHORT = {
+    "Assessment":"Assessment",
+    "Airway & Respiratory":"Airway",
+    "Cardiac & Medical":"Cardiac",
+    "Trauma":"Trauma",
+    "OB/Peds & Special Populations":"OB/Peds",
+    "EMS Operations":"Operations"
+  };
+  var BAR_COLORS = ['#2C9C8B','#E8776A','#C9973A','#2C9C8B','#E8776A','#C9973A'];
+
+  function readJSON(key, fallback){
+    try{ var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function dayKey(offset){
+    var d = new Date();
+    if(offset) d.setDate(d.getDate() + offset);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function render(){
+    var XP = window.LevlXP;
+    if(!XP) return; // nav.js hasn't loaded yet; the retry below covers it
+
+    // Level + XP
+    var state = XP.loadXp();
+    var level = XP.levelForXp(state.total);
+    var prev = XP.xpForLevel(level), next = XP.xpForLevel(level + 1);
+    var into = state.total - prev, span = Math.max(1, next - prev);
+    document.getElementById('heroLevelRing').textContent = 'L' + level;
+    document.getElementById('heroLevelTitle').textContent = XP.titleForLevel(level);
+    document.getElementById('heroLevelSub').textContent = 'Level ' + level + ' \u00b7 ' + state.total + ' XP';
+    document.getElementById('heroXpFill').style.width = Math.min(100, Math.round(into / span * 100)) + '%';
+    document.getElementById('heroXpLabel').textContent = state.total + ' / ' + next + ' XP to Level ' + (level + 1);
+
+    // Streak — same "broken unless today or yesterday" rule the dashboard uses.
+    var s = readJSON('nremt_streak', null);
+    var n = 0;
+    if(s && s.currentStreak){
+      var today = dayKey(0), yesterday = dayKey(-1);
+      var broken = s.lastActiveDate !== null && s.lastActiveDate !== today && s.lastActiveDate !== yesterday;
+      n = broken ? 0 : s.currentStreak;
+    }
+    var chip = document.getElementById('heroStreak');
+    chip.hidden = n < 1;
+    document.getElementById('heroStreakCount').textContent = n;
+
+    // Domain bars: the four most-answered domains, so the card stays compact.
+    var stats = readJSON('nremt_domain_stats_all', {});
+    var attempted = DOMAINS
+      .map(function(d, i){ return { name: d, i: i, s: stats[d] }; })
+      .filter(function(x){ return x.s && x.s.total > 0; })
+      .sort(function(a, b){ return b.s.total - a.s.total; })
+      .slice(0, 4);
+
+    var box = document.getElementById('heroDomains');
+    if(!attempted.length){
+      box.innerHTML = '<div class="mini-domain-row" style="border-top:1px solid var(--line-soft);color:var(--muted);font-weight:700;font-size:12.5px;display:block;padding-top:12px">' +
+        'Answer a few questions and your six domain readings appear here.</div>';
+      return;
+    }
+    box.innerHTML = attempted.map(function(x){
+      var pct = Math.round(x.s.correct / x.s.total * 100);
+      return '<div class="mini-domain-row">' +
+        '<span>' + SHORT[x.name] + '</span>' +
+        '<span class="bar"><i style="width:' + pct + '%;--dc:' + BAR_COLORS[x.i] + '"></i></span>' +
+        '<span class="pct">' + pct + '%</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  // nav.js is deferred and defines window.LevlXP; run once it's there.
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
+  else render();
+})();
+</script>
 <script src="assets/nav.js" defer></script>
 </body>
 </html>

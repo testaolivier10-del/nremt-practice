@@ -13,27 +13,28 @@
 <meta property="og:site_name" content="LevlPrep">
 <link rel="stylesheet" href="assets/theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
 <style>
 
   .search-box{
-    width:100%;max-width:520px;padding:13px 15px;border:1px solid var(--line);border-radius:10px;
-    font-family:var(--font-serif);font-size:16px;background:var(--white);color:var(--ink);margin-bottom:18px;
+    width:100%;max-width:520px;padding:13px 16px;border:2px solid var(--line);border-radius:var(--radius);
+    font-family:var(--font-ui);font-weight:700;font-size:15.5px;background:var(--white);color:var(--ink);margin-bottom:18px;
   }
   .letter-index{display:flex;flex-wrap:wrap;gap:2px;}
   .letter-index a{
-    font:700 13px var(--font-mono);padding:6px 10px;border-radius:5px;text-decoration:none;
+    font:700 13px var(--font-mono);padding:7px 11px;border-radius:9px;text-decoration:none;
     color:var(--muted);background:transparent;
   }
-  .letter-index a.active{color:var(--ink);background:var(--hover-tint);}
+  .letter-index a.active{color:var(--accent);background:var(--tint-accent);}
   .letter-group{scroll-margin-top:calc(var(--site-header-h) + 16px);padding-bottom:28px;}
   .term{
     padding:13px 0;border-bottom:1px solid var(--line-soft);
   }
   .term:last-child{border-bottom:0;}
-  .term .word{font-size:17.5px;margin-bottom:2px;}
-  .term .def{font-size:15px;color:var(--muted);text-wrap:pretty;}
-  .no-results{font-size:16px;color:var(--muted);display:none;}
+  .term .word{font-size:16.5px;font-weight:900;margin-bottom:3px;}
+  .term .def{font-size:14.5px;font-weight:600;color:var(--muted);text-wrap:pretty;}
+  .no-results{font-size:15px;font-weight:700;color:var(--muted);display:none;}
 </style>
 </head>
 <body>

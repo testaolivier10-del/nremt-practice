@@ -10,7 +10,7 @@
 // The cached copy is only served as a fallback when the network fails.
 // Bump CACHE_NAME whenever this file changes, so old cached entries are
 // dropped instead of lingering forever.
-const CACHE_NAME = 'levlprep-v4';
+const CACHE_NAME = 'levlprep-v5';
 const PRECACHE_URLS = [
   'index.html',
   'practice.html',

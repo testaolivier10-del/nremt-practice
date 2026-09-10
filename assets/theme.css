@@ -1,374 +1,667 @@
-/* Shared "health vibe" design tokens + header/nav component styles.
-   Loaded on every page so the palette and header live in one place
-   instead of being copy-pasted per file. */
+/* LevlPrep — "Guided Path" design system.
+   Chunky, tactile, game-like: heavy Nunito, 2px outlines, generous radii,
+   and hard offset shadows that collapse on press. Loaded on every page so
+   the palette and the shared header live in one place.
 
+   Layers, in order:
+     1. Tokens (light + dark)
+     2. Base reset / page shell / typography
+     3. Primitives: buttons, cards, pills, tracks, tags
+     4. Site shell layout (.xshell, .hero, .xsection, grids)
+     5. Gamification components (level, XP, streak, path nodes, badges)
+     6. Sticky site header (markup injected by nav.js)
+     7. Auth modal, print
+*/
+
+/* ==========================================================================
+   1. Tokens
+   ========================================================================== */
 :root{
-  --navy:#16332E;      /* deep teal-black — headers, buttons, strong text */
-  --navy2:#1F4A42;      /* secondary teal — hover/pressed states */
-  --paper:#FBFAF7;      /* page background — warm editorial paper */
-  --white:#FFFFFF;
-  --accent:#2C9C8B;      /* primary teal-mint accent */
-  --accent-2:#E8776A;    /* warm coral — used sparingly for streaks/CTAs */
-  --line:#E3DFD6;
-  --line-soft:#EDEAE3;   /* lighter rule — dividers between rows inside a section */
-  --hover-tint:#F1EEE7;  /* nav/row hover background */
-  --ink:#17231F;
-  --muted:#5B7A72;
+  /* Core palette */
+  --navy:#16332E;        /* deep teal-black — primary buttons, strong text */
+  --navy-press:#0E2620;  /* the "underside" of a navy pressed button */
+  --navy2:#1F4A42;       /* secondary teal — hover states */
+  --paper:#FBFAF7;       /* page background — warm paper */
+  --white:#FFFFFF;       /* card surface */
+  --accent:#2C9C8B;      /* primary teal-mint */
+  --accent-press:#1F7A6C;
+  --amber:#C9973A;       /* streaks, "in progress" */
+  --amber-press:#A67A28;
+  --coral:#E8776A;       /* warm highlight, difficulty tags */
+  --coral-press:#C15A4E;
+  --accent-2:#E8776A;    /* legacy alias for --coral */
+
+  /* Lines + tracks */
+  --line:#E3DFD6;        /* 2px card outlines, section rules */
+  --line-soft:#EDEAE3;   /* 1px dividers between rows inside a card */
+  --track:#EDEAE3;       /* unfilled portion of a progress bar */
+  --hover-tint:#F1EEE7;
+
+  /* Text */
+  --ink:#16241F;
+  --muted:#5F7770;
+  --on-accent:#FFFFFF;   /* text on a solid navy/accent fill — white in both themes */
+
+  /* Status */
   --good:#2F9E5B;
+  --good-press:#237A45;
   --bad:#D1594A;
-  --warn:#C08A2E;
+  --bad-press:#A84135;
+  --warn:#C9973A;
+
+  /* Pale tints — badge and answer-state backgrounds */
+  --tint-accent:#E9F2EF;
+  --tint-amber:#F7EDDA;
+  --tint-coral:#FBEAE6;
+  --tint-good:#E4F3E9;
+  --tint-bad:#F8E6E1;
+  --tint-warn:#F7EDDA;
+
+  /* Type */
   --font-ui:'Nunito','Segoe UI',system-ui,sans-serif;
-  --font-serif:'Charter','Georgia',serif;
-  --font-mono:ui-monospace,Menlo,monospace;
-  --radius:12px;
-  --on-accent:#FFFFFF;   /* text sitting on a solid navy/accent background — stays white in both themes */
-  --tint-accent:#E9F2EF; /* pale accent tint — selected/hover states, "medium" badges */
-  --tint-good:#E4F3E9;   /* pale green tint — correct answers, "easy"/good badges */
-  --tint-bad:#F8E6E1;    /* pale red tint — incorrect answers, "hard"/bad badges */
-  --tint-warn:#FCEFD8;   /* pale amber tint — "within reach" badges */
-  --overlay-bg:rgba(255,255,255,0.88); /* translucent panel over the 3D canvas/viewer */
-  --radius-sm:8px;
-  --radius-lg:16px;
-  --shadow-card:0 1px 2px rgba(22,51,46,0.05), 0 6px 16px -8px rgba(22,51,46,0.10);
-  --shadow-pop:0 4px 10px rgba(22,51,46,0.08), 0 16px 32px -12px rgba(22,51,46,0.18);
-  --header-bg:rgba(251,250,247,0.92); /* translucent .paper, for the blurred sticky nav */
-  --site-header-h:64px; /* fallback; nav.js measures the real rendered height and overrides this */
+  --font-display:'Nunito','Segoe UI',system-ui,sans-serif;
+  --font-serif:'Nunito','Segoe UI',system-ui,sans-serif; /* legacy alias — the serif is gone */
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+
+  /* Shape */
+  --radius-sm:10px;
+  --radius:14px;
+  --radius-lg:20px;
+  --radius-pill:999px;
+  --bw:2px;              /* the standard outline weight */
+
+  /* Hard offset shadows — the signature of this system. No blur. */
+  --lift-sm:0 3px 0 var(--line);
+  --lift:0 4px 0 var(--line);
+  --lift-lg:0 5px 0 var(--line);
+  --shadow-card:0 4px 0 var(--line);
+  --shadow-pop:0 8px 0 var(--line);
+
+  --overlay-bg:rgba(255,255,255,0.92);
+  --header-bg:var(--paper);
+  --site-header-h:64px;  /* fallback; nav.js measures the real height */
 }
 
-/* Dark theme — toggled via [data-theme="dark"] on <html>, set by the
-   toggle button in nav.js and persisted to localStorage. */
+/* Dark theme — toggled via [data-theme="dark"] on <html> by nav.js. */
 :root[data-theme="dark"]{
-  --navy:#0E1B18;
-  --navy2:#16332E;
-  --paper:#0F1715;
-  --white:#182422;
+  /* --navy is both the primary button fill and the dark-panel background. On a
+     near-black page the light theme's #16332E is almost invisible, so dark
+     lifts it to the mid teal — buttons stay legible and the dark panels read
+     as a distinct surface rather than merging into the page. */
+  --navy:#1F4A42;
+  --navy-press:#14332C;
+  --navy2:#2A5F55;
+  --paper:#0F1613;
+  --white:#182420;
   --accent:#3FBBA6;
+  --accent-press:#2E8D80;
+  --amber:#D9A54B;
+  --amber-press:#A67A28;
+  --coral:#E8776A;
+  --coral-press:#C15A4E;
   --accent-2:#E8776A;
-  --line:#2A3A36;
+
+  --line:#28352F;
   --line-soft:#233330;
+  --track:#233330;
   --hover-tint:#1B2926;
+
   --ink:#E7F1EE;
-  --muted:#93A6A0;
+  --muted:#8CA39B;
+
   --good:#4FBE79;
+  --good-press:#237A45;
   --bad:#E4776A;
+  --bad-press:#A84135;
   --warn:#D9A54B;
-  --tint-accent:rgba(63,187,166,0.20);
-  --tint-good:rgba(79,190,121,0.20);
-  --tint-bad:rgba(228,119,106,0.20);
-  --tint-warn:rgba(217,165,75,0.20);
-  --overlay-bg:rgba(24,36,34,0.88);
-  --shadow-card:0 1px 2px rgba(0,0,0,0.16), 0 6px 16px -8px rgba(0,0,0,0.30);
-  --shadow-pop:0 4px 10px rgba(0,0,0,0.24), 0 16px 32px -12px rgba(0,0,0,0.40);
-  --header-bg:rgba(15,23,21,0.92);
+
+  --tint-accent:rgba(63,187,166,0.16);
+  --tint-amber:rgba(217,165,75,0.18);
+  --tint-coral:rgba(232,119,106,0.16);
+  --tint-good:rgba(79,190,121,0.18);
+  --tint-bad:rgba(228,119,106,0.18);
+  --tint-warn:rgba(217,165,75,0.18);
+
+  --overlay-bg:rgba(24,36,32,0.92);
 }
 
-/* ---- Shared base layer: reset + page shell + typography, loaded once
-   here instead of being copy-pasted into every page's inline <style>. ---- */
+/* ==========================================================================
+   2. Base
+   ========================================================================== */
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
   background:var(--paper);
   color:var(--ink);
-  font-family:'Charter','Georgia',serif;
-  line-height:1.6;
+  font-family:var(--font-ui);
+  font-weight:600;
+  line-height:1.55;
   font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
 }
-.wrap{max-width:680px;margin:0 auto;padding:40px 22px 90px;}
-h1{font-size:clamp(30px,4.4vw,44px);font-weight:400;margin:6px 0 12px;letter-spacing:-0.03em;line-height:1.06;}
-h2{font-family:var(--font-ui);font-size:17px;font-weight:800;letter-spacing:-0.005em;color:var(--ink);margin:48px 0 14px;padding-top:14px;border-top:1px solid var(--line);}
-.lede{color:var(--muted);font-size:17px;max-width:56ch;margin:0 0 24px;text-wrap:pretty;}
+a{color:inherit;}
+svg{display:block;}
 
-/* ---- Editorial site shell: the wide ruled-grid layout used across the
-   redesigned pages (Home, Practice, Study Plan, Notes, Mnemonics, Glossary,
-   Dashboard, Tools). Distinct from the older narrow .wrap column, which
-   the specialized tool pages (body map, sound trainer, scenario sim) still
-   use for their single-column interactive UI. ---- */
-.xshell{max-width:1120px;margin:0 auto;}
-.eyebrow{font:800 11px var(--font-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;}
-.hero{padding:clamp(36px,5vw,56px) clamp(20px,4vw,56px) 40px;border-bottom:1px solid var(--line);}
-.hero h1{margin:0 0 16px;}
-.hero .lede{margin:0;max-width:52ch;}
-.xsection{padding:40px clamp(20px,4vw,56px);border-bottom:1px solid var(--line);}
+h1,h2,h3,h4{font-family:var(--font-ui);letter-spacing:-0.02em;}
+h1{font-size:clamp(28px,4.2vw,44px);font-weight:900;margin:6px 0 14px;line-height:1.08;}
+h2{
+  font-size:clamp(20px,2.6vw,26px);font-weight:900;color:var(--ink);
+  margin:44px 0 16px;padding-top:0;border-top:0;line-height:1.2;
+}
+h3{font-size:17px;font-weight:900;margin:26px 0 10px;}
+p{text-wrap:pretty;}
+.lede{color:var(--muted);font-size:16.5px;font-weight:700;max-width:52ch;margin:0 0 26px;}
+strong,b{font-weight:900;}
+
+/* The narrow single-column measure still used by the interactive tool pages
+   (body map, sound trainer, scenario sim) and the long-form notes. */
+.wrap{max-width:760px;margin:0 auto;padding:36px 22px 90px;}
+
+/* ==========================================================================
+   3. Primitives
+   ========================================================================== */
+
+/* ---- The pressed button: the core primitive of this system. The hard
+   offset shadow reads as the button's thickness; on :active the element
+   drops by exactly that offset and the shadow collapses to zero. ---- */
+.btn-press,.btn-dark,.start-btn,.auth-modal-submit{
+  font:900 15px var(--font-ui);
+  color:var(--on-accent);
+  background:var(--navy);
+  padding:14px 26px;
+  border-radius:var(--radius);
+  border:0;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-block;
+  text-align:center;
+  box-shadow:0 5px 0 var(--navy-press);
+  transition:transform .08s ease, box-shadow .08s ease, filter .12s ease;
+}
+.btn-press:hover,.btn-dark:hover,.start-btn:hover,.auth-modal-submit:hover{
+  filter:brightness(1.06);color:var(--on-accent);background:var(--navy);
+}
+.btn-press:active,.btn-dark:active,.start-btn:active,.auth-modal-submit:active{
+  transform:translateY(5px);box-shadow:0 0 0 var(--navy-press);
+}
+.btn-press.alt,.btn-accent{background:var(--accent);box-shadow:0 5px 0 var(--accent-press);}
+.btn-press.alt:hover,.btn-accent:hover{background:var(--accent);}
+.btn-press.alt:active,.btn-accent:active{box-shadow:0 0 0 var(--accent-press);}
+.btn-press.coral{background:var(--coral);box-shadow:0 5px 0 var(--coral-press);}
+.btn-press.coral:active{box-shadow:0 0 0 var(--coral-press);}
+.btn-press.sm{font-size:13.5px;padding:11px 20px;box-shadow:0 4px 0 var(--navy-press);}
+.btn-press.sm.alt{box-shadow:0 4px 0 var(--accent-press);}
+.btn-press.sm:active{transform:translateY(4px);}
+.btn-press.wide{display:block;width:100%;}
+.btn-press:disabled,.btn-dark:disabled,.start-btn:disabled{
+  opacity:.45;cursor:not-allowed;transform:none;filter:none;
+}
+
+/* Outline variant — same thickness, paper fill. */
+.btn-outline,.review-btn,.domain-btn{
+  font:900 14px var(--font-ui);
+  color:var(--ink);
+  background:var(--white);
+  border:var(--bw) solid var(--line);
+  padding:12px 22px;
+  border-radius:var(--radius);
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-block;
+  text-align:center;
+  box-shadow:var(--lift);
+  transition:transform .08s ease, box-shadow .08s ease, border-color .12s ease;
+}
+.btn-outline:hover,.review-btn:hover,.domain-btn:hover{border-color:var(--accent);color:var(--ink);}
+.btn-outline:active,.review-btn:active,.domain-btn:active{transform:translateY(4px);box-shadow:0 0 0 var(--line);}
+
+/* Quiet text link with an accent underline. */
+.link-underline,.link-quiet{
+  font:800 14.5px var(--font-ui);color:var(--ink);background:none;border:0;
+  border-bottom:var(--bw) solid var(--accent);padding:0 0 2px;cursor:pointer;
+  text-decoration:none;display:inline-block;
+}
+.link-underline:hover,.link-quiet:hover{color:var(--accent);}
+
+/* ---- Card: 2px outline + hard lift. Every panel on the site is one. ---- */
+.card,.panel{
+  background:var(--white);
+  border:var(--bw) solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:22px;
+  box-shadow:var(--lift-lg);
+}
+.panel h2{font-size:16px;font-weight:900;margin:0 0 16px;letter-spacing:-0.01em;}
+.card-tight{padding:18px 20px;border-radius:var(--radius);box-shadow:var(--lift);}
+
+/* ---- Pills + tags ---- */
+.chip-pill{
+  font:800 13.5px var(--font-ui);color:var(--ink);background:var(--white);
+  border:var(--bw) solid var(--line);border-radius:var(--radius-pill);
+  padding:8px 16px;display:inline-block;
+}
+.tag{font:900 11.5px var(--font-ui);padding:6px 13px;border-radius:var(--radius-pill);display:inline-block;}
+.tag.domain{color:var(--coral);background:var(--tint-coral);}
+.tag.diff{color:var(--amber);background:var(--tint-amber);}
+.tag.good{color:var(--good);background:var(--tint-good);}
+.tag.accent{color:var(--accent);background:var(--tint-accent);}
+
+/* ---- Progress track ---- */
+.track{height:12px;border-radius:var(--radius-pill);background:var(--track);overflow:hidden;}
+.track > i,.track > .fill{display:block;height:100%;border-radius:var(--radius-pill);background:var(--dc,var(--accent));transition:width .35s ease;}
+.track.thin{height:8px;}
+.track.thick{height:16px;}
+
+/* ==========================================================================
+   4. Site shell
+   ========================================================================== */
+.xshell{max-width:1180px;margin:0 auto;padding:0 clamp(18px,3.5vw,48px);}
+.eyebrow{font:900 11px var(--font-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+
+.hero{padding:clamp(40px,5vw,60px) 0 clamp(36px,4vw,54px);border-bottom:var(--bw) solid var(--line);}
+.hero h1{margin:0 0 16px;max-width:17ch;}
+.hero .lede{margin:0 0 28px;max-width:48ch;}
+.hero-ctas{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+
+.page-head{padding:34px 0 6px;}
+.page-head h1{font-size:clamp(26px,3.2vw,34px);margin:0 0 6px;}
+.page-head p{color:var(--muted);font-weight:700;font-size:14.5px;margin:0;}
+
+.xsection{padding:clamp(36px,4.5vw,52px) 0;border-bottom:var(--bw) solid var(--line);}
 .xsection:last-child{border-bottom:0;}
-.xsection-tight{padding-top:20px;}
-.xgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(24px,4vw,40px);}
-.xlabel{font:800 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:4px;max-width:150px;}
+.xsection-tight{padding-top:22px;}
+.section-head{text-align:center;margin-bottom:8px;}
+.section-head h2{margin:0 0 8px;font-size:clamp(23px,3vw,30px);}
+.section-lede{color:var(--muted);font-size:15px;font-weight:700;max-width:50ch;margin:0 auto;}
+
+.xgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(22px,3.5vw,38px);}
+.xlabel{font:900 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:4px;max-width:150px;}
 .xcontent{grid-column:span 2;min-width:0;}
 .xcontent.narrow{max-width:64ch;}
-.xrow{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line-soft);}
-.xrow:last-child{border-bottom:0;}
+
+/* A labelled section (an .xlabel beside its .xcontent) reads as a titled card
+   in this system, not as an editorial column with a gutter: the label becomes
+   the card's heading and the content sits on a raised panel. Grids without a
+   label — tool tiles, mnemonic cards — keep their multi-column layout. */
+.xgrid:has(> .xlabel){display:block;}
+.xgrid:has(> .xlabel) > .xlabel{
+  font:900 16px var(--font-ui);letter-spacing:-0.01em;text-transform:none;
+  color:var(--ink);max-width:none;padding-top:0;margin-bottom:14px;
+}
+.xgrid:has(> .xlabel) > .xlabel br{display:none;}
+.xgrid:has(> .xlabel) > .xcontent{
+  grid-column:auto;max-width:none;
+  background:var(--white);border:var(--bw) solid var(--line);
+  border-radius:var(--radius-lg);padding:22px 24px;box-shadow:var(--lift-lg);
+}
+.xgrid:has(> .xlabel) > .xcontent.narrow{max-width:74ch;}
+
+/* Tool tiles on the Tools page: the whole card is the link. */
+.tool-card{
+  display:block;background:var(--white);border:var(--bw) solid var(--line);
+  border-radius:var(--radius-lg);padding:18px;box-shadow:var(--lift-lg);
+  text-decoration:none;color:inherit;
+  transition:transform .08s ease, box-shadow .08s ease, border-color .12s ease;
+}
+.tool-card:hover{border-color:var(--accent);transform:translateY(2px);box-shadow:0 3px 0 var(--line);}
+.tool-card:active{transform:translateY(5px);box-shadow:0 0 0 var(--line);}
+
+/* Row inside a card: label left, value right, hairline divider. */
+.xrow,.kv-row{
+  display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline;justify-content:space-between;
+  padding:11px 0;border-bottom:1px solid var(--line-soft);font-size:14.5px;font-weight:700;
+}
+.xrow:last-child,.kv-row:last-child{border-bottom:0;}
 .xnum{font:700 13px var(--font-mono);color:var(--accent);}
-.xmeta{font:12.5px var(--font-mono);color:var(--muted);white-space:nowrap;}
-.btn-dark{font:800 14px var(--font-ui);color:var(--on-accent);background:var(--navy);padding:12px 22px;border-radius:6px;border:0;cursor:pointer;text-decoration:none;display:inline-block;}
-.btn-dark:hover{background:var(--navy2);color:var(--on-accent);}
-.btn-outline{font:800 14px var(--font-ui);color:var(--ink);background:var(--white);border:1px solid var(--ink);padding:12px 22px;border-radius:6px;cursor:pointer;text-decoration:none;display:inline-block;}
-.btn-outline:hover{background:var(--hover-tint);}
-.link-underline{font:800 14px var(--font-ui);color:var(--ink);background:none;border:0;border-bottom:2px solid var(--accent);padding:0 0 2px;cursor:pointer;text-decoration:none;display:inline-block;}
-.link-underline:hover{color:var(--accent);}
-.screenshot-slot{min-height:200px;border:1px solid var(--line);border-radius:6px;background-image:repeating-linear-gradient(135deg,var(--hover-tint) 0 8px,var(--paper) 8px 16px);display:flex;align-items:flex-end;padding:12px;}
-.screenshot-slot span{font:11px var(--font-mono);color:var(--muted);background:var(--paper);padding:3px 6px;border-radius:3px;}
+.xmeta,.kv-row .v{font:700 12.5px var(--font-mono);color:var(--muted);white-space:nowrap;}
 
-.kv-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:15px;}
-.kv-row:last-child{border-bottom:0;}
-.kv-row .v{font:12.5px var(--font-mono);color:var(--muted);}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4.5vw,52px);align-items:start;}
+.split-divider{border-left:var(--bw) solid var(--line);padding-left:clamp(20px,3vw,30px);}
+.split-label{font:900 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
 
-.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(32px,5vw,56px);align-items:end;}
-.split-divider{border-left:1px solid var(--line);padding-left:clamp(20px,3vw,30px);}
-.split-label{font:800 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
-
-.trust-row{display:flex;flex-wrap:wrap;gap:36px;align-items:baseline;justify-content:space-between;}
-.trust-item-title{font:800 14px var(--font-ui);color:var(--ink);}
-.trust-item-sub{font-size:13px;color:var(--muted);}
-.trust-note{font:12px var(--font-ui);color:var(--muted);margin:0;max-width:40ch;}
-
-.chip-pill{font:600 13.5px var(--font-ui);color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:7px 15px;display:inline-block;}
-
-.step-row{display:flex;gap:20px;padding:16px 0;border-bottom:1px solid var(--line-soft);}
+.step-row{display:flex;gap:18px;padding:16px 0;border-bottom:1px solid var(--line-soft);}
 .step-row:last-child{border-bottom:0;}
-.step-num{font:700 13px var(--font-mono);color:var(--accent);padding-top:5px;flex-shrink:0;}
-.step-title{font-size:19px;display:block;margin-bottom:2px;}
-.step-sub{font-size:14.5px;color:var(--muted);}
+.step-num{font:700 13px var(--font-mono);color:var(--accent);padding-top:6px;flex-shrink:0;}
+.step-title{font-size:17px;font-weight:900;display:block;margin-bottom:2px;}
+.step-sub{font-size:14px;font-weight:600;color:var(--muted);}
 
-/* ---- Browser surfaces: theme the parts the page doesn't draw ---- */
+/* Trust strip — pills, not a ruled row. */
+.trust-row{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center;}
+.trust-pill{
+  display:flex;align-items:center;gap:10px;background:var(--white);
+  border:var(--bw) solid var(--line);border-radius:var(--radius-pill);
+  padding:12px 20px;font-weight:900;font-size:13.5px;
+}
+.trust-item-title{font:900 14px var(--font-ui);color:var(--ink);}
+.trust-item-sub{font-size:13px;font-weight:600;color:var(--muted);}
+.trust-note,.disclaimer{
+  font:600 12.5px var(--font-ui);color:var(--muted);margin:0 auto;
+  max-width:65ch;text-align:center;padding-top:24px;
+}
+
+.screenshot-slot{
+  min-height:220px;border:var(--bw) solid var(--line);border-radius:var(--radius-lg);
+  background-image:repeating-linear-gradient(135deg,var(--hover-tint) 0 8px,var(--paper) 8px 16px);
+  display:flex;align-items:flex-end;padding:14px;box-shadow:var(--lift);
+}
+.screenshot-slot span{font:700 11px var(--font-mono);color:var(--muted);background:var(--paper);padding:4px 8px;border-radius:6px;}
+
+/* ==========================================================================
+   5. Gamification components
+   ========================================================================== */
+
+/* Level ring — the circular "L4" chip used in the header and hero card. */
+.level-ring{
+  width:56px;height:56px;border-radius:50%;background:var(--tint-accent);
+  border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;
+  font:900 16px var(--font-ui);color:var(--accent);flex-shrink:0;
+}
+.level-ring.sm{width:32px;height:32px;border-width:2px;font-size:11.5px;}
+
+/* Streak chip — amber flame + count. */
+.streak-chip{
+  display:inline-flex;align-items:center;gap:8px;font-weight:900;font-size:17px;
+  color:var(--amber);background:var(--tint-amber);padding:8px 14px;border-radius:var(--radius-pill);
+}
+.streak-chip svg{width:20px;height:20px;}
+.streak-chip.sm{font-size:13.5px;gap:6px;padding:6px 11px;}
+.streak-chip.sm svg{width:15px;height:15px;}
+
+/* XP bar + label. */
+.xp-track{height:16px;border-radius:var(--radius-pill);background:var(--track);overflow:hidden;margin-bottom:8px;}
+.xp-fill{height:100%;border-radius:var(--radius-pill);background:var(--accent);transition:width .4s ease;}
+.xp-label{font:700 11.5px var(--font-mono);color:var(--muted);}
+
+/* A domain row with an inline bar — used in the hero card and dashboard. */
+.mini-domain-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0;border-top:1px solid var(--line-soft);font-size:13px;font-weight:800;
+}
+.mini-domain-row .bar{flex:1;height:8px;border-radius:var(--radius-pill);background:var(--track);margin:0 12px;overflow:hidden;}
+.mini-domain-row .bar i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--dc,var(--accent));transition:width .35s ease;}
+.mini-domain-row .pct{font:700 12px var(--font-mono);color:var(--muted);width:36px;text-align:right;}
+
+/* Stat card — tinted icon tile over a big number. */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.stat-card{
+  background:var(--white);border:var(--bw) solid var(--line);border-radius:18px;
+  padding:18px 20px;box-shadow:var(--lift);
+}
+.stat-card .icon{
+  width:38px;height:38px;border-radius:11px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:12px;background:var(--tint-accent);
+}
+.stat-card .icon svg{width:20px;height:20px;}
+.stat-card .v{font-weight:900;font-size:25px;line-height:1;}
+.stat-card .l{font-size:12px;color:var(--muted);font-weight:800;margin-top:5px;}
+
+/* Chunky answer option — letter circle + label, selectable, gradable. */
+.qopt{
+  display:flex;align-items:center;gap:14px;font-size:15.5px;font-weight:800;
+  padding:15px 18px;border-radius:16px;border:var(--bw) solid var(--line);
+  margin-bottom:12px;box-shadow:var(--lift);cursor:pointer;background:var(--white);
+  transition:transform .08s ease, box-shadow .08s ease, border-color .12s ease, background-color .12s ease;
+  width:100%;text-align:left;font-family:var(--font-ui);color:var(--ink);
+}
+.qopt:hover{transform:translateY(1px);box-shadow:var(--lift-sm);}
+.qopt .letter{
+  width:28px;height:28px;border-radius:50%;border:var(--bw) solid var(--muted);
+  display:flex;align-items:center;justify-content:center;font:900 12px var(--font-ui);
+  flex-shrink:0;transition:background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+.qopt.selected{border-color:var(--navy);box-shadow:0 4px 0 var(--navy-press);}
+.qopt.selected .letter{background:var(--navy);border-color:var(--navy);color:var(--on-accent);}
+.qopt.correct{border-color:var(--accent);background:var(--tint-accent);box-shadow:0 4px 0 var(--accent-press);}
+.qopt.correct .letter{background:var(--accent);border-color:var(--accent);color:var(--on-accent);}
+.qopt.incorrect{border-color:var(--bad);background:var(--tint-bad);box-shadow:0 4px 0 var(--bad-press);}
+.qopt.incorrect .letter{background:var(--bad);border-color:var(--bad);color:var(--on-accent);}
+.qopt:disabled{cursor:default;}
+.qopt:disabled:hover{transform:none;box-shadow:var(--lift);}
+
+/* Badge grid — earned / locked achievement discs. */
+.badge-grid{display:flex;flex-wrap:wrap;gap:14px;}
+.badge{width:66px;text-align:center;}
+.badge-circle{
+  width:56px;height:56px;border-radius:50%;background:var(--tint-accent);
+  border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin:0 auto 6px;
+}
+.badge-circle.locked{background:var(--track);border-color:var(--line);opacity:.5;}
+.badge span{font-size:10.5px;font-weight:800;color:var(--muted);line-height:1.3;display:block;}
+
+/* Streak calendar. */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-day{
+  aspect-ratio:1;border-radius:8px;background:var(--track);display:flex;
+  align-items:center;justify-content:center;font:800 10px var(--font-mono);color:var(--muted);
+}
+.cal-day.done{background:var(--accent);color:var(--on-accent);}
+.cal-day.today{outline:2px solid var(--navy);outline-offset:1px;}
+
+/* Skill path — zigzagging domain nodes joined by a dashed spine. */
+.path{position:relative;max-width:520px;margin:0 auto;}
+.path::before{
+  content:"";position:absolute;left:50%;top:38px;bottom:38px;width:4px;
+  background:repeating-linear-gradient(to bottom,var(--line) 0 10px,transparent 10px 20px);
+  transform:translateX(-50%);z-index:0;
+}
+/* [ label ] [ circle ] [ label ] — the middle track is the circle's own width,
+   so the spine at 50% runs straight through every node. */
+.node{
+  position:relative;display:grid;align-items:center;
+  grid-template-columns:1fr 76px 1fr;gap:16px;margin-bottom:34px;z-index:1;
+}
+.node:last-child{margin-bottom:0;}
+.node > *{grid-row:1;} /* keep circle and label on one row; auto-placement would push the left-side label to row 2 */
+.node .node-circle{grid-column:2;}
+.node.left .node-text{grid-column:1;justify-self:end;text-align:right;}
+.node.right .node-text{grid-column:3;justify-self:start;}
+.node.center .node-text{grid-column:3;justify-self:start;}
+.node-circle{
+  width:76px;height:76px;border-radius:50%;background:var(--white);
+  border:4px solid var(--c,var(--accent));display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;box-shadow:0 5px 0 var(--cd,var(--accent-press));cursor:pointer;
+  transition:transform .1s ease, box-shadow .1s ease;text-decoration:none;
+}
+.node-circle:hover{transform:translateY(2px);box-shadow:0 3px 0 var(--cd,var(--accent-press));}
+.node-circle:active{transform:translateY(5px);box-shadow:0 0 0 var(--cd,var(--accent-press));}
+.node-circle svg{width:30px;height:30px;}
+.node-text{background:var(--white);border:var(--bw) solid var(--line);border-radius:12px;padding:9px 14px;max-width:100%;}
+.node-text .n{font-weight:900;font-size:13.5px;line-height:1.25;}
+.node-text .d{font-size:11.5px;color:var(--muted);font-weight:700;line-height:1.35;}
+
+/* Side rail tip card. */
+.tip-card{
+  background:var(--white);border:var(--bw) solid var(--line);border-radius:18px;
+  padding:20px 22px;box-shadow:var(--lift);
+}
+.tip-card .k{font:900 11px var(--font-ui);color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+.tip-card .v{font-weight:900;font-size:15px;margin-bottom:4px;}
+.tip-card .s{font-size:13px;color:var(--muted);font-weight:600;line-height:1.5;}
+
+/* ==========================================================================
+   6. Site header (markup injected by nav.js)
+   ========================================================================== */
+#site-header{
+  position:sticky;top:0;z-index:30;
+  background:var(--header-bg);
+  border-bottom:var(--bw) solid var(--line);
+}
+.site-header__inner{
+  max-width:1180px;margin:0 auto;
+  padding:12px clamp(18px,3.5vw,48px);
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:8px 14px;font-family:var(--font-ui);
+}
+.site-header__brand-row{display:inline-flex;align-items:center;gap:10px;flex-shrink:0;}
+.hub-back{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--line);background:var(--white);
+  font-size:14px;font-weight:900;color:var(--muted);
+  text-decoration:none;flex-shrink:0;line-height:1;
+}
+.hub-back:hover{border-color:var(--accent);color:var(--accent);}
+
+.site-header__brand{
+  display:inline-flex;align-items:center;gap:10px;
+  font-weight:900;font-size:17px;color:var(--ink);text-decoration:none;
+  letter-spacing:-0.01em;background:none;border:0;padding:0;cursor:pointer;
+}
+.site-header__brand .brand-mark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:10px;
+  background:var(--navy);color:var(--on-accent);
+  font-size:17px;font-weight:900;line-height:1;
+  box-shadow:0 3px 0 var(--navy-press);flex-shrink:0;
+}
+.site-header__groups{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 2px;flex:1 1 auto;min-width:0;}
+
+/* Nav links are pills, not underlined tabs. */
+.nav-link{
+  font:800 13px var(--font-ui);color:var(--muted);background:none;border:0;
+  padding:9px 10px;border-radius:10px;cursor:pointer;white-space:nowrap;
+  text-decoration:none;display:inline-block;
+}
+.nav-link:hover{background:var(--tint-accent);color:var(--ink);}
+.nav-link.active{background:var(--tint-accent);color:var(--accent);}
+.nav-link .rule{display:none;} /* the old underline indicator — pills replace it */
+
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto;}
+
+/* Header streak chip (injected by nav.js). Hidden at 0 so a new user
+   doesn't see an empty flame. */
+.nav-streak{
+  display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:13.5px;
+  color:var(--amber);background:var(--tint-amber);padding:6px 11px;border-radius:var(--radius-pill);
+  text-decoration:none;white-space:nowrap;flex-shrink:0;
+}
+.nav-streak svg{width:15px;height:15px;flex-shrink:0;}
+.nav-streak[hidden]{display:none;}
+
+/* Header level badge — a ring, matching the mockup. */
+.level-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;
+  border:2px solid var(--accent);background:var(--tint-accent);color:var(--accent);
+  font:900 11.5px var(--font-ui);text-decoration:none;flex-shrink:0;
+}
+.level-badge:hover{background:var(--accent);color:var(--on-accent);}
+
+.theme-toggle{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;
+  border:2px solid var(--line);background:var(--white);color:var(--ink);
+  cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;
+}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
+.account-btn{
+  display:inline-flex;align-items:center;height:34px;padding:0 15px;
+  border-radius:var(--radius-pill);border:2px solid var(--line);background:var(--white);
+  color:var(--ink);font-family:var(--font-ui);font-weight:800;font-size:12.5px;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;max-width:130px;overflow:hidden;text-overflow:ellipsis;
+}
+.account-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+.site-nav-fallback{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:24px;font-family:var(--font-ui);}
+.site-nav-fallback a{color:var(--accent);text-decoration:none;}
+.site-nav-fallback a:hover{text-decoration:underline;}
+
+/* Below this width the seven nav pills no longer fit beside the brand and the
+   controls, so give them their own centered row rather than letting flex-wrap
+   strand the controls under the brand. */
+@media (max-width:1160px){
+  .site-header__groups{order:3;flex-basis:100%;justify-content:flex-start;}
+}
+@media (max-width:640px){
+  .site-header__brand-row{flex:1 1 auto;}
+  .site-header__groups{gap:2px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .site-header__groups::-webkit-scrollbar{display:none;}
+  .hub-back{display:none;}
+}
+
+/* ==========================================================================
+   7. Notices, footer, modal, print
+   ========================================================================== */
+.warning{
+  background:var(--tint-amber);border:var(--bw) solid var(--amber);
+  border-radius:var(--radius);padding:14px 18px;box-shadow:0 3px 0 var(--amber-press);
+  font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:32px;
+}
+.warning b{display:block;margin-bottom:4px;font-weight:900;}
+
+footer{
+  font-family:var(--font-ui);font-weight:600;
+  margin-top:48px;font-size:12.5px;color:var(--muted);max-width:60ch;
+}
+
 ::selection{background:var(--accent);color:var(--on-accent);}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px;}
 html{scrollbar-color:var(--muted) transparent;}
 ::-webkit-scrollbar{width:10px;height:10px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--accent);}
-.warning{
-  background:#FBF0E9;border:1px solid #E8C4A8;border-radius:var(--radius-sm);padding:14px 16px;
-  font-size:13.5px;color:#7A4A2A;margin-bottom:32px;
-}
-:root[data-theme="dark"] .warning{background:#3A2A1C;border-color:#5C4530;color:#E8C4A8;}
-.warning b{display:block;margin-bottom:4px;}
-
-footer{
-  font-family:var(--font-ui);
-  margin-top:44px;font-size:12px;color:var(--muted);max-width:58ch;
-}
-
-/* Smooth, subtle motion on interactive elements site-wide. */
-button, a, .theme-toggle, .nav-group summary{
-  transition:background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .1s ease;
-}
-button:active{transform:scale(0.98);}
-
-/* ---- Theme toggle button (injected by nav.js) ---- */
-.theme-toggle{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:32px;height:32px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:var(--white);
-  color:var(--ink);
-  cursor:pointer;
-  font-size:15px;
-  line-height:1;
-  flex-shrink:0;
-}
-.theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
-
-/* ---- Level badge (injected by nav.js into the header, next to the theme toggle) ---- */
-.level-badge{
-  display:inline-flex;
-  align-items:center;
-  height:32px;
-  padding:0 12px;
-  border-radius:999px;
-  border:1px solid var(--warn);
-  background:var(--tint-warn);
-  color:var(--warn);
-  font-family:var(--font-ui);
-  font-weight:800;
-  font-size:12.5px;
-  letter-spacing:0.01em;
-  text-decoration:none;
-  white-space:nowrap;
-  flex-shrink:0;
-}
-.level-badge:hover{background:var(--warn);color:var(--on-accent);}
-
-/* ---- Account button (injected by nav.js) + sign-in/sign-up modal ----
-   Login is optional — the account button just adds cross-device sync of
-   progress on top of the localStorage-only experience everyone already has. */
-.account-btn{
-  display:inline-flex;
-  align-items:center;
-  height:32px;
-  padding:0 14px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:var(--white);
-  color:var(--ink);
-  font-family:var(--font-ui);
-  font-weight:700;
-  font-size:12.5px;
-  cursor:pointer;
-  white-space:nowrap;
-  flex-shrink:0;
-  max-width:120px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.account-btn:hover{border-color:var(--accent);color:var(--accent);}
 
 .auth-modal-overlay{
-  position:fixed;inset:0;background:rgba(22,51,46,0.45);
-  display:flex;align-items:center;justify-content:center;
-  padding:20px;z-index:1000;
+  position:fixed;inset:0;background:rgba(14,38,32,0.5);
+  display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000;
   opacity:0;pointer-events:none;transition:opacity .15s;
 }
 .auth-modal-overlay.open{opacity:1;pointer-events:auto;}
 .auth-modal{
-  position:relative;width:100%;max-width:360px;
-  background:var(--white);border-radius:var(--radius);
-  box-shadow:var(--shadow-pop);padding:28px 24px 24px;
+  position:relative;width:100%;max-width:380px;
+  background:var(--white);border:var(--bw) solid var(--line);border-radius:var(--radius-lg);
+  box-shadow:0 8px 0 var(--line);padding:28px 26px 24px;
   font-family:var(--font-ui);color:var(--ink);
 }
-.auth-modal h2{margin:0 0 6px;font-family:var(--font-display);font-size:20px;}
-.auth-modal-sub{margin:0 0 18px;font-size:13px;color:var(--muted);line-height:1.5;}
+.auth-modal h2{margin:0 0 6px;font-size:21px;font-weight:900;}
+.auth-modal-sub{margin:0 0 18px;font-size:13px;font-weight:600;color:var(--muted);line-height:1.5;}
 .auth-modal-close{
-  position:absolute;top:14px;right:14px;width:26px;height:26px;
+  position:absolute;top:14px;right:14px;width:28px;height:28px;
   border:none;background:transparent;color:var(--muted);cursor:pointer;
   font-size:20px;line-height:1;border-radius:50%;
 }
 .auth-modal-close:hover{background:var(--hover-tint);color:var(--ink);}
 .auth-modal form{display:flex;flex-direction:column;gap:12px;}
-.auth-modal label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700;color:var(--muted);}
+.auth-modal label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
 .auth-modal label[hidden]{display:none;}
 .auth-modal input{
-  font-family:inherit;font-size:14.5px;padding:9px 11px;
-  border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--paper);color:var(--ink);
+  font-family:inherit;font-size:14.5px;font-weight:700;padding:11px 13px;
+  border:var(--bw) solid var(--line);border-radius:var(--radius-sm);
+  background:var(--paper);color:var(--ink);
 }
 .auth-modal input:focus{outline:none;border-color:var(--accent);}
-.auth-modal-msg{font-size:12.5px;min-height:1.4em;}
+.auth-modal-msg{font-size:12.5px;font-weight:700;min-height:1.4em;}
 .auth-modal-msg.error{color:var(--bad);}
 .auth-modal-msg.success{color:var(--good);}
-.auth-modal-submit{
-  margin-top:2px;padding:11px;border:none;border-radius:var(--radius-sm);
-  background:var(--navy);color:var(--on-accent);font-family:inherit;font-weight:700;font-size:14.5px;cursor:pointer;
-}
-.auth-modal-submit:hover{background:var(--navy2);}
-.auth-modal-submit:disabled{opacity:0.6;cursor:not-allowed;}
-.auth-modal-toggle{margin:16px 0 0;font-size:12.5px;color:var(--muted);text-align:center;}
+.auth-modal-submit{margin-top:4px;width:100%;padding:13px;font-size:14.5px;}
+.auth-modal-toggle{margin:16px 0 0;font-size:12.5px;font-weight:700;color:var(--muted);text-align:center;}
 .auth-modal-toggle button{
-  border:none;background:transparent;color:var(--accent);font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer;padding:0;
+  border:none;background:transparent;color:var(--accent);font-family:inherit;
+  font-weight:900;font-size:12.5px;cursor:pointer;padding:0;
 }
 .auth-modal-toggle button:hover{text-decoration:underline;}
 
-/* ---- Print stylesheet: applies on every page ---- */
 @media print{
-  #site-header, .site-nav-fallback, .theme-toggle, button,
-  .start-btn, .review-btn, .domain-btn, .planner-row button,
-  #searchBox, .print-btn, .auth-modal-overlay{ display:none !important; }
+  #site-header,.site-nav-fallback,.theme-toggle,button,
+  .start-btn,.review-btn,.domain-btn,.planner-row button,
+  #searchBox,.print-btn,.auth-modal-overlay{display:none !important;}
   body{background:#fff !important;color:#000 !important;}
   a{color:#000 !important;text-decoration:underline;}
-  .wrap{max-width:100% !important;padding:0 !important;}
+  .wrap,.xshell{max-width:100% !important;padding:0 !important;}
+  .card,.panel,.stat-card,.tip-card{box-shadow:none !important;}
 }
 
-/* ---- Shared site header: a full-bleed sticky flat nav bar (injected by
-   nav.js into #site-header). Every page places the #site-header mount as
-   the first child of <body>, ahead of its own .wrap/.xshell content, so
-   the bar itself can span the full viewport width while its contents stay
-   aligned to the same 1120px measure as the page below it. ---- */
-#site-header{
-  position:sticky;
-  top:0;
-  z-index:30;
-  background:var(--header-bg);
-  -webkit-backdrop-filter:blur(8px);
-  backdrop-filter:blur(8px);
-  border-bottom:1px solid var(--line);
-}
-
-.site-header__inner{
-  max-width:1120px;
-  margin:0 auto;
-  padding:14px clamp(20px,4vw,56px);
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px 20px;
-  font-family:var(--font-ui);
-}
-
-.site-header__brand-row{
-  display:inline-flex;
-  align-items:center;
-  gap:14px;
-}
-.hub-back{
-  font-size:12.5px;
-  font-weight:700;
-  color:var(--muted);
-  text-decoration:none;
-  white-space:nowrap;
-}
-.hub-back:hover{color:var(--accent);}
-
-.site-header__brand{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-weight:800;
-  font-size:15px;
-  color:var(--ink);
-  text-decoration:none;
-  letter-spacing:-0.01em;
-  background:none;
-  border:0;
-  padding:0;
-  cursor:pointer;
-}
-.site-header__brand:hover{color:var(--accent);}
-.site-header__brand .brand-mark{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:26px;height:26px;
-  border-radius:8px;
-  background:linear-gradient(155deg,var(--accent),var(--navy2));
-  color:var(--on-accent);
-  font-size:13px;
-  line-height:1;
-  box-shadow:0 2px 6px -1px rgba(22,51,46,0.35);
-}
-
-.site-header__groups{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:4px 2px;
-}
-
-.nav-link{
-  font:700 13.5px var(--font-ui);
-  color:var(--muted);
-  background:none;
-  border:0;
-  padding:7px 11px;
-  border-radius:6px;
-  cursor:pointer;
-  white-space:nowrap;
-  text-decoration:none;
-  display:inline-block;
-}
-.nav-link:hover{color:var(--ink);background:var(--hover-tint);}
-.nav-link.active{color:var(--ink);}
-.nav-link .rule{height:2px;border-radius:2px;margin-top:5px;background:transparent;}
-.nav-link.active .rule{background:var(--accent);}
-
-/* No-JS fallback list (hidden once nav.js successfully renders) */
-.site-nav-fallback{font-size:13px;color:var(--muted);margin-bottom:24px;font-family:var(--font-ui);}
-.site-nav-fallback a{color:var(--accent);text-decoration:none;}
-.site-nav-fallback a:hover{text-decoration:underline;}
-
-@media (max-width:640px){
-  .site-header__inner{flex-direction:column;align-items:flex-start;}
-  .site-header__groups{gap:2px;}
+@media (max-width:900px){
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  /* One spine down the left, every label to its right. */
+  .path{max-width:none;}
+  .path::before{left:38px;}
+  .node{grid-template-columns:76px 1fr;gap:14px;}
+  .node .node-circle{grid-column:1;}
+  .node.left .node-text,.node.right .node-text,.node.center .node-text{
+    grid-column:2;justify-self:start;text-align:left;
+  }
 }
