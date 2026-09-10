@@ -126,6 +126,14 @@
       '<rect x="3.5" y="5" width="17" height="15" rx="2" stroke="currentColor" stroke-width="2"/>' +
       '<path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
     '</svg>';
+  // Header search icon — links straight to search.html. Previously the only
+  // way in was a text link buried at the bottom of tools.html, which made
+  // the whole feature effectively undiscoverable.
+  var SEARCH_SVG =
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+      '<circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2"/>' +
+      '<path d="M19.5 19.5l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+    '</svg>';
 
   function streakDayKey(offset){
     var d = new Date();
@@ -205,6 +213,7 @@
           '<a href="dashboard.html" class="nav-streak" id="navStreak" title="Daily streak" hidden>' + FLAME_SVG + '<span id="navStreakCount">0</span></a>' +
           '<a href="dashboard.html' + (cur === 'dashboard.html' ? '#levelSection' : '') + '" class="level-badge" id="levelBadge" title="Your level">L1</a>' +
           '<span id="accountSlot"></span>' +
+          '<a href="search.html" class="theme-toggle" aria-label="Search" title="Search">' + SEARCH_SVG + '</a>' +
           '<button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">\u25D1</button>' +
         '</div>' +
       '</div>';

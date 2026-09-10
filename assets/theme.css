@@ -566,8 +566,10 @@ strong,b{font-weight:900;}
   width:34px;height:34px;border-radius:50%;
   border:2px solid var(--line);background:var(--white);color:var(--ink);
   cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;
+  text-decoration:none;
 }
 .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
+.theme-toggle svg{width:16px;height:16px;}
 
 .account-btn{
   display:inline-flex;align-items:center;height:34px;padding:0 15px;
