@@ -83,7 +83,7 @@
   const resultsEl = document.getElementById('results');
   const searchBox = document.getElementById('searchBox');
 
-  // The 978-question bank in practice.html is 1.6MB inline and not something
+  // The 1,078-question bank in practice.html is 1.6MB inline and not something
   // worth indexing client-side here. Instead, when a query looks like it's
   // about one of the six exam domains, surface a direct deep link into
   // practice.html's existing ?domain= filter (the same param the homepage's
@@ -114,7 +114,7 @@
       resultsEl.before(cta);
     }
     cta.innerHTML = `
-      <span class="t"><b>Question bank</b>Practice ${escapeHtml(domain)} questions from the 978-question bank</span>
+      <span class="t"><b>Question bank</b>Practice ${escapeHtml(domain)} questions from the 1,078-question bank</span>
       <a href="practice.html?domain=${encodeURIComponent(domain)}" class="btn-press alt sm">Practice this in the question bank &rarr;</a>
     `;
   }
