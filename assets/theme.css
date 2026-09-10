@@ -547,6 +547,11 @@ strong,b{font-weight:900;}
 }
 .nav-streak svg{width:15px;height:15px;flex-shrink:0;}
 
+/* Exam-countdown chip (injected by nav.js). Same pill treatment as the
+   streak chip but in the accent teal, so the two read as distinct signals
+   at a glance. Hidden unless an exam date is set and still in the future. */
+.nav-exam{color:var(--accent);background:var(--tint-accent);}
+
 /* Header level badge — a ring, matching the mockup. */
 .level-badge{
   display:inline-flex;align-items:center;justify-content:center;

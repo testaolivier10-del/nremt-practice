@@ -121,6 +121,11 @@
     '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
       '<path d="M12 2c1 4-3 5-3 9a3 3 0 006 0c1.5 1 2 3 2 4.5A5.5 5.5 0 0111.5 21 6 6 0 016 15c0-5 4-6 4-9 0-1.5-.5-2.5-1-3.5C10.5 2 11 2 12 2z" fill="currentColor"/>' +
     '</svg>';
+  var CALENDAR_SVG =
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+      '<rect x="3.5" y="5" width="17" height="15" rx="2" stroke="currentColor" stroke-width="2"/>' +
+      '<path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+    '</svg>';
 
   function streakDayKey(offset){
     var d = new Date();
@@ -147,6 +152,33 @@
     el.title = n + '-day study streak';
   }
 
+  // ---- Exam-countdown chip. Reads the exam date study-plan.html persists
+  // (nremt_exam_date), same hidden-unless-set pattern as the streak chip:
+  // no chip at all until a date is set, and it hides itself again once the
+  // date is in the past rather than showing a negative count. ----
+  var EXAM_DATE_KEY = 'nremt_exam_date';
+  function daysUntilExam(){
+    var raw;
+    try{ raw = localStorage.getItem(EXAM_DATE_KEY); }catch(e){ return null; }
+    if(!raw) return null;
+    var target = new Date(raw + 'T00:00:00');
+    if(isNaN(target.getTime())) return null;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((target - today) / 86400000);
+  }
+  function renderNavExamCountdown(){
+    var el = document.getElementById('navExamDate');
+    if(!el) return;
+    var d = daysUntilExam();
+    el.hidden = d === null || d < 0;
+    if(el.hidden) return;
+    var label = d === 0 ? 'Exam today' : d + ' day' + (d === 1 ? '' : 's') + ' left';
+    var count = document.getElementById('navExamDateCount');
+    if(count) count.textContent = label;
+    el.title = 'Exam date set on the Study Plan page';
+  }
+
   function renderHeader(){
     var mount = document.getElementById('site-header');
     if(!mount) return;
@@ -169,6 +201,7 @@
         '</span>' +
         '<nav class="site-header__groups" aria-label="Site sections">' + itemsHtml + '</nav>' +
         '<div class="nav-right">' +
+          '<a href="study-plan.html" class="nav-streak nav-exam" id="navExamDate" title="Exam countdown" hidden>' + CALENDAR_SVG + '<span id="navExamDateCount"></span></a>' +
           '<a href="dashboard.html" class="nav-streak" id="navStreak" title="Daily streak" hidden>' + FLAME_SVG + '<span id="navStreakCount">0</span></a>' +
           '<a href="dashboard.html' + (cur === 'dashboard.html' ? '#levelSection' : '') + '" class="level-badge" id="levelBadge" title="Your level">L1</a>' +
           '<span id="accountSlot"></span>' +
@@ -181,6 +214,7 @@
 
     renderLevelBadge();
     renderNavStreak();
+    renderNavExamCountdown();
     renderAccountUI();
 
     var toggle = document.getElementById('themeToggle');

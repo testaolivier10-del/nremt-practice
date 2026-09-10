@@ -88,6 +88,11 @@
           <input type="number" id="daysInput" min="1" placeholder="10">
           <button id="planBtn" class="btn-dark">Build my plan</button>
         </div>
+        <div class="planner-row" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:10px">
+          <label for="examDateInput" style="font-size:16px;color:var(--muted)">Or set your exam date</label>
+          <input type="date" id="examDateInput">
+          <span class="empty-note" id="examDateNote" style="font-size:13px"></span>
+        </div>
         <div class="plan-output" id="planOutput"></div>
       </div>
     </div>
@@ -154,6 +159,47 @@
       .sort((a,b) => a.pct - b.pct)
       .slice(0, limit || 2);
   }
+
+  // Persisted exam date, read by assets/nav.js to show a "N days left" chip
+  // in the header on every page. Kept separate from the days-until-exam
+  // planner input above (which is a one-off "build me a plan" number, not
+  // something that should silently go stale).
+  const EXAM_DATE_KEY = 'nremt_exam_date';
+  const examDateInput = document.getElementById('examDateInput');
+  const examDateNote = document.getElementById('examDateNote');
+
+  function daysUntil(dateStr){
+    const target = new Date(dateStr + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    return Math.round((target - today) / 86400000);
+  }
+
+  function refreshExamDateNote(){
+    const saved = localStorage.getItem(EXAM_DATE_KEY);
+    if(!saved){ examDateNote.textContent = ''; return; }
+    const d = daysUntil(saved);
+    examDateNote.textContent = d > 0
+      ? `Saved — ${d} day${d===1?'':'s'} left. Shows in the header on every page.`
+      : d === 0
+        ? 'Saved — that’s today.'
+        : 'Saved date has passed.';
+  }
+
+  const savedExamDate = localStorage.getItem(EXAM_DATE_KEY);
+  if(savedExamDate) examDateInput.value = savedExamDate;
+  refreshExamDateNote();
+
+  examDateInput.addEventListener('change', () => {
+    if(examDateInput.value){
+      localStorage.setItem(EXAM_DATE_KEY, examDateInput.value);
+      const d = daysUntil(examDateInput.value);
+      if(d > 0) document.getElementById('daysInput').value = d;
+    } else {
+      localStorage.removeItem(EXAM_DATE_KEY);
+    }
+    refreshExamDateNote();
+  });
 
   document.getElementById('planBtn').addEventListener('click', () => {
     const days = parseInt(document.getElementById('daysInput').value, 10);
