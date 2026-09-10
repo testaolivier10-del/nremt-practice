@@ -130,6 +130,10 @@
    ========================================================================== */
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
+/* Components in this system set explicit display values (inline-flex chips,
+   flex cards), which otherwise beat the hidden attribute's UA rule — so the
+   streak chip would still show at zero. */
+[hidden]{display:none !important;}
 body{
   background:var(--paper);
   color:var(--ink);
@@ -537,7 +541,6 @@ strong,b{font-weight:900;}
   text-decoration:none;white-space:nowrap;flex-shrink:0;
 }
 .nav-streak svg{width:15px;height:15px;flex-shrink:0;}
-.nav-streak[hidden]{display:none;}
 
 /* Header level badge — a ring, matching the mockup. */
 .level-badge{
