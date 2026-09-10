@@ -298,7 +298,12 @@ strong,b{font-weight:900;}
   background:var(--white);border:var(--bw) solid var(--line);
   border-radius:var(--radius-lg);padding:22px 24px;box-shadow:var(--lift-lg);
 }
-.xgrid:has(> .xlabel) > .xcontent.narrow{max-width:74ch;}
+/* .narrow keeps prose at a readable measure, but pinning that measure to the
+   left inside the full 1180px shell just strands empty space on the right.
+   Centering the whole labelled card (heading + panel) as one ~820px column
+   keeps the readable width without the lopsided gap. */
+.xgrid:has(> .xlabel) > .xcontent.narrow{max-width:none;}
+.xgrid:has(> .xcontent.narrow){max-width:820px;margin-left:auto;margin-right:auto;}
 
 /* Tool tiles on the Tools page: the whole card is the link. */
 .tool-card{

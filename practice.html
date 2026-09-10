@@ -31,6 +31,11 @@
      The reset, page shell, typography and button/card primitives live there;
      this file only styles what is specific to the exam runner. */
 
+  /* The shared .wrap measure (760px) is right for prose tool pages, but it
+     leaves large dead margins on an exam page full of grids and stat tiles.
+     Widen just this page. */
+  .wrap{max-width:960px;}
+
   h1{margin:6px 0 16px;max-width:22ch;}
   .lede{max-width:52ch;}
   .backlink{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:18px;display:inline-block;}
