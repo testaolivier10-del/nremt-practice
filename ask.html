@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>try{if(localStorage.getItem("nremt_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon.svg">
+<meta name="theme-color" content="#16332E">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask — LevlPrep</title>
+<meta name="description" content="Ask a question about anything on this site and get an answer pulled from the study notes, glossary, mnemonics, flow diagrams and skill sheets.">
+<meta property="og:site_name" content="LevlPrep">
+<meta property="og:title" content="Ask LevlPrep — your questions, answered from the study material">
+<meta property="og:description" content="Ask follow-up questions about anything on the site. Answers are drawn from this site's own notes and glossary, with links to the source.">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+  .ask-note{
+    display:flex;gap:12px;align-items:flex-start;
+    background:var(--tint-accent);border:var(--bw) solid var(--accent);border-radius:16px;
+    padding:14px 16px;margin:22px 0 0;
+  }
+  .ask-note .t{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.5;}
+  .ask-note .t b{display:block;font:900 11px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;}
+</style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <noscript><div class="site-nav-fallback" style="max-width:1120px;margin:0 auto;padding:14px clamp(20px,4vw,56px)"><a href="index.html">Home</a> · <a href="practice.html">Practice</a> · <a href="study-plan.html">Study Plan</a> · <a href="study-notes.html">Notes</a> · <a href="mnemonics.html">Mnemonics</a> · <a href="glossary.html">Glossary</a> · <a href="tools.html">Tools</a> · <a href="dashboard.html">Dashboard</a></div></noscript>
+<div class="wrap">
+  <div class="eyebrow">Tools</div>
+  <h1>Ask</h1>
+  <p class="lede">Stuck on something, or want a point explained a different way? Ask here. Answers come from this site's own study notes, glossary, mnemonics, flow diagrams and skill sheets — with a link to exactly where it came from.</p>
+
+  <div id="askMount"></div>
+
+  <div class="ask-note">
+    <span class="t"><b>How this works</b>
+      Your question is matched against the material on this site and the closest passage is quoted back to you. It runs entirely in your browser, so it works offline and nothing is sent anywhere. If the answer isn't on the site, it will say so rather than invent one — for anything clinical, your protocols and medical direction are the authority.
+    </span>
+  </div>
+
+  <footer>
+    <p>Can't find it here? Try the <a href="search.html">full-text search</a> or the <a href="study-notes.html">study notes</a>.</p>
+  </footer>
+</div>
+
+<script>window.LEVLPREP_TUTOR_INLINE = 'askMount';</script>
+<script src="assets/tutor.js"></script>
+<script src="assets/chime.js"></script>
+<script src="assets/nav.js" defer></script>
+</body>
+</html>

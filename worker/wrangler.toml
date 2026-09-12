@@ -1,0 +1,16 @@
+name = "levlprep-ask"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+# Workers AI. Free accounts get a daily allowance; past it, requests fail and
+# the site falls back to its own answers. No card, no overage.
+[ai]
+binding = "AI"
+
+# Per-IP throttle: 12 questions a minute is plenty for a human studying and
+# useless to anyone trying to burn through the daily allowance.
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 12, period = 60 }

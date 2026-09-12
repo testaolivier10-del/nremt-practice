@@ -20,7 +20,7 @@
 
   // Pages that live "under" Tools (linked from the tools.html hub) but keep
   // their own URL — the Tools nav link should still read as active on them.
-  var TOOLS_SUBPAGES = ['tools.html', 'body-map.html', 'sound-trainer.html', 'scenario-sim.html', 'skillsheets.html', 'flowcharts.html', 'search.html'];
+  var TOOLS_SUBPAGES = ['tools.html', 'body-map.html', 'sound-trainer.html', 'scenario-sim.html', 'skillsheets.html', 'flowcharts.html', 'search.html', 'ask.html'];
 
   function currentFile(){
     var p = location.pathname.split('/').pop();
