@@ -27,6 +27,7 @@
   'use strict';
 
   var ENDPOINT_KEY = 'levlprep_ai_endpoint';
+  var MET_KEY = 'levlprep_ai_met';
 
   // Pages worth reading to answer a question. practice.html is deliberately
   // absent: it's 2.3MB of inline question bank, and parsing it would cost more
@@ -564,13 +565,48 @@
   }
 
   // ------------------------------------------------------------------- view
+  // The Assistant — the site's mascot, and the only way into the tutor.
+  // One drawing, used at 58px in the corner and 26px in the panel header, so
+  // the character stays the same object wherever it appears. The antenna light
+  // pulses on idle and the eyes widen on hover; both stop under
+  // prefers-reduced-motion.
+  function mascotSvg(cls){
+    return '<svg class="' + (cls || '') + '" viewBox="0 0 120 120" aria-hidden="true" focusable="false">'
+      +   '<rect width="120" height="120" rx="26" fill="#16332E"/>'
+      +   '<g class="lp-bob">'
+      +     '<path d="M60 31 L60 19" stroke="#2C9C8B" stroke-width="4" stroke-linecap="round"/>'
+      +     '<circle class="lp-blip" cx="60" cy="15" r="5.2" fill="#C9973A"/>'
+      +     '<rect x="27" y="30" width="66" height="53" rx="17" fill="#2C9C8B"/>'
+      +     '<rect x="35" y="42" width="50" height="27" rx="13.5" fill="#16332E"/>'
+      +     '<circle class="lp-eye" cx="49" cy="55.5" r="4.6" fill="#3FBBA6"/>'
+      +     '<circle class="lp-eye" cx="71" cy="55.5" r="4.6" fill="#3FBBA6"/>'
+      +     '<rect x="45" y="86" width="30" height="8" rx="4" fill="#2C9C8B" opacity=".75"/>'
+      +   '</g>'
+      + '</svg>';
+  }
+
   var CSS = [
-    '.lp-launch{position:fixed;right:20px;bottom:20px;z-index:900;display:flex;align-items:center;gap:9px;',
-      'padding:13px 18px;border:var(--bw) solid var(--line);border-radius:999px;background:var(--accent);',
-      'color:var(--on-accent);font:900 14px var(--font-ui);cursor:pointer;box-shadow:0 5px 0 var(--accent-press);}',
-    '.lp-launch:active{transform:translateY(4px);box-shadow:0 1px 0 var(--accent-press);}',
-    '.lp-launch svg{width:18px;height:18px;}',
-    '@media(max-width:520px){.lp-launch{right:14px;bottom:14px;padding:12px 15px;font-size:13px;}}',
+    '.lp-launch{position:fixed;right:20px;bottom:20px;z-index:900;width:58px;height:58px;padding:0;',
+      'border:none;background:transparent;cursor:pointer;line-height:0;',
+      'filter:drop-shadow(0 4px 10px rgba(0,0,0,.26));transition:transform .16s ease;}',
+    '.lp-launch svg{width:100%;height:100%;display:block;border-radius:18px;}',
+    '.lp-launch:hover{transform:translateY(-2px) scale(1.04);}',
+    '.lp-launch:active{transform:translateY(1px) scale(.98);}',
+    '.lp-launch:hover .lp-eye{r:5.6;}',
+    // A mascot with no label is a mystery button on first visit, so it says
+    // what it is until someone has actually opened it once.
+    '.lp-tip{position:fixed;right:86px;bottom:34px;z-index:900;background:var(--navy);color:#fff;',
+      'font:800 12.5px var(--font-ui);padding:7px 12px;border-radius:10px;white-space:nowrap;',
+      'pointer-events:none;opacity:0;transform:translateX(6px);transition:opacity .18s ease, transform .18s ease;}',
+    '.lp-tip.show{opacity:1;transform:translateX(0);}',
+    '.lp-bob{transform-box:fill-box;transform-origin:center;animation:lpbob 4.2s ease-in-out infinite;}',
+    '@keyframes lpbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}',
+    '.lp-blip{animation:lppulse 2.4s ease-in-out infinite;}',
+    '@keyframes lppulse{0%,100%{opacity:1}50%{opacity:.35}}',
+    '.lp-avatar{width:26px;height:26px;flex:none;}',
+    '.lp-avatar svg{width:100%;height:100%;border-radius:8px;display:block;}',
+    '@media(prefers-reduced-motion:reduce){.lp-bob,.lp-blip{animation:none;}.lp-launch{transition:none;}}',
+    '@media(max-width:520px){.lp-launch{right:14px;bottom:14px;width:52px;height:52px;}.lp-tip{display:none;}}',
     '.lp-panel{position:fixed;right:20px;bottom:20px;z-index:901;width:min(408px,calc(100vw - 32px));',
       'height:min(620px,calc(100vh - 40px));display:flex;flex-direction:column;background:var(--paper);',
       'border:var(--bw) solid var(--line);border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.22);overflow:hidden;}',
@@ -644,6 +680,7 @@
     root.className = 'lp-panel';
     root.innerHTML =
       '<div class="lp-head">'
+      +  '<span class="lp-avatar">' + mascotSvg() + '</span>'
       +  '<b>Ask LevlPrep<span class="lp-sub" data-role="mode"></span></b>'
       +  '<button class="lp-icon" data-act="settings" title="Settings" aria-label="Tutor settings">⚙</button>'
       +  (opts.inline ? '' : '<button class="lp-icon" data-act="close" title="Close" aria-label="Close">✕</button>')
@@ -800,12 +837,28 @@
     var btn = document.createElement('button');
     btn.className = 'lp-launch';
     btn.type = 'button';
-    btn.setAttribute('aria-label', 'Ask a question about this site');
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L3 21l1.1-4.6A8.4 8.4 0 1 1 21 11.5z"/></svg><span>Ask</span>';
+    btn.setAttribute('aria-label', 'Ask the study assistant');
+    btn.innerHTML = mascotSvg();
     document.body.appendChild(btn);
+
+    var tip = document.createElement('div');
+    tip.className = 'lp-tip';
+    tip.textContent = 'Ask me anything';
+    document.body.appendChild(tip);
+
+    var met = false;
+    try { met = localStorage.getItem(MET_KEY) === '1'; } catch(e){}
+    if(!met) setTimeout(function(){ tip.classList.add('show'); }, 1200);
+    btn.addEventListener('mouseenter', function(){ tip.classList.add('show'); });
+    btn.addEventListener('mouseleave', function(){ if(met) tip.classList.remove('show'); });
 
     var host = null, tutor = null;
     function close(){ if(host) host.style.display = 'none'; btn.style.display = ''; }
+    function meet(){
+      met = true;
+      tip.classList.remove('show');
+      try { localStorage.setItem(MET_KEY, '1'); } catch(e){}
+    }
     btn.addEventListener('click', function(){
       if(!host){
         host = document.createElement('div');
@@ -815,6 +868,7 @@
         host.style.display = '';
       }
       btn.style.display = 'none';
+      meet();
       setTimeout(function(){ tutor.input.focus(); }, 50);
     });
     document.addEventListener('keydown', function(e){
