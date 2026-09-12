@@ -342,6 +342,9 @@ function submitAnswer(chosenId, round){
 
   const fb = document.getElementById('quizFeedback');
   fb.classList.add('visible');
+  // Reported either way: a miss makes no sound but still resets the rising run
+  // the chime walks up on a streak.
+  if(window.LevlSound) window.LevlSound.answer(correct);
   fb.innerHTML = `
     <div class="feedback-verdict ${correct ? 'correct' : 'incorrect'}">${correct ? 'Correct — that\'s ' + round.label + '.' : 'Not quite — that was ' + round.label + '.'}</div>
     <p>${round.clinical}</p>
@@ -356,6 +359,7 @@ function submitAnswer(chosenId, round){
 function renderResults(){
   const box = document.getElementById('quizBox');
   const pct = Math.round((quizState.score / quizState.rounds.length) * 100);
+  if(window.LevlSound) window.LevlSound.flourish(quizState.score / quizState.rounds.length);
   box.innerHTML = `
     <div class="results-box">
       <div class="quiz-progress">Quiz complete</div>
@@ -373,6 +377,7 @@ function renderResults(){
 renderListenSection();
 renderQuizRound();
 </script>
+<script src="assets/chime.js"></script>
 <script src="assets/nav.js" defer></script>
 </body>
 </html>

@@ -135,6 +135,35 @@
       '<path d="M19.5 19.5l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
     '</svg>';
 
+  /* Two speaker glyphs for the correct-answer chime's mute switch: waves on when
+     it's on, a slash when it's muted. */
+  var SPEAKER_ON =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M11 5 6 9H3v6h3l5 4V5z" fill="currentColor" stroke="none"/>' +
+      '<path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/>' +
+    '</svg>';
+  var SPEAKER_OFF =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M11 5 6 9H3v6h3l5 4V5z" fill="currentColor" stroke="none"/>' +
+      '<path d="M16 9.5l5 5"/><path d="M21 9.5l-5 5"/>' +
+    '</svg>';
+
+  /* Keeps the button's icon, tooltip and pressed state in step with the stored
+     preference — on render, and again on every change, including one that did
+     not come from this button. */
+  function syncSoundButton(btn){
+    if(!btn || !window.LevlSound) return;
+    var on = window.LevlSound.isEnabled();
+    btn.innerHTML = on ? SPEAKER_ON : SPEAKER_OFF;
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    var label = on ? 'Turn answer sounds off' : 'Turn answer sounds on';
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+    btn.classList.toggle('is-muted', !on);
+  }
+
   function streakDayKey(offset){
     var d = new Date();
     if(offset) d.setDate(d.getDate() + offset);
@@ -214,6 +243,9 @@
           '<a href="dashboard.html' + (cur === 'dashboard.html' ? '#levelSection' : '') + '" class="level-badge" id="levelBadge" title="Your level">L1</a>' +
           '<span id="accountSlot"></span>' +
           '<a href="search.html" class="theme-toggle" aria-label="Search" title="Search">' + SEARCH_SVG + '</a>' +
+          (window.LevlSound
+            ? '<button type="button" class="theme-toggle sound-toggle" id="soundToggle"></button>'
+            : '') +
           '<button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">\u25D1</button>' +
         '</div>' +
       '</div>';
@@ -225,6 +257,13 @@
     renderNavStreak();
     renderNavExamCountdown();
     renderAccountUI();
+
+    var sound = document.getElementById('soundToggle');
+    if(sound && window.LevlSound){
+      syncSoundButton(sound);
+      window.LevlSound.onChange(function(){ syncSoundButton(sound); });
+      sound.addEventListener('click', function(){ window.LevlSound.toggle(); });
+    }
 
     var toggle = document.getElementById('themeToggle');
     if(toggle) toggle.addEventListener('click', function(){

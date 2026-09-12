@@ -4084,6 +4084,12 @@ function showResults(){
   if(mode !== 'adaptive') recordStudyActivity(activeIndices.length);
   awardQuizXp(domainStats, score);
 
+  /* The one page here with no per-answer chime: this quiz withholds right/wrong
+     until you submit, the way the real exam does, so a sound on selection would
+     hand you the answer. The reward lands here instead, on the score reveal,
+     pitched to how the attempt went. */
+  if(window.LevlSound) window.LevlSound.flourish(score / activeIndices.length);
+
   document.getElementById('scoreBig').textContent = `${score}/${activeIndices.length}`;
   document.getElementById('scoreSub').textContent = `${Math.round(score/activeIndices.length*100)}% correct — completed in ${formatDuration(elapsed)}`;
 
@@ -4187,6 +4193,7 @@ function backToStart(){
 document.getElementById('retryBtn').addEventListener('click', backToStart);
 document.getElementById('retryBtnTop').addEventListener('click', backToStart);
 </script>
+<script src="assets/chime.js"></script>
 <script src="assets/nav.js" defer></script>
 </body>
 </html>
